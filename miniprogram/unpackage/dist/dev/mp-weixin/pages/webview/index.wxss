@@ -1,0 +1,14 @@
+
+.page.data-v-b62bacda {
+	min-height: 100vh;
+	background: #fff;
+}
+.loading.data-v-b62bacda {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	font-size: 28rpx;
+	color: #999;
+}
+

@@ -1,0 +1,47 @@
+{
+  "name": "资料下载器",
+  "appid": "__UNI__XXXXXXX",
+  "description": "资源下载微信小程序",
+  "versionName": "1.0.0",
+  "versionCode": "100",
+  "transformPx": false,
+  "mp-weixin": {
+    "appid": "wx5be23d52a525cc71",
+    "setting": {
+      "urlCheck": false,
+      "es6": true,
+      "postcss": true,
+      "minified": true,
+      "newFeature": true,
+      "autoAudits": false,
+      "checkSiteMap": true,
+      "checkInvalidKey": true
+    },
+    "usingComponents": true,
+    "optimization": {
+      "subPackages": false
+    },
+    "permission": {
+      "scope.userLocation": {
+        "desc": "用于获取您的位置信息，以便推荐附近资源"
+      },
+      "scope.camera": {
+        "desc": "用于扫码识别资源二维码"
+      },
+      "scope.writePhotosAlbum": {
+        "desc": "用于保存下载的文件到相册"
+      }
+    },
+    "requiredPrivateInfos": [
+      "chooseAddress",
+      "getLocation"
+    ]
+  },
+  "vueVersion": "2",
+  "h5": {
+    "title": "资料下载器",
+    "router": {
+      "mode": "hash"
+    }
+  }
+}
