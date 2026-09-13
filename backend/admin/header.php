@@ -18,6 +18,23 @@ if (empty($csrfToken)) {
     $_SESSION['csrf_token'] = $csrfToken;
 }
 
+// 获取后台每页显示条数
+if (!function_exists('getPerPage')) {
+    function getPerPage($default = 15) {
+        static $perPage = null;
+        if ($perPage === null) {
+            try {
+                $db = \Database::getInstance();
+                $row = $db->fetch("SELECT setting_value FROM system_settings WHERE setting_key = 'admin_per_page' LIMIT 1");
+                $perPage = max(5, min(100, (int)($row['setting_value'] ?? $default)));
+            } catch (\Exception $e) {
+                $perPage = $default;
+            }
+        }
+        return $perPage;
+    }
+}
+
 $navItems = [
     ['key' => 'bigscreen',  'label' => '数据大屏',   'icon' => '🖥️', 'url' => 'bigscreen.php'],
     ['key' => 'dashboard',  'label' => '仪表盘',     'icon' => '📊', 'url' => 'dashboard.php'],
@@ -28,6 +45,7 @@ $navItems = [
     ['key' => 'viplans',    'label' => 'VIP管理',    'icon' => '⭐', 'url' => 'viplans.php'],
     ['key' => 'comments',   'label' => '评论管理',   'icon' => '💬', 'url' => 'comments.php'],
     ['key' => 'announcements', 'label' => '公告管理',   'icon' => '📢', 'url' => 'announcements.php'],
+    ['key' => 'points',      'label' => '积分管理',   'icon' => '💎', 'url' => 'points.php'],
     ['key' => 'activities',    'label' => '活动管理',   'icon' => '🎯', 'url' => 'activities.php'],
     ['key' => 'banners',    'label' => '轮播图管理', 'icon' => '🖼️', 'url' => 'banners.php'],
     ['key' => 'logs',       'label' => '操作日志',   'icon' => '📋', 'url' => 'logs.php'],
@@ -46,6 +64,7 @@ $pageTitles = [
     'viplans' => 'VIP管理',
     'comments' => '评论管理',
     'announcements' => '公告管理',
+    'points' => '积分管理',
     'activities' => '活动管理',
     'banners' => '轮播图管理',
     'logs' => '操作日志',

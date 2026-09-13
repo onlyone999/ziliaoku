@@ -216,8 +216,12 @@ export default {
 	margin: 24rpx;
 	padding: 30rpx;
 	background: #fff;
-	border-radius: 24rpx;
-	box-shadow: 0 12rpx 40rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	border-radius: 28rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 	overflow: hidden;
 }
@@ -308,8 +312,12 @@ export default {
 	margin: 0 24rpx 24rpx;
 	padding: 30rpx;
 	background: #fff;
-	border-radius: 24rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	border-radius: 28rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 /* 顶部渐变装饰线 */

@@ -7,6 +7,7 @@ session_start();
 if (empty($_SESSION['admin_id'])) { header('Location: login.php'); exit; }
 
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/helper.php';
 $db = Database::getInstance();
 
 // 自动创建 admin_logs 表（如果不存在）
@@ -35,7 +36,7 @@ $filterTarget  = trim($_GET['target_type'] ?? '');
 $dateFrom      = $_GET['date_from'] ?? '';
 $dateTo        = $_GET['date_to'] ?? '';
 $page          = max(1, (int)($_GET['page'] ?? 1));
-$perPage       = 20;
+$perPage       = getPerPage(20);
 $offset        = ($page - 1) * $perPage;
 
 $where = '1=1';

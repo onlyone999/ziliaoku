@@ -278,10 +278,14 @@ export default {
 .order-card {
 	width: 100%;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 32rpx;
 	margin-bottom: 48rpx;
-	box-shadow: 0 12rpx 40rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 	overflow: hidden;
 }
@@ -352,7 +356,9 @@ export default {
 .action-btn.primary {
 	background: linear-gradient(135deg, #2ed573 0%, #27ae60 100%);
 	color: #fff;
-	box-shadow: 0 10rpx 36rpx rgba(46,213,115, 0.3);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 .action-btn.primary::after {
 	content: '';
@@ -378,6 +384,8 @@ export default {
 	-webkit-backdrop-filter: blur(16rpx);
 
 	border: 2rpx solid rgba(46,213,115, 0.2);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.06);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.04),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 </style>

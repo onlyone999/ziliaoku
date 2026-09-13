@@ -190,7 +190,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 .main-scroll {
 	height: 100vh;
@@ -200,9 +200,13 @@ export default {
 .form-section {
 	margin: 24rpx;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 28rpx 30rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 /* 顶部渐变装饰线 */
@@ -213,7 +217,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
 	opacity: 0.4;
@@ -269,8 +273,9 @@ export default {
 	font-size: 28rpx;
 	color: #1a1a2e;
 	padding: 20rpx;
-	background: #f8f9fe;
+	background: rgba(0,0,0,0.02);
 	border-radius: 20rpx;
+	border: 1rpx solid rgba(0,0,0,0.04);
 	box-sizing: border-box;
 	line-height: 1.6;
 	border: 2rpx solid transparent;
@@ -311,14 +316,16 @@ export default {
 	margin: 40rpx 24rpx;
 }
 .submit-btn {
-	background: linear-gradient(135deg, #2ed573, #5A52D5, #1abc9c);
+	background: #2ed573;
 	text-align: center;
 	padding: 26rpx;
 	border-radius: 44rpx;
 	font-size: 30rpx;
 	font-weight: 600;
 	color: #fff;
-	box-shadow: 0 8rpx 28rpx rgba(46,213,115, 0.35);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	transition: all 0.3s ease;
 	letter-spacing: 2rpx;
 	position: relative;
@@ -375,9 +382,13 @@ export default {
 }
 .history-item {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 24rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: transform 0.2s ease;
 	position: relative;
 }
@@ -389,7 +400,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
 	opacity: 0.4;

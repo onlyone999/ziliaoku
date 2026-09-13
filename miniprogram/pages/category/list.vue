@@ -124,7 +124,6 @@ export default {
 			sortBy: 'newest',
 			resources: [],
 			page: 1,
-			pageSize: 15,
 			total: 0,
 			totalPages: 0,
 			loading: false,
@@ -327,15 +326,15 @@ export default {
 .page {
 	display: flex;
 	height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 
 /* 左侧边栏 */
 .sidebar {
 	width: 180rpx;
-	background: linear-gradient(180deg, #ffffff 0%, #fafafe 100%);
+	background: linear-gradient(180deg, #ffffff 0%, #fafbfe 100%);
 	flex-shrink: 0;
-	border-right: 1rpx solid rgba(46,213,115, 0.08);
+	border-right: 1rpx solid rgba(0,0,0,0.04);
 }
 .sidebar-scroll {
 	height: 100%;
@@ -353,6 +352,7 @@ export default {
 	font-weight: 700;
 	border-left: 6rpx solid transparent;
 	position: relative;
+	background: rgba(0,0,0,0.02);
 }
 .sidebar-indicator {
 	position: absolute;
@@ -381,7 +381,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
-	background: linear-gradient(180deg, rgba(236, 253, 245, 0.5) 0%, #f7f8fc 100%);
+	background: linear-gradient(180deg, rgba(0,0,0,0.01) 0%, #fafbfe 100%);
 }
 
 /* 子分类标签 */
@@ -494,12 +494,15 @@ export default {
 .resource-card {
 	display: flex;
 	background: #fff;
-	border-radius: 20rpx;
+	border-radius: 24rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
-	box-shadow: 0 4rpx 20rpx rgba(46,213,115, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
 	transition: all 0.3s ease;
-	border: 1rpx solid rgba(46,213,115, 0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 /* 卡片顶部精细装饰线 */
@@ -510,7 +513,7 @@ export default {
 	left: 10%;
 	right: 10%;
 	height: 2rpx;
-	background: linear-gradient(90deg, transparent 0%, #26c67a 30%, #2ed573 50%, #26c67a 70%, transparent 100%);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 1rpx;
 	filter: blur(1rpx);
 	box-shadow: 0 0 4rpx rgba(46,213,115, 0.25), 0 0 8rpx rgba(46,213,115, 0.08);
@@ -544,13 +547,15 @@ export default {
 }
 .card-title {
 	font-size: 28rpx;
-	color: #333;
+	color: #1a1a2e;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	letter-spacing: 0.5rpx;
+	line-height: 1.6;
 	line-height: 1.5;
 }
 .card-tags {
@@ -615,8 +620,11 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 0 20rpx;
 	background: #fff;
-	border-radius: 16rpx;
-	box-shadow: 0 2rpx 12rpx rgba(46,213,115, 0.06);
+	border-radius: 20rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .pager-btn {
 	padding: 12rpx 28rpx;

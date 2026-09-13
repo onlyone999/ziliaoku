@@ -94,7 +94,6 @@ export default {
 			keyword: '',
 			downloads: [],
 			page: 1,
-			pageSize: 10,
 			total: 0,
 			totalPages: 0,
 			loading: false,
@@ -247,27 +246,27 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 	display: flex;
 	flex-direction: column;
 }
 
 .filter-bar {
 	padding: 16rpx 24rpx;
-	background: rgba(255, 255, 255, 0.75);
+	background: rgba(255, 255, 255, 0.9);
 	backdrop-filter: blur(24px);
 	-webkit-backdrop-filter: blur(24px);
 	flex-shrink: 0;
-	border-bottom: 1rpx solid rgba(240, 240, 240, 0.5);
+	border-bottom: 1rpx solid rgba(0,0,0,0.04);
 }
 .search-box {
 	display: flex;
 	align-items: center;
 	height: 72rpx;
 	padding: 0 24rpx;
-	background: rgba(245, 247, 250, 0.8);
+	background: rgba(245, 247, 250, 0.9);
 	border-radius: 36rpx;
-	border: 2rpx solid rgba(46,213,115, 0.08);
+	border: 2rpx solid rgba(0,0,0,0.04);
 	transition: all 0.3s ease;
 }
 .search-box:focus-within {
@@ -300,12 +299,14 @@ export default {
 .download-card {
 	display: flex;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
 	box-shadow:
-		0 2rpx 8rpx rgba(46,213,115, 0.04),
-		0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: all 0.3s ease;
 	position: relative;
 }
@@ -317,7 +318,7 @@ export default {
 	left: 10%;
 	right: 10%;
 	height: 2rpx;
-	background: linear-gradient(90deg, transparent 0%, #26c67a 30%, #2ed573 50%, #26c67a 70%, transparent 100%);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 1rpx;
 	filter: blur(1rpx);
 	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4), 0 0 6rpx rgba(46,213,115, 0.15);
@@ -394,6 +395,8 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	letter-spacing: 0.5rpx;
+	line-height: 1.6;
 	line-height: 1.5;
 }
 .card-meta {
@@ -484,8 +487,11 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 24rpx 20rpx;
 	background: #fff;
-	border-radius: 16rpx;
-	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+	border-radius: 20rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .pager-btn {
 	padding: 12rpx 28rpx;
@@ -533,7 +539,7 @@ export default {
 	width: 280rpx;
 	height: 280rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.06), rgba(139, 127, 255, 0.1));
+	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
 }
 .empty-icon {
 	font-size: 100rpx;
@@ -567,7 +573,9 @@ export default {
 	border-radius: 36rpx;
 	font-size: 28rpx;
 	color: #fff;
-	box-shadow: 0 6rpx 20rpx rgba(46,213,115, 0.3);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	position: relative;
 	z-index: 1;
 	transition: all 0.2s ease;

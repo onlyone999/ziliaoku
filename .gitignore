@@ -1,6 +1,11 @@
 runtime/
 backend/.env
+backend/uploads/
 *.log
 node_modules/
 .DS_Store
 Thumbs.db
+
+# UniApp build artifacts
+miniprogram/unpackage/
+miniprogram/dist/

@@ -453,7 +453,7 @@ class ResourceController
             $total = intval($countStmt->fetchColumn());
 
             // 查询评论，关联用户信息
-            $sql = "SELECT `cm`.`id`, `cm`.`content`, `cm`.`rating`, `cm`.`parent_id`, `cm`.`created_at`,
+            $sql = "SELECT `cm`.`id`, `cm`.`content`, `cm`.`rating`, `cm`.`parent_id`, `cm`.`like_count`, `cm`.`created_at`,
                            `u`.`id` AS `user_id`, `u`.`nickname`, `u`.`avatar_url`
                     FROM `comments` `cm`
                     INNER JOIN `users` `u` ON `u`.`id` = `cm`.`user_id`
@@ -473,6 +473,41 @@ class ResourceController
 
         } catch (\Exception $e) {
             Response::error('获取评论异常: ' . $e->getMessage(), 500);
+        }
+    }
+
+    /**
+     * 点赞评论
+     */
+    public function commentLike()
+    {
+        try {
+            $userId = Auth::required();
+            $commentId = isset($GLOBALS['REQUEST_DATA']['comment_id']) ? intval($GLOBALS['REQUEST_DATA']['comment_id']) : 0;
+            if ($commentId <= 0) {
+                Response::error('缺少评论ID', 400);
+            }
+
+            // 检查评论是否存在
+            $stmt = $this->db->prepare("SELECT `id`, `like_count` FROM `comments` WHERE `id` = ? AND `status` = 'approved'");
+            $stmt->execute([$commentId]);
+            $comment = $stmt->fetch(PDO::FETCH_ASSOC);
+            if (!$comment) {
+                Response::error('评论不存在', 404);
+            }
+
+            // 检查是否已点赞（用 comment_likes 表或简单处理）
+            // 简单方案：直接增加 like_count（不做去重）
+            $this->db->prepare("UPDATE `comments` SET `like_count` = `like_count` + 1 WHERE `id` = ?")->execute([$commentId]);
+
+            // 返回最新 like_count
+            $stmt = $this->db->prepare("SELECT `like_count` FROM `comments` WHERE `id` = ?");
+            $stmt->execute([$commentId]);
+            $newCount = intval($stmt->fetchColumn());
+
+            Response::success(['like_count' => $newCount], '点赞成功');
+        } catch (\Exception $e) {
+            Response::error('点赞失败: ' . $e->getMessage(), 500);
         }
     }
 
@@ -501,6 +536,10 @@ class ResourceController
             if ($rating <= 0) {
                 $rating = isset($GLOBALS['REQUEST_DATA']['rating']) ? intval($GLOBALS['REQUEST_DATA']['rating']) : 0;
             }
+            $parentId = isset($_POST['parent_id']) ? intval($_POST['parent_id']) : 0;
+            if ($parentId <= 0) {
+                $parentId = isset($GLOBALS['REQUEST_DATA']['parent_id']) ? intval($GLOBALS['REQUEST_DATA']['parent_id']) : 0;
+            }
 
             if ($resourceId <= 0) {
                 Response::error('缺少资源ID', 400);
@@ -522,21 +561,23 @@ class ResourceController
                 Response::error('资源不存在', 404);
             }
 
-            // 防重复评论：同一用户同一资源24小时内不能重复评论
-            $dupStmt = $this->db->prepare(
-                "SELECT COUNT(*) FROM `comments` WHERE `user_id` = ? AND `resource_id` = ? AND `created_at` > DATE_SUB(NOW(), INTERVAL 24 HOUR)"
-            );
-            $dupStmt->execute([$userId, $resourceId]);
-            if ($dupStmt->fetchColumn() > 0) {
-                Response::error('24小时内不能重复评论', 429);
+            // 防重复评论：同一用户同一资源24小时内不能重复评论（回复不受限制）
+            if ($parentId <= 0) {
+                $dupStmt = $this->db->prepare(
+                    "SELECT COUNT(*) FROM `comments` WHERE `user_id` = ? AND `resource_id` = ? AND `parent_id` = 0 AND `created_at` > DATE_SUB(NOW(), INTERVAL 24 HOUR)"
+                );
+                $dupStmt->execute([$userId, $resourceId]);
+                if ($dupStmt->fetchColumn() > 0) {
+                    Response::error('24小时内不能重复评论', 429);
+                }
             }
 
             // 插入评论
             $now = date('Y-m-d H:i:s');
             $insertStmt = $this->db->prepare(
-                "INSERT INTO `comments` (`user_id`, `resource_id`, `content`, `rating`, `status`, `created_at`) VALUES (?, ?, ?, ?, 'approved', ?)"
+                "INSERT INTO `comments` (`user_id`, `resource_id`, `parent_id`, `content`, `rating`, `status`, `created_at`) VALUES (?, ?, ?, ?, ?, 'approved', ?)"
             );
-            $insertStmt->execute([$userId, $resourceId, $content, $rating, $now]);
+            $insertStmt->execute([$userId, $resourceId, $parentId, $content, $rating, $now]);
 
             // 更新资源评论数
             $this->db->prepare("UPDATE `resources` SET `comment_count` = `comment_count` + 1 WHERE `id` = ?")

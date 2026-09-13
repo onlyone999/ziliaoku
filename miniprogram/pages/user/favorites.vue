@@ -63,7 +63,6 @@ export default {
 		return {
 			favorites: [],
 			page: 1,
-			pageSize: 15,
 			loading: false,
 			noMore: false,
 			isRefreshing: false
@@ -170,7 +169,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 .list-scroll {
 	height: 100vh;
@@ -182,10 +181,14 @@ export default {
 }
 .fav-card {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	position: relative;
 }
@@ -197,7 +200,7 @@ export default {
 	left: 30%;
 	right: 30%;
 	height: 2rpx;
-	background: linear-gradient(90deg, transparent, rgba(46,213,115, 0.15), transparent);
+	background: linear-gradient(90deg, transparent, rgba(0,0,0,0.06), transparent);
 	border-radius: 2rpx;
 	z-index: 2;
 }
@@ -234,6 +237,8 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	letter-spacing: 0.5rpx;
+	line-height: 1.6;
 	line-height: 1.5;
 }
 .card-tags {
@@ -316,7 +321,7 @@ export default {
 	width: 320rpx;
 	height: 320rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.06), rgba(255, 107, 129, 0.06));
+	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
 	filter: blur(2rpx);
 }
 .empty-icon {
@@ -347,12 +352,14 @@ export default {
 }
 .empty-btn {
 	padding: 20rpx 56rpx;
-	background: linear-gradient(135deg, #2ed573, #5A52D5);
+	background: linear-gradient(135deg, #2ed573, #1abc9c);
 	border-radius: 40rpx;
 	font-size: 28rpx;
 	color: #fff;
 	font-weight: 600;
-	box-shadow: 0 8rpx 24rpx rgba(46,213,115, 0.3);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	position: relative;
 	z-index: 1;
 	transition: all 0.3s ease;

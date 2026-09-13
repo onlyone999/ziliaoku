@@ -3,7 +3,7 @@
  * 用于资源下载小程序所有API调用
  */
 
-const BASE_URL = 'http://192.168.0.109:9901';
+const BASE_URL = 'http://192.168.0.106:9901';
 
 // ============ Token 管理 ============
 
@@ -68,8 +68,10 @@ const request = (options) => {
           if (data.code === 0) {
             resolve(data);
           } else if (data.code === 401) {
-            clearToken();
-            uni.showToast({ title: '请重新登录', icon: 'none' });
+            if (!options.silent) {
+              clearToken();
+              uni.showToast({ title: '请重新登录', icon: 'none' });
+            }
             reject(new Error('未授权'));
           } else {
             if (!options.silent) {
@@ -78,14 +80,24 @@ const request = (options) => {
             reject(new Error(data.message || data.msg || '请求失败'));
           }
         } else if (res.statusCode === 401) {
-          clearToken();
-          uni.showToast({ title: '请重新登录', icon: 'none' });
+          if (!options.silent) {
+            clearToken();
+            uni.showToast({ title: '请重新登录', icon: 'none' });
+          }
           reject(new Error('未授权'));
         } else {
+          // 尝试从响应体获取错误信息
+          var errMsg = '服务器错误(' + res.statusCode + ')';
+          try {
+            var body = typeof res.data === 'string' ? JSON.parse(res.data) : res.data;
+            if (body && (body.message || body.msg)) {
+              errMsg = body.message || body.msg;
+            }
+          } catch(e) {}
           if (!options.silent) {
-            uni.showToast({ title: `服务器错误(${res.statusCode})`, icon: 'none' });
+            uni.showToast({ title: errMsg, icon: 'none' });
           }
-          reject(new Error(`HTTP ${res.statusCode}`));
+          reject(new Error(errMsg));
         }
       },
       fail: (err) => {

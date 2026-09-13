@@ -158,7 +158,9 @@ class VipController
      */
     public function createOrder()
     {
+        $data = $GLOBALS['REQUEST_DATA'] ?? [];
         $_POST['order_type'] = 'vip';
+        $_POST['vip_plan_id'] = $data['plan_id'] ?? $data['vip_plan_id'] ?? 0;
         require_once __DIR__ . '/PaymentController.php';
         $ctrl = new PaymentController();
         $ctrl->create();

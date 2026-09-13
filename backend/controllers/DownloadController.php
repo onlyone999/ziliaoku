@@ -101,7 +101,7 @@ class DownloadController
                     // 会员免费：检查是否指定了VIP等级
                     $vipFreeLevels = $resource['vip_free_levels'] ? explode(',', $resource['vip_free_levels']) : [];
                     if ($isVip && (empty($vipFreeLevels) || in_array((string)$user['vip_level'], $vipFreeLevels))) {
-                        // VIP等级匹配或未指定等级（全部VIP免费）
+                        // VIP等级匹配 → 免费下载
                         Response::success([
                             'can_download' => true,
                             'reason' => 'VIP会员免费下载',
@@ -109,14 +109,16 @@ class DownloadController
                             'vip_price' => 0,
                         ], '可以下载');
                     } else {
+                        // 非VIP或等级不匹配 → 可单独购买
+                        $actualPrice = $isVip ? $resource['vip_price'] : $resource['price'];
                         $levelNames = [1 => '月卡', 2 => '季卡', 3 => '年卡', 4 => '终身'];
                         $freeLevelStr = empty($vipFreeLevels) ? 'VIP' : implode('、', array_map(function($l) use ($levelNames) { return $levelNames[$l] ?? $l; }, $vipFreeLevels));
                         Response::success([
                             'can_download' => false,
-                            'reason' => $freeLevelStr . '会员免费，普通用户需付费',
+                            'reason' => $freeLevelStr . '会员免费，普通用户可单独购买',
                             'price' => $resource['price'],
                             'vip_price' => $resource['vip_price'],
-                            'need_vip' => true,
+                            'actual_price' => $actualPrice,
                             'vip_free_levels' => $vipFreeLevels,
                         ], '需要VIP或付费');
                     }

@@ -119,7 +119,6 @@ export default {
 			currentTab: 'all',
 			orders: [],
 			page: 1,
-			pageSize: 15,
 			loading: false,
 			noMore: false,
 			isRefreshing: false
@@ -334,7 +333,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 	display: flex;
 	flex-direction: column;
 }
@@ -395,10 +394,14 @@ export default {
 }
 .order-card {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: transform 0.2s ease;
 	position: relative;
 }
@@ -410,7 +413,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
 	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
@@ -438,23 +441,23 @@ export default {
 /* 待支付脉冲 */
 .order-status-badge.pending {
 	color: #ff9f43;
-	background: linear-gradient(135deg, rgba(255, 159, 67, 0.14), rgba(255, 159, 67, 0.06));
-	box-shadow: 0 2rpx 4rpx rgba(255, 159, 67, 0.15);
+	background: rgba(255, 159, 67, 0.10);
+	box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04);
 	animation: pulse-orange 2s ease-in-out infinite;
 }
 @keyframes pulse-orange {
-	0%, 100% { box-shadow: 0 2rpx 4rpx rgba(255, 159, 67, 0.15); }
-	50% { box-shadow: 0 2rpx 8rpx rgba(255, 159, 67, 0.35), 0 0 6rpx rgba(255, 159, 67, 0.15); }
+	0%, 100% { box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04); }
+	50% { box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08); }
 }
 /* 已完成脉冲 */
 .order-status-badge.paid {
-	background: linear-gradient(135deg, rgba(46,213,115, 0.14), rgba(46,213,115, 0.06));
-	box-shadow: 0 2rpx 4rpx rgba(46,213,115, 0.15);
+	background: rgba(46,213,115, 0.10);
+	box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04);
 	animation: pulse-green 2s ease-in-out infinite;
 }
 @keyframes pulse-green {
-	0%, 100% { box-shadow: 0 2rpx 4rpx rgba(46,213,115, 0.15); }
-	50% { box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.35), 0 0 6rpx rgba(46,213,115, 0.15); }
+	0%, 100% { box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04); }
+	50% { box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.08); }
 }
 .order-status-badge.cancelled {
 	color: #999;
@@ -502,6 +505,8 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	letter-spacing: 0.5rpx;
+	line-height: 1.6;
 	line-height: 1.5;
 }
 .order-meta {

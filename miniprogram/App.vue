@@ -43,12 +43,17 @@ export default {
 
 <style>
 @import './common/theme-overrides.wxss';
+@import './common/premium.css';
 
 page {
-  background-color: #f5f5f5;
+  background: linear-gradient(180deg, #f0f2f8 0%, #f5f6fa 15%, #f8f9fc 40%, #fafbfe 100%);
   font-size: 28rpx;
-  color: #333333;
-  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'Microsoft YaHei', Arial, sans-serif;
+  color: #1a1a2e;
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Helvetica, 'PingFang SC', 'SF Pro Display', 'Microsoft YaHei', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  letter-spacing: 0.3rpx;
+  line-height: 1.6;
 
   /* 主题变量（默认绿，运行时被 JS 覆盖） */
   --c-primary: #2ed573;

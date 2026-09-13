@@ -1,10 +1,11 @@
 <template>
-	<view class="page">
+	<view class="page" :style="'--tc-primary:' + tc.primary + ';'">
 		<!-- 顶部分类标签 -->
 		<view class="tabs-bar">
 			<view
 				class="tab-item"
 				:class="{ active: currentType === '' }"
+				:style="currentType === '' ? 'background:' + tc.primary + ';color:#fff;font-weight:700;box-shadow:0 6rpx 24rpx ' + tc.primary + '59;transform:scale(1.02);' : ''"
 				@tap="switchType('')"
 			>
 				<text>全部</text>
@@ -12,6 +13,7 @@
 			<view
 				class="tab-item"
 				:class="{ active: currentType === 'online' }"
+				:style="currentType === 'online' ? 'background:' + tc.primary + ';color:#fff;font-weight:700;box-shadow:0 6rpx 24rpx ' + tc.primary + '59;transform:scale(1.02);' : ''"
 				@tap="switchType('online')"
 			>
 				<text>线上</text>
@@ -19,6 +21,7 @@
 			<view
 				class="tab-item"
 				:class="{ active: currentType === 'offline' }"
+				:style="currentType === 'offline' ? 'background:' + tc.primary + ';color:#fff;font-weight:700;box-shadow:0 6rpx 24rpx ' + tc.primary + '59;transform:scale(1.02);' : ''"
 				@tap="switchType('offline')"
 			>
 				<text>线下</text>
@@ -26,6 +29,7 @@
 			<view
 				class="tab-item"
 				:class="{ active: currentType === 'both' }"
+				:style="currentType === 'both' ? 'background:' + tc.primary + ';color:#fff;font-weight:700;box-shadow:0 6rpx 24rpx ' + tc.primary + '59;transform:scale(1.02);' : ''"
 				@tap="switchType('both')"
 			>
 				<text>线上线下</text>
@@ -63,14 +67,18 @@
 				>
 					<view class="card-cover">
 						<image
-							:src="item.cover_url || '/static/default-cover.png'"
+							v-if="item.cover_url"
+							:src="fixUrl(item.cover_url)"
 							mode="aspectFill"
 							class="cover-img"
 						></image>
-						<view class="type-tag" :class="item.activity_type">
+						<view v-else class="card-cover-placeholder">
+							<text class="card-cover-icon">🎯</text>
+						</view>
+						<view class="type-tag" :style="'background:' + tc.primary + ';box-shadow:0 4rpx 16rpx ' + tc.primary + '66;'">
 							<text>{{ typeLabels[item.activity_type] || '线上' }}</text>
 						</view>
-						<view v-if="item.is_signed_up" class="signed-tag" :style="'background:' + tc.primary + ';'">
+						<view v-if="item.is_signed_up" class="signed-tag" :style="'background:' + tc.primary + ';box-shadow:0 4rpx 14rpx ' + tc.primary + '59;'">
 							<text>已报名</text>
 						</view>
 					</view>
@@ -89,14 +97,14 @@
 								<text class="count-text">
 									{{ item.current_count }}/{{ item.max_participants > 0 ? item.max_participants : '不限' }}人
 								</text>
-								<view v-if="item.max_participants > 0" class="mini-progress">
+								<view v-if="item.max_participants > 0" class="mini-progress" :style="'background:' + tc.primary + '14;'">
 									<view
 										class="mini-progress-bar"
-										:style="{ width: Math.min(100, (item.current_count / item.max_participants) * 100) + '%' }"
+										:style="{ width: Math.min(100, (item.current_count / item.max_participants) * 100) + '%', background: tc.primary, boxShadow: '0 2rpx 8rpx ' + tc.primary + '4c' }"
 									></view>
 								</view>
 							</view>
-							<view class="status-badge" :class="getStatusClass(item)" :style="getStatusClass(item) === 'open' ? tPri : ''">
+							<view class="status-badge" :class="getStatusClass(item)" :style="getStatusClass(item) === 'open' ? 'color:' + tc.primary + ';background:' + tc.primary + '1a;box-shadow:0 2rpx 8rpx ' + tc.primary + '1f;' : ''">
 								<text>{{ getStatusText(item) }}</text>
 							</view>
 						</view>
@@ -122,7 +130,7 @@
 </template>
 
 <script>
-import http from '@/utils/http.js';
+import http, { BASE_URL } from '@/utils/http.js';
 
 export default {
 	data() {
@@ -130,7 +138,6 @@ export default {
 			currentType: '',
 			list: [],
 			page: 1,
-			pageSize: 10,
 			loading: false,
 			noMore: false,
 			isRefreshing: false,
@@ -141,7 +148,19 @@ export default {
 			}
 		};
 	},
-	onLoad() {
+	async onLoad() {
+		try {
+			const res = await http.get('/api/settings/config', {}, { silent: true });
+			if (res.code === 0 && res.data.activity_enabled === '0') {
+				uni.showModal({
+					title: '提示',
+					content: '活动中心暂未开放',
+					showCancel: false,
+					success: () => { uni.navigateBack(); }
+				});
+				return;
+			}
+		} catch (e) {}
 		this.loadData(true);
 	},
 	methods: {
@@ -204,6 +223,11 @@ export default {
 		goDetail(id) {
 			uni.navigateTo({ url: '/pages/activity/detail?id=' + id });
 		},
+		fixUrl(url) {
+			if (!url) return '';
+			if (url.startsWith('http')) return url;
+			return BASE_URL + url;
+		},
 
 		formatTime(dt) {
 			if (!dt) return '';
@@ -239,7 +263,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 
 /* ===== 分类标签 ===== */
@@ -253,7 +277,7 @@ export default {
 	position: sticky;
 	top: 0;
 	z-index: 10;
-	box-shadow: 0 4rpx 20rpx rgba(46,213,115, 0.06);
+	box-shadow: 0 4rpx 20rpx var(--tc-primary, #2ed573)0f;
 }
 .tab-item {
 	flex: 1;
@@ -267,10 +291,8 @@ export default {
 	position: relative;
 }
 .tab-item.active {
-	background: linear-gradient(135deg, #2ed573 0%, #27ae60 100%);
 	color: #fff;
 	font-weight: 700;
-	box-shadow: 0 6rpx 24rpx rgba(46,213,115, 0.35);
 	transform: scale(1.02);
 }
 
@@ -321,10 +343,14 @@ export default {
 }
 .activity-card {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	overflow: hidden;
 	margin-bottom: 28rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.08), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: transform 0.25s ease, box-shadow 0.25s ease;
 	position: relative;
 }
@@ -336,14 +362,14 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 5;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 0 6rpx var(--tc-primary, #2ed573)40;
 }
 .activity-card:active {
 	transform: scale(0.985);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.12);
+	opacity: 0.92;
 }
 
 /* 封面区域 */
@@ -356,6 +382,19 @@ export default {
 	width: 100%;
 	height: 100%;
 	transition: transform 0.4s ease;
+}
+.card-cover-placeholder {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 0;
+}
+.card-cover-icon {
+	font-size: 64rpx;
+	opacity: 0.5;
 }
 .activity-card:active .cover-img {
 	transform: scale(1.02);
@@ -381,17 +420,7 @@ export default {
 	border-radius: 24rpx;
 	font-size: 22rpx;
 	color: #fff;
-	background: linear-gradient(135deg, #2ed573, #27ae60);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.4), 0 0 20rpx rgba(46,213,115, 0.2);
 	animation: tagGlow 2s ease-in-out infinite alternate;
-}
-.type-tag.offline {
-	background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-	box-shadow: 0 4rpx 16rpx rgba(255, 107, 107, 0.4), 0 0 20rpx rgba(255, 107, 107, 0.2);
-}
-.type-tag.both {
-	background: linear-gradient(135deg, #2ed573, #3be88a);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.4), 0 0 20rpx rgba(46,213,115, 0.2);
 }
 @keyframes tagGlow {
 	0% { filter: brightness(1); }
@@ -406,8 +435,6 @@ export default {
 	border-radius: 24rpx;
 	font-size: 22rpx;
 	color: #fff;
-	background: linear-gradient(135deg, #2ed573, #3be88a);
-	box-shadow: 0 4rpx 14rpx rgba(46,213,115, 0.35), 0 0 16rpx rgba(46,213,115, 0.15);
 }
 
 /* ===== 卡片内容 ===== */
@@ -445,7 +472,7 @@ export default {
 	align-items: center;
 	margin-top: 16rpx;
 	padding-top: 16rpx;
-	border-top: 1rpx solid rgba(46,213,115, 0.06);
+	border-top: 1rpx solid var(--tc-primary, #2ed573)0f;
 }
 .progress-info {
 	flex: 1;
@@ -459,17 +486,14 @@ export default {
 .mini-progress {
 	width: 160rpx;
 	height: 10rpx;
-	background: rgba(46,213,115, 0.08);
 	border-radius: 10rpx;
 	overflow: hidden;
 	position: relative;
 }
 .mini-progress-bar {
 	height: 100%;
-	background: linear-gradient(90deg, #2ed573, #27ae60);
 	border-radius: 10rpx;
 	transition: width 0.5s ease;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.3);
 	position: relative;
 }
 /* 进度条光泽扫过效果 */
@@ -495,8 +519,7 @@ export default {
 	font-weight: 600;
 }
 .status-badge.open {
-	background: rgba(46,213,115, 0.1);
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.12), 0 0 12rpx rgba(46,213,115, 0.06);
+	background: var(--tc-primary, #2ed573)1a;
 }
 .status-badge.full {
 	color: #ff6b6b;
@@ -524,7 +547,7 @@ export default {
 	width: 240rpx;
 	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.08), rgba(126, 217, 87, 0.04));
+	background: var(--tc-primary, #2ed573)14;
 	top: 80rpx;
 }
 .empty-icon {

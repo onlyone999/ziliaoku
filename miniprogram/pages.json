@@ -94,6 +94,35 @@
       }
     },
     {
+      "path": "pages/points/index",
+      "style": {
+        "navigationBarTitleText": "积分中心",
+        "navigationStyle": "custom",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/points/ranking",
+      "style": {
+        "navigationBarTitleText": "积分排行榜",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/points/rule",
+      "style": {
+        "navigationBarTitleText": "积分规则",
+        "disableScroll": true
+      }
+    },
+    {
+      "path": "pages/about/index",
+      "style": {
+        "navigationBarTitleText": "关于我们",
+        "disableScroll": true
+      }
+    },
+    {
       "path": "pages/activity/detail",
       "style": {
         "navigationBarTitleText": "活动详情"

@@ -299,7 +299,7 @@
 					<view class="comment-item" v-for="item in comments" :key="item.id">
 						<view class="comment-header">
 							<view class="avatar-ring">
-								<image class="comment-avatar" :src="item.avatar || '/static/default-avatar.png'" mode="aspectFill"></image>
+								<image class="comment-avatar" :src="fixUrl(item.avatar_url) || '/static/default-avatar.png'" mode="aspectFill"></image>
 							</view>
 							<view class="comment-user">
 								<view class="comment-user-row">
@@ -315,7 +315,7 @@
 						<view class="comment-actions">
 							<view class="comment-action-btn" @tap="likeComment(item)">
 								<text class="action-icon">👍</text>
-								<text class="action-count" v-if="item.like_count">{{ item.like_count }}</text>
+								<text class="action-count">{{ item.like_count || 0 }}</text>
 							</view>
 							<view class="comment-action-btn" @tap="replyComment(item)">
 								<text class="action-icon">💬</text>
@@ -335,7 +335,10 @@
 				<!-- 发表评论 -->
 				<view class="comment-form">
 					<view class="form-divider"></view>
-					<text class="form-title">发表评价</text>
+					<view class="form-title-row">
+						<text class="form-title">{{ replyTo ? '回复 @' + replyTo.nickname : '发表评价' }}</text>
+						<text class="form-cancel-reply" v-if="replyTo" @tap="cancelReply">取消回复</text>
+					</view>
 					<view class="form-rating">
 						<text class="form-rating-label">评分</text>
 						<view class="form-stars">
@@ -448,6 +451,30 @@
 					</view>
 					<text class="bar-label">收藏</text>
 				</view>
+				<view class="bar-btn" v-if="canAccess" @tap="handlePreview">
+					<view class="bar-icon-circle">
+						<text class="bar-icon">👁</text>
+					</view>
+					<text class="bar-label">预览</text>
+				</view>
+				<view class="bar-btn" v-if="canAccess" @tap="handlePrint">
+					<view class="bar-icon-circle">
+						<text class="bar-icon">🖨</text>
+					</view>
+					<text class="bar-label">打印</text>
+				</view>
+				<view class="bar-btn" v-if="!canAccess" @tap="showAccessTip">
+					<view class="bar-icon-circle locked">
+						<text class="bar-icon">🔒</text>
+					</view>
+					<text class="bar-label">预览</text>
+				</view>
+				<view class="bar-btn" v-if="!canAccess" @tap="showAccessTip">
+					<view class="bar-icon-circle locked">
+						<text class="bar-icon">🔒</text>
+					</view>
+					<text class="bar-label">打印</text>
+				</view>
 				<button class="bar-btn share-btn" open-type="share">
 					<view class="bar-icon-circle">
 						<text class="bar-icon">↗</text>
@@ -456,21 +483,17 @@
 				</button>
 			</view>
 			<view class="bar-right">
-				<view class="action-btn free-btn" :style="'background:' + tc.primary + ';color:#fff;border-color:' + tc.primary + ';'" v-if="resource.price <= 0" @tap="handleDownload">
-					<text class="action-btn-icon">↓</text>
-					<text>免费下载</text>
-				</view>
-				<view class="action-btn buy-btn" v-else-if="!isPurchased && !isMemberFree" @tap="handleBuy">
+				<view class="action-btn buy-btn" v-if="!isPurchased && !isMemberFree && resource.price > 0" @tap="handleBuy">
 					<text class="action-btn-icon">🛒</text>
 					<text>¥{{ resource.price }} 立即购买</text>
 				</view>
-				<view class="action-btn member-btn" v-else-if="!isPurchased && isMemberFree && !isVip" @tap="goVip">
+				<view class="action-btn free-btn" :style="'background:' + tc.primary + ';color:#fff;border-color:' + tc.primary + ';'" v-else-if="!isPurchased && isMemberFree && !isVip" @tap="showVipOrBuy">
 					<text class="action-btn-icon">👑</text>
-					<text>开通会员免费下</text>
+					<text>开通VIP免费获取</text>
 				</view>
 				<view class="action-btn free-btn" :style="'background:' + tc.primary + ';color:#fff;border-color:' + tc.primary + ';'" v-else @tap="handleDownload">
 					<text class="action-btn-icon">↓</text>
-					<text>立即下载</text>
+					<text>{{ isMemberFree ? 'VIP免费下载' : '免费下载' }}</text>
 				</view>
 			</view>
 		</view>
@@ -535,6 +558,8 @@ export default {
 			},
 			submittingComment: false,
 			commentEnabled: true,
+			replyTo: null,
+			parentId: 0,
 			userVote: null,
 			upVotes: 0,
 			downVotes: 0
@@ -572,6 +597,16 @@ export default {
 			return !!(this.resource.preview_images && this.resource.preview_images.length > 0) ||
 				!!this.resource.preview_code ||
 				!!this.resource.preview_text;
+		},
+		canAccess() {
+			if (!this.resource) return false;
+			// 已购买
+			if (this.isPurchased) return true;
+			// VIP免费 + 是VIP
+			if (this.isMemberFree && this.isVip) return true;
+			// 普通免费资源（非VIP专属）
+			if (this.resource.price <= 0 && !this.isMemberFree) return true;
+			return false;
 		},
 		canSubmitComment() {
 			return this.commentForm.content.trim().length > 0 && !this.submittingComment;
@@ -619,7 +654,7 @@ export default {
 					this.images = this.resource.images && this.resource.images.length > 0
 						? this.resource.images
 						: [this.resource.cover_url].filter(Boolean);
-					this.isMemberFree = !!this.resource.is_member_free;
+					this.isMemberFree = this.resource.price_type === 'member_free' || !!this.resource.is_member_free;
 					this.isPurchased = !!this.resource.is_purchased;
 					this.commentEnabled = this.resource.comment_enabled !== false;
 					uni.setNavigationBarTitle({ title: this.resource.title || '资源详情' });
@@ -667,7 +702,7 @@ export default {
 			try {
 				const res = await http.get('/api/favorite/check', {
 					resource_id: this.resourceId
-				});
+				}, { silent: true });
 				if (res.code === 0) {
 					this.isFavorited = !!res.data.is_favorited;
 				}
@@ -677,7 +712,7 @@ export default {
 			const token = uni.getStorageSync('token');
 			if (!token) return;
 			try {
-				const res = await http.get('/api/user/vipStatus');
+				const res = await http.get('/api/user/vipStatus', {}, { silent: true });
 				if (res.code === 0) {
 					this.isVip = !!(res.data && res.data.is_vip);
 				}
@@ -764,7 +799,170 @@ export default {
 				uni.showToast({ title: '操作失败', icon: 'none' });
 			}
 		},
+		showAccessTip() {
+			if (this.isMemberFree) {
+				uni.showModal({
+					title: '👑 VIP专属资源',
+					content: '该资源为VIP免费资源，开通VIP即可畅享预览、打印、下载。也可单独购买。',
+					confirmText: '开通VIP',
+					cancelText: '单独购买',
+					success: (res) => {
+						if (res.confirm) {
+							this.goVip();
+						} else if (res.cancel && this.resource.price > 0) {
+							this.handleBuy();
+						}
+					}
+				});
+			} else {
+				uni.showModal({
+					title: '💰 付费资源',
+					content: '该资源需要购买后才能预览、打印和下载，是否立即购买？',
+					confirmText: '立即购买',
+					cancelText: '再看看',
+					success: (res) => {
+						if (res.confirm) {
+							this.handleBuy();
+						}
+					}
+				});
+			}
+		},
+		showVipOrBuy() {
+			const priceText = this.resource.price > 0 ? '¥' + this.resource.price + ' ' : '';
+			uni.showActionSheet({
+				itemList: [
+					'👑 开通VIP免费获取（推荐）',
+					'🛒 ' + priceText + '单独购买'
+				],
+				success: (res) => {
+					if (res.tapIndex === 0) {
+						this.goVip();
+					} else if (res.tapIndex === 1) {
+						this.handleBuy();
+					}
+				}
+			});
+		},
+		handlePreview() {
+			if (!this.canAccess) { this.showAccessTip(); return; }
+			const token = uni.getStorageSync('token');
+			if (!token) {
+				uni.showModal({
+					title: '提示',
+					content: '请先登录后再预览',
+					confirmText: '去登录',
+					success: (res) => { if (res.confirm) uni.switchTab({ url: '/pages/user/index' }); }
+				});
+				return;
+			}
+			this.doPreview();
+		},
+		async doPreview() {
+			uni.showLoading({ title: '加载预览...' });
+			try {
+				const res = await http.post('/api/download/download', { resource_id: this.resourceId });
+				if (res.code === 0 && res.data) {
+					const fileUrl = (res.data.resource && res.data.resource.file_url) || res.data.file_url;
+					if (!fileUrl) {
+						uni.hideLoading();
+						uni.showToast({ title: '获取预览链接失败', icon: 'none' });
+						return;
+					}
+					uni.hideLoading();
+					uni.showLoading({ title: '下载中...' });
+					uni.downloadFile({
+						url: fileUrl,
+						success: (dlRes) => {
+							uni.hideLoading();
+							if (dlRes.statusCode === 200) {
+								uni.openDocument({
+									filePath: dlRes.tempFilePath,
+									showMenu: true,
+									fail: () => {
+										uni.showToast({ title: '该文件类型暂不支持预览', icon: 'none' });
+									}
+								});
+							} else {
+								uni.showToast({ title: '预览失败', icon: 'none' });
+							}
+						},
+						fail: () => {
+							uni.hideLoading();
+							uni.showToast({ title: '下载失败', icon: 'none' });
+						}
+					});
+				} else {
+					uni.hideLoading();
+					uni.showToast({ title: '获取预览链接失败', icon: 'none' });
+				}
+			} catch (e) {
+				uni.hideLoading();
+				uni.showToast({ title: '预览失败', icon: 'none' });
+			}
+		},
+		handlePrint() {
+			if (!this.canAccess) { this.showAccessTip(); return; }
+			const token = uni.getStorageSync('token');
+			if (!token) {
+				uni.showModal({
+					title: '提示',
+					content: '请先登录后再打印',
+					confirmText: '去登录',
+					success: (res) => { if (res.confirm) uni.switchTab({ url: '/pages/user/index' }); }
+				});
+				return;
+			}
+			this.doPrint();
+		},
+		async doPrint() {
+			uni.showLoading({ title: '准备打印...' });
+			try {
+				const res = await http.post('/api/download/download', { resource_id: this.resourceId });
+				if (res.code === 0 && res.data) {
+					const fileUrl = (res.data.resource && res.data.resource.file_url) || res.data.file_url;
+					if (!fileUrl) {
+						uni.hideLoading();
+						uni.showToast({ title: '获取文件链接失败', icon: 'none' });
+						return;
+					}
+					uni.hideLoading();
+					uni.showLoading({ title: '下载中...' });
+					uni.downloadFile({
+						url: fileUrl,
+						success: (dlRes) => {
+							uni.hideLoading();
+							if (dlRes.statusCode === 200) {
+								uni.openDocument({
+									filePath: dlRes.tempFilePath,
+									showMenu: true,
+									success: () => {
+										uni.showToast({ title: '请点击右上角 · 选择打印', icon: 'none', duration: 3000 });
+									},
+									fail: () => {
+										uni.showToast({ title: '该文件类型暂不支持打印', icon: 'none' });
+									}
+								});
+							} else {
+								uni.showToast({ title: '打印失败', icon: 'none' });
+							}
+						},
+						fail: () => {
+							uni.hideLoading();
+							uni.showToast({ title: '下载失败', icon: 'none' });
+						}
+					});
+				} else {
+					uni.hideLoading();
+					uni.showToast({ title: '获取文件链接失败', icon: 'none' });
+				}
+			} catch (e) {
+				uni.hideLoading();
+				uni.showToast({ title: '打印失败', icon: 'none' });
+			}
+		},
 		handleDownload() {
+			if (!this.canAccess) { this.showAccessTip(); return; }
 			const token = uni.getStorageSync('token');
 			if (!token) {
 				uni.showModal({
@@ -784,7 +982,6 @@ export default {
 		async doDownload() {
 			uni.showLoading({ title: '获取下载链接...' });
 			try {
-				console.log('[DOWNLOAD] resourceId:', this.resourceId, 'resource:', this.resource?.title);
 				const res = await http.post('/api/download/download', {
 					resource_id: this.resourceId
 				});
@@ -796,56 +993,105 @@ export default {
 						return;
 					}
 					uni.hideLoading();
-					this.downloading = true;
-					this.downloadPercent = 0;
-					const downloadTask = uni.downloadFile({
-						url: fileUrl,
-						success: (downloadRes) => {
-							this.downloading = false;
-							if (downloadRes.statusCode === 200) {
-								const tempPath = downloadRes.tempFilePath;
-								uni.openDocument({
-									filePath: tempPath,
-									showMenu: true,
-									success: () => {
-										uni.showToast({ title: '下载成功，点右上角可保存转发', icon: 'success', duration: 3000 });
-									},
-									fail: (err) => {
-										uni.showModal({
-											title: '下载完成',
-											content: '该文件无法在小程序内打开，请复制链接到浏览器下载。',
-											confirmText: '复制链接',
-											success: (mr) => {
-												if (mr.confirm) uni.setClipboardData({ data: fileUrl });
-											}
-										});
-									}
-								});
-							} else {
-								uni.showToast({ title: '下载失败(HTTP ' + downloadRes.statusCode + ')', icon: 'none' });
-							}
-						},
-						fail: (err) => {
-							this.downloading = false;
-							console.error('[DOWNLOAD]', fileUrl, err);
-							uni.showToast({ title: '下载失败:' + (err.errMsg || '未知'), icon: 'none', duration: 5000 });
-						}
-					});
-					if (downloadTask && downloadTask.onProgressUpdate) {
-						downloadTask.onProgressUpdate((progressRes) => {
-							this.downloadPercent = progressRes.progress || 0;
-						});
-					}
+					this.showDownloadOptions(fileUrl);
 				} else {
 					uni.hideLoading();
-					uni.showToast({ title: res.message || res.msg || '获取下载链接失败', icon: 'none' });
+					uni.showToast({ title: res.message || '获取下载链接失败', icon: 'none' });
 				}
 			} catch (e) {
 				uni.hideLoading();
-				this.downloading = false;
-				console.error('[DOWNLOAD] 异常:', e);
-				uni.showToast({ title: '下载异常:' + (e.message || '未知'), icon: 'none', duration: 5000 });
+				uni.showToast({ title: '下载失败', icon: 'none' });
 			}
+		},
+		showDownloadOptions(fileUrl) {
+			uni.showActionSheet({
+				itemList: ['📥 预览文件', '🔗 复制下载链接', '💾 保存到手机'],
+				success: (tapRes) => {
+					if (tapRes.tapIndex === 0) {
+						this.doOpenFile(fileUrl);
+					} else if (tapRes.tapIndex === 1) {
+						this.doCopyLink(fileUrl);
+					} else if (tapRes.tapIndex === 2) {
+						this.doSaveFile(fileUrl);
+					}
+				}
+			});
+		},
+		doOpenFile(fileUrl) {
+			uni.showLoading({ title: '下载中...' });
+			uni.downloadFile({
+				url: fileUrl,
+				success: (dlRes) => {
+					uni.hideLoading();
+					if (dlRes.statusCode === 200) {
+						uni.openDocument({
+							filePath: dlRes.tempFilePath,
+							showMenu: true,
+							fail: () => {
+								uni.showToast({ title: '该文件类型暂不支持预览', icon: 'none' });
+							}
+						});
+					} else {
+						uni.showToast({ title: '预览失败', icon: 'none' });
+					}
+				},
+				fail: () => {
+					uni.hideLoading();
+					uni.showToast({ title: '下载失败', icon: 'none' });
+				}
+			});
+		},
+		doCopyLink(fileUrl) {
+			uni.setClipboardData({
+				data: fileUrl,
+				success: () => {
+					uni.showModal({
+						title: '✅ 下载链接已复制',
+						content: '链接已复制到剪贴板，请打开浏览器粘贴访问即可下载。也可发送到电脑端下载大文件。',
+						confirmText: '我知道了',
+						showCancel: false
+					});
+				}
+			});
+		},
+		doSaveFile(fileUrl) {
+			uni.showLoading({ title: '下载中...' });
+			uni.downloadFile({
+				url: fileUrl,
+				success: (dlRes) => {
+					uni.hideLoading();
+					if (dlRes.statusCode === 200) {
+						uni.saveFile({
+							tempFilePath: dlRes.tempFilePath,
+							success: (saveRes) => {
+								uni.showModal({
+									title: '✅ 保存成功',
+									content: '文件已保存到手机，路径：' + (saveRes.savedFilePath || '本地文件'),
+									confirmText: '打开文件',
+									cancelText: '知道了',
+									success: (mr) => {
+										if (mr.confirm) {
+											uni.openDocument({
+												filePath: saveRes.savedFilePath,
+												showMenu: true
+											});
+										}
+									}
+								});
+							},
+							fail: () => {
+								uni.showToast({ title: '保存失败', icon: 'none' });
+							}
+						});
+					} else {
+						uni.showToast({ title: '下载失败', icon: 'none' });
+					}
+				},
+				fail: () => {
+					uni.hideLoading();
+					uni.showToast({ title: '下载失败', icon: 'none' });
+				}
+			});
 		},
 		async handleBuy() {
 			const token = uni.getStorageSync('token');
@@ -972,12 +1218,15 @@ export default {
 				const res = await http.post('/api/resource/comment', {
 					resource_id: this.resourceId,
 					rating: this.commentForm.rating,
-					content: this.commentForm.content.trim()
+					content: this.commentForm.content.trim(),
+					parent_id: this.parentId
 				});
 				if (res.code === 0) {
-					uni.showToast({ title: '评价成功', icon: 'success' });
+					uni.showToast({ title: this.replyTo ? '回复成功' : '评价成功', icon: 'success' });
 					this.commentForm.content = '';
 					this.commentForm.rating = 5;
+					this.replyTo = null;
+					this.parentId = 0;
 					this.loadComments();
 				} else {
 					uni.showToast({ title: res.message || res.msg || '评价失败', icon: 'none' });
@@ -1034,11 +1283,31 @@ export default {
 				});
 			}
 		},
-		likeComment(item) {
-			uni.showToast({ title: '已点赞', icon: 'none' });
+		async likeComment(item) {
+			const token = uni.getStorageSync('token');
+			if (!token) {
+				uni.showToast({ title: '请先登录', icon: 'none' });
+				return;
+			}
+			try {
+				const res = await http.post('/api/resource/comment-like', { comment_id: item.id });
+				if (res.code === 0) {
+					item.like_count = res.data.like_count;
+					uni.showToast({ title: '已点赞', icon: 'none' });
+				}
+			} catch (e) {
+				uni.showToast({ title: '点赞失败', icon: 'none' });
+			}
 		},
 		replyComment(item) {
+			this.replyTo = item;
+			this.parentId = item.id;
 			this.commentForm.content = '@' + item.nickname + ' ';
+		},
+		cancelReply() {
+			this.replyTo = null;
+			this.parentId = 0;
+			this.commentForm.content = '';
 		},
 		goMore() {
 			uni.switchTab({ url: '/pages/category/list' });
@@ -1058,7 +1327,7 @@ export default {
 /* ========== 基础 ========== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 300rpx, #f5f6fa 100%);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 	position: relative;
 }
 .main-scroll {
@@ -1085,7 +1354,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 240rpx;
-	background: linear-gradient(to bottom, rgba(0,0,0,0.5), rgba(0,0,0,0.1), transparent);
+	background: linear-gradient(to bottom, rgba(0,0,0,0.55), rgba(0,0,0,0.15), transparent);
 	z-index: 10;
 	pointer-events: none;
 }
@@ -1094,8 +1363,8 @@ export default {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	height: 260rpx;
-	background: linear-gradient(to top, rgba(0,0,0,0.45), rgba(0,0,0,0.1), transparent);
+	height: 280rpx;
+	background: linear-gradient(to top, rgba(0,0,0,0.5), rgba(0,0,0,0.15), transparent);
 	z-index: 10;
 	pointer-events: none;
 }
@@ -1105,8 +1374,9 @@ export default {
 	left: 28rpx;
 	width: 72rpx;
 	height: 72rpx;
-	background: rgba(0,0,0,0.3);
-	backdrop-filter: blur(16px);
+	background: rgba(0,0,0,0.35);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -1194,7 +1464,11 @@ export default {
 	border-radius: 28rpx;
 	position: relative;
 	z-index: 15;
-	box-shadow: 0 12rpx 48rpx rgba(46,213,115,0.08), 0 4rpx 12rpx rgba(0,0,0,0.04);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.06),
+		0 12rpx 36rpx rgba(0,0,0,0.1),
+		0 24rpx 60rpx rgba(0,0,0,0.06);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	overflow: hidden;
 }
 .hero-card::before {
@@ -1253,12 +1527,12 @@ export default {
 	font-size: 22rpx;
 }
 .hero-title {
-	font-size: 38rpx;
-	font-weight: 900;
+	font-size: 36rpx;
+	font-weight: 800;
 	color: #1a1a2e;
 	line-height: 1.5;
 	display: block;
-	letter-spacing: 0.5rpx;
+	letter-spacing: 1rpx;
 }
 .hero-meta {
 	display: flex;
@@ -1488,8 +1762,10 @@ export default {
 /* 免费卡片 */
 .free-card {
 	background: #f0fdf4;
-	border: 2rpx solid rgba(0,0,0,0.08);
-	box-shadow: 0 6rpx 28rpx rgba(0,0,0,0.06);
+	border: 1rpx solid rgba(0,0,0,0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	position: relative;
 }
 .free-card::after {
@@ -1579,14 +1855,17 @@ export default {
 
 /* ========== 投票卡片 ========== */
 .vote-card {
-	background: linear-gradient(135deg, #fff 0%, #f8f6ff 50%, #fff 100%);
+	background: #fff;
 	margin: 20rpx 24rpx 0;
 	padding: 28rpx 32rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
-	box-shadow: 0 6rpx 28rpx rgba(0,0,0,0.04);
-	border: 2rpx solid rgba(46,213,115,0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .vote-btn {
 	display: flex;
@@ -1676,10 +1955,14 @@ export default {
 	background: #fff;
 	margin: 20rpx 24rpx 0;
 	padding: 32rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
-	box-shadow: 0 6rpx 28rpx rgba(0,0,0,0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 	overflow: hidden;
 }
@@ -1796,8 +2079,12 @@ export default {
 	background: #fff;
 	margin: 20rpx 24rpx 0;
 	padding: 32rpx;
-	border-radius: 24rpx;
-	box-shadow: 0 6rpx 28rpx rgba(0,0,0,0.04);
+	border-radius: 28rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .section-header {
 	display: flex;
@@ -1817,8 +2104,9 @@ export default {
 }
 .section-title {
 	font-size: 32rpx;
-	font-weight: 900;
+	font-weight: 800;
 	color: #1a1a2e;
+	letter-spacing: 1rpx;
 }
 .section-hint-badge {
 	display: flex;
@@ -2001,12 +2289,13 @@ export default {
 	gap: 12rpx;
 }
 .tag-item {
-	padding: 12rpx 26rpx;
-	border-radius: 28rpx;
+	padding: 10rpx 24rpx;
+	border-radius: 20rpx;
 	display: flex;
 	align-items: center;
 	gap: 6rpx;
 	transition: all 0.2s;
+	border: 1rpx solid rgba(0,0,0,0.04);
 }
 .tag-item.tag-color-0 {
 	background: linear-gradient(135deg, rgba(46,213,115,0.06), rgba(46,213,115,0.08));
@@ -2255,10 +2544,21 @@ export default {
 }
 .form-title {
 	font-size: 30rpx;
-	font-weight: 800;
+	font-weight: 700;
 	color: #1a1a2e;
-	margin-bottom: 24rpx;
-	display: block;
+}
+.form-title-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 20rpx;
+}
+.form-cancel-reply {
+	font-size: 24rpx;
+	color: #999;
+	padding: 6rpx 16rpx;
+	background: rgba(0,0,0,0.04);
+	border-radius: 16rpx;
 }
 .form-rating {
 	display: flex;
@@ -2577,9 +2877,10 @@ export default {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(255,255,255,0.92);
+	background: rgba(255,255,255,0.95);
 	backdrop-filter: blur(24px);
-	box-shadow: 0 -4rpx 40rpx rgba(46,213,115,0.06);
+	-webkit-backdrop-filter: blur(24px);
+	box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.04);
 	z-index: -1;
 }
 .bar-glass::after {
@@ -2595,8 +2896,8 @@ export default {
 .bar-left {
 	display: flex;
 	align-items: center;
-	gap: 28rpx;
-	margin-right: 24rpx;
+	gap: 20rpx;
+	margin-right: 20rpx;
 }
 .bar-btn {
 	display: flex;
@@ -2632,6 +2933,10 @@ export default {
 .bar-icon-circle.active {
 	background: rgba(255,71,87,0.08);
 }
+.bar-icon-circle.locked {
+	background: #f0f0f5;
+	opacity: 0.5;
+}
 .bar-icon {
 	font-size: 36rpx;
 	color: #888;
@@ -2664,6 +2969,9 @@ export default {
 	color: #fff;
 	position: relative;
 	overflow: hidden;
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 .action-btn::after {
 	content: '';
@@ -2687,19 +2995,41 @@ export default {
 }
 .buy-btn {
 	background: linear-gradient(135deg, #ff4757, #ff6b81);
-	box-shadow: 0 10rpx 32rpx rgba(255,71,87,0.35);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 }
 .buy-btn:active {
 	transform: scale(0.97) translateY(2rpx);
-	box-shadow: 0 4rpx 12rpx rgba(255,71,87,0.21);
+	box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08);
 }
-.member-btn {
+/* VIP免费 + 单独购买 双按钮 */
+.member-dual-btns {
+	flex: 1;
+	display: flex;
+	gap: 12rpx;
+}
+.member-vip-btn {
+	flex: 1.2;
 	background: linear-gradient(135deg, #f59e0b, #fbbf24);
-	box-shadow: 0 10rpx 32rpx rgba(245,158,11,0.35);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 }
-.member-btn:active {
+.member-vip-btn:active {
 	transform: scale(0.97) translateY(2rpx);
-	box-shadow: 0 4rpx 12rpx rgba(245,158,11,0.21);
+	box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08);
+}
+.member-buy-btn {
+	flex: 1;
+	background: linear-gradient(135deg, #ff4757, #ff6b81);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
+}
+.member-buy-btn:active {
+	transform: scale(0.97) translateY(2rpx);
+	box-shadow: 0 4rpx 12rpx rgba(0,0,0,0.08);
 }
 
 /* ========== 加载 ========== */

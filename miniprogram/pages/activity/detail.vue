@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :style="'--tc-primary:' + tc.primary + ';'">
 		<scroll-view scroll-y class="detail-scroll">
 			<!-- 加载骨架屏 -->
 			<view v-if="loading && !activity" class="skeleton">
@@ -13,103 +13,150 @@
 			</view>
 
 			<view v-else-if="activity">
-				<!-- 封面大图 -->
-				<view class="cover-section">
-					<image
-						:src="activity.cover_url || '/static/default-cover.png'"
-						mode="aspectFill"
-						class="cover-image"
-					></image>
-					<view class="cover-overlay">
-						<view class="type-tag-lg" :class="activity.activity_type">
-							<text>{{ typeLabels[activity.activity_type] || '线上' }}</text>
+				<!-- 公告详情 -->
+				<view v-if="loadType === 'announcement'" class="announcement-view">
+					<view class="ann-header">
+						<text class="ann-tag" :style="'color:' + tc.primary + ';background:' + tc.primary + '12;'">{{ typeMap[activity.type] || '通知' }}</text>
+						<text class="ann-time">{{ formatDateTime(activity.created_at) }}</text>
+					</view>
+					<text class="ann-title">{{ activity.title }}</text>
+					<view class="ann-divider"></view>
+					<rich-text :nodes="formatDesc(activity.content || '')" class="ann-content"></rich-text>
+
+					<!-- 公告图片 -->
+					<view class="ann-images" v-if="activity.images && activity.images.length > 0">
+						<image
+							v-for="(img, idx) in activity.images"
+							:key="idx"
+							:src="fixUrl(img)"
+							mode="widthFix"
+							class="ann-image"
+							@tap="previewImage(idx)"
+						></image>
+					</view>
+
+					<!-- 公告附件 -->
+					<view class="ann-attachments" v-if="activity.attachments && activity.attachments.length > 0">
+						<view class="ann-attach-title" :style="'color:' + tc.primary + ';'">
+							<text>📎 附件下载</text>
+						</view>
+						<view
+							class="ann-attach-item"
+							v-for="(file, idx) in activity.attachments"
+							:key="idx"
+							@tap="downloadFile(file)"
+						>
+							<text class="ann-attach-icon">📄</text>
+							<text class="ann-attach-name">{{ file.name || getFileName(file.url || file) }}</text>
+							<text class="ann-attach-dl" :style="'color:' + tc.primary + ';'">下载</text>
 						</view>
 					</view>
 				</view>
 
-				<!-- 活动信息 -->
-				<view class="info-card">
-					<text class="activity-title">{{ activity.title }}</text>
-
-					<view class="info-row">
-						<view class="info-icon-wrap">
-							<text class="row-icon">&#128197;</text>
+				<!-- 活动详情 -->
+				<template v-else>
+					<!-- 封面大图 -->
+					<view class="cover-section">
+						<image
+							v-if="activity.cover_url"
+							:src="fixUrl(activity.cover_url)"
+							mode="aspectFill"
+							class="cover-image"
+						></image>
+						<view v-else class="cover-placeholder">
+							<text class="cover-placeholder-icon">🎯</text>
 						</view>
-						<view class="info-content">
-							<text class="info-label">活动时间</text>
-							<text class="info-value">{{ formatDateTime(activity.start_time) }} - {{ formatDateTime(activity.end_time) }}</text>
-						</view>
-					</view>
-
-					<view class="info-row" v-if="activity.location">
-						<view class="info-icon-wrap">
-							<text class="row-icon">&#128205;</text>
-						</view>
-						<view class="info-content">
-							<text class="info-label">活动地点</text>
-							<text class="info-value">{{ activity.location }}</text>
-						</view>
-					</view>
-
-					<view class="info-row" v-if="activity.signup_deadline && activity.signup_deadline !== '0000-00-00 00:00:00'">
-						<view class="info-icon-wrap">
-							<text class="row-icon">&#9200;</text>
-						</view>
-						<view class="info-content">
-							<text class="info-label">报名截止</text>
-							<text class="info-value">{{ formatDateTime(activity.signup_deadline) }}</text>
-						</view>
-					</view>
-
-					<!-- 报名进度 -->
-					<view class="progress-section">
-						<view class="progress-header">
-							<text class="progress-title">报名进度</text>
-							<text class="progress-count">
-								<text class="count-current" :style="tPri">{{ activity.current_count }}</text>
-								<text class="count-sep"> / </text>
-								<text class="count-total">{{ activity.max_participants > 0 ? activity.max_participants : '不限' }}</text>
-								<text class="count-unit">人</text>
-							</text>
-						</view>
-						<view class="progress-bar-wrap" v-if="activity.max_participants > 0">
-							<view class="progress-bar-bg">
-								<view
-									class="progress-bar-fill"
-									:style="{ width: progressPercent + '%' }"
-								></view>
+						<view class="cover-overlay">
+							<view class="type-tag-lg" :style="'background:' + tc.primary + ';box-shadow:0 4rpx 20rpx ' + tc.primary + '70;'">
+								<text>{{ typeLabels[activity.activity_type] || '线上' }}</text>
 							</view>
-							<text class="progress-percent" :style="tPri">{{ progressPercent }}%</text>
 						</view>
 					</view>
-				</view>
 
-				<!-- 活动描述 -->
-				<view class="desc-card" v-if="activity.description">
-					<view class="section-title-wrap">
-						<view class="section-bar" :style="'background:' + tc.primary + ';'"></view>
-						<text class="section-title">活动详情</text>
+					<!-- 活动信息 -->
+					<view class="info-card">
+						<text class="activity-title">{{ activity.title }}</text>
+
+						<view class="info-row">
+							<view class="info-icon-wrap">
+								<text class="row-icon">&#128197;</text>
+							</view>
+							<view class="info-content">
+								<text class="info-label">活动时间</text>
+								<text class="info-value">{{ formatDateTime(activity.start_time) }} - {{ formatDateTime(activity.end_time) }}</text>
+							</view>
+						</view>
+
+						<view class="info-row" v-if="activity.location">
+							<view class="info-icon-wrap">
+								<text class="row-icon">&#128205;</text>
+							</view>
+							<view class="info-content">
+								<text class="info-label">活动地点</text>
+								<text class="info-value">{{ activity.location }}</text>
+							</view>
+						</view>
+
+						<view class="info-row" v-if="activity.signup_deadline && activity.signup_deadline !== '0000-00-00 00:00:00'">
+							<view class="info-icon-wrap">
+								<text class="row-icon">&#9200;</text>
+							</view>
+							<view class="info-content">
+								<text class="info-label">报名截止</text>
+								<text class="info-value">{{ formatDateTime(activity.signup_deadline) }}</text>
+							</view>
+						</view>
+
+						<!-- 报名进度 -->
+						<view class="progress-section">
+							<view class="progress-header">
+								<text class="progress-title">报名进度</text>
+								<text class="progress-count">
+									<text class="count-current" :style="tPri">{{ activity.current_count }}</text>
+									<text class="count-sep"> / </text>
+									<text class="count-total">{{ activity.max_participants > 0 ? activity.max_participants : '不限' }}</text>
+									<text class="count-unit">人</text>
+								</text>
+							</view>
+							<view class="progress-bar-wrap" v-if="activity.max_participants > 0">
+								<view class="progress-bar-bg">
+									<view
+										class="progress-bar-fill"
+										:style="{ width: progressPercent + '%' }"
+									></view>
+								</view>
+								<text class="progress-percent" :style="tPri">{{ progressPercent }}%</text>
+							</view>
+						</view>
 					</view>
-					<rich-text :nodes="formatDesc(activity.description)" class="desc-content"></rich-text>
-				</view>
 
-				<!-- 已报名信息 -->
-				<view class="signup-info-card" v-if="activity.is_signed_up && activity.signup_status">
-					<view class="signup-info-header">
+					<!-- 活动描述 -->
+					<view class="desc-card" v-if="activity.description">
 						<view class="section-title-wrap">
 							<view class="section-bar" :style="'background:' + tc.primary + ';'"></view>
-							<text class="section-title">我的报名</text>
+							<text class="section-title">活动详情</text>
 						</view>
-						<view class="signup-status-badge" :class="activity.signup_status.status" :style="activity.signup_status && activity.signup_status.status === 'confirmed' ? tPri : ''">
-							<text>{{ signupStatusLabels[activity.signup_status.status] || '已报名' }}</text>
+						<rich-text :nodes="formatDesc(activity.description)" class="desc-content"></rich-text>
+					</view>
+
+					<!-- 已报名信息 -->
+					<view class="signup-info-card" v-if="activity.is_signed_up && activity.signup_status">
+						<view class="signup-info-header">
+							<view class="section-title-wrap">
+								<view class="section-bar" :style="'background:' + tc.primary + ';'"></view>
+								<text class="section-title">我的报名</text>
+							</view>
+							<view class="signup-status-badge" :class="activity.signup_status.status" :style="activity.signup_status && activity.signup_status.status === 'confirmed' ? tPri : ''">
+								<text>{{ signupStatusLabels[activity.signup_status.status] || '已报名' }}</text>
+							</view>
+						</view>
+						<view class="signup-detail">
+							<text class="signup-detail-item">姓名：{{ activity.signup_status.name }}</text>
+							<text class="signup-detail-item" v-if="activity.signup_status.phone">手机：{{ activity.signup_status.phone }}</text>
+							<text class="signup-detail-item">报名时间：{{ activity.signup_status.created_at }}</text>
 						</view>
 					</view>
-					<view class="signup-detail">
-						<text class="signup-detail-item">姓名：{{ activity.signup_status.name }}</text>
-						<text class="signup-detail-item" v-if="activity.signup_status.phone">手机：{{ activity.signup_status.phone }}</text>
-						<text class="signup-detail-item">报名时间：{{ activity.signup_status.created_at }}</text>
-					</view>
-				</view>
+				</template>
 
 				<!-- 底部占位 -->
 				<view style="height: 180rpx;"></view>
@@ -117,13 +164,13 @@
 		</scroll-view>
 
 		<!-- 底部固定按钮 -->
-		<view class="bottom-bar" v-if="activity">
+		<view class="bottom-bar" v-if="activity && loadType !== 'announcement'">
 			<!-- 已报名 -->
 			<view v-if="activity.is_signed_up" class="bottom-btn-group">
 				<view class="btn-cancel" @tap="cancelSignup">
 					<text>取消报名</text>
 				</view>
-				<view class="btn-signed">
+				<view class="btn-signed" :style="'background:' + tc.primary + ';box-shadow:0 6rpx 24rpx ' + tc.primary + '4c;'">
 					<text>&#10003; 已报名</text>
 				</view>
 			</view>
@@ -136,7 +183,7 @@
 				<text>报名已截止</text>
 			</view>
 			<!-- 立即报名 -->
-			<view v-else class="btn-signup" @tap="showSignupForm">
+			<view v-else class="btn-signup" :style="'background:' + tc.primary + ';'" @tap="showSignupForm">
 				<text>立即报名</text>
 			</view>
 		</view>
@@ -191,6 +238,7 @@ export default {
 	data() {
 		return {
 			activityId: 0,
+			loadType: 'activity',
 			activity: null,
 			loading: true,
 			showModal: false,
@@ -208,7 +256,8 @@ export default {
 				pending: '待确认',
 				confirmed: '已确认',
 				cancelled: '已取消'
-			}
+			},
+			typeMap: { info: '通知', warning: '警告', success: '喜讯' }
 		};
 	},
 	computed: {
@@ -227,6 +276,10 @@ export default {
 	},
 	onLoad(options) {
 		this.activityId = parseInt(options.id) || 0;
+		this.loadType = options.type || 'activity';
+		if (this.loadType === 'announcement') {
+			uni.setNavigationBarTitle({ title: '公告详情' });
+		}
 		if (this.activityId > 0) {
 			this.loadDetail();
 		}
@@ -235,12 +288,15 @@ export default {
 		async loadDetail() {
 			this.loading = true;
 			try {
-				const res = await http.get('/api/activity/detail', { id: this.activityId });
+				const apiUrl = this.loadType === 'announcement'
+					? '/api/announcement/detail'
+					: '/api/activity/detail';
+				const res = await http.get(apiUrl, { id: this.activityId });
 				if (res.code === 0) {
 					this.activity = res.data;
 				}
 			} catch (e) {
-				console.error('加载活动详情失败', e);
+				console.error('加载详情失败', e);
 				uni.showToast({ title: '加载失败', icon: 'none' });
 			} finally {
 				this.loading = false;
@@ -348,6 +404,48 @@ export default {
 				.replace(/</g, '&lt;')
 				.replace(/>/g, '&gt;')
 				.replace(/\n/g, '<br>');
+		},
+		fixUrl(url) {
+			if (!url) return '';
+			if (url.startsWith('http')) return url;
+			return http.getBaseUrl() + url;
+		},
+		previewImage(idx) {
+			var images = (this.activity.images || []).map(function(u) {
+				return u.startsWith('http') ? u : http.getBaseUrl() + u;
+			});
+			uni.previewImage({ urls: images, current: images[idx] || images[0] });
+		},
+		downloadFile(file) {
+			var url = typeof file === 'string' ? file : (file.url || '');
+			if (!url) return;
+			var fullUrl = url.startsWith('http') ? url : http.getBaseUrl() + url;
+			uni.showLoading({ title: '下载中...' });
+			uni.downloadFile({
+				url: fullUrl,
+				success: function(res) {
+					uni.hideLoading();
+					if (res.statusCode === 200) {
+						uni.openDocument({
+							filePath: res.tempFilePath,
+							showMenu: true,
+							fail: function() {
+								uni.showToast({ title: '无法打开此文件', icon: 'none' });
+							}
+						});
+					} else {
+						uni.showToast({ title: '下载失败', icon: 'none' });
+					}
+				},
+				fail: function() {
+					uni.hideLoading();
+					uni.showToast({ title: '下载失败', icon: 'none' });
+				}
+			});
+		},
+		getFileName(path) {
+			if (!path) return '附件';
+			return path.split('/').pop();
 		}
 	},
 	onShareAppMessage() {
@@ -362,7 +460,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 	position: relative;
 }
 .detail-scroll {
@@ -404,6 +502,18 @@ export default {
 	height: 100%;
 	transition: transform 0.4s ease;
 }
+.cover-placeholder {
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.cover-placeholder-icon {
+	font-size: 80rpx;
+	opacity: 0.6;
+}
 .cover-section:active .cover-image {
 	transform: scale(1.02);
 }
@@ -412,7 +522,7 @@ export default {
 	bottom: 0;
 	left: 0;
 	right: 0;
-	padding: 40rpx 24rpx 24rpx;
+	padding: 60rpx 24rpx 24rpx;
 	background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
 }
 /* 类型标签发光 */
@@ -423,17 +533,7 @@ export default {
 	font-size: 24rpx;
 	font-weight: 600;
 	color: #fff;
-	background: linear-gradient(135deg, #2ed573, #27ae60);
-	box-shadow: 0 4rpx 20rpx rgba(46,213,115, 0.45), 0 0 24rpx rgba(46,213,115, 0.2);
 	animation: tagGlow 2s ease-in-out infinite alternate;
-}
-.type-tag-lg.offline {
-	background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
-	box-shadow: 0 4rpx 20rpx rgba(255, 107, 107, 0.45), 0 0 24rpx rgba(255, 107, 107, 0.2);
-}
-.type-tag-lg.both {
-	background: linear-gradient(135deg, #2ed573, #3be88a);
-	box-shadow: 0 4rpx 20rpx rgba(46,213,115, 0.45), 0 0 24rpx rgba(46,213,115, 0.2);
 }
 @keyframes tagGlow {
 	0% { filter: brightness(1); }
@@ -442,13 +542,13 @@ export default {
 
 /* ===== 信息卡片 ===== */
 .info-card {
-	margin: -48rpx 24rpx 24rpx;
+	margin: -20rpx 24rpx 24rpx;
 	background: #fff;
 	border-radius: 24rpx;
 	padding: 32rpx;
 	position: relative;
 	z-index: 2;
-	box-shadow: 0 12rpx 40rpx rgba(46,213,115, 0.1), 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+	box-shadow: 0 12rpx 40rpx var(--tc-primary, #2ed573)1a, 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 /* 顶部装饰圆点 */
 .info-card::before {
@@ -459,8 +559,9 @@ export default {
 	width: 10rpx;
 	height: 10rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #2ed573, #27ae60);
-	box-shadow: 0 0 12rpx rgba(46,213,115, 0.4), 24rpx 0 0 rgba(126, 217, 87, 0.6), 48rpx 0 0 rgba(145, 228, 50, 0.4);
+	background: var(--tc-primary, #2ed573);
+	box-shadow: 0 0 12rpx var(--tc-primary, #2ed573), 24rpx 0 0 var(--tc-primary, #2ed573), 48rpx 0 0 var(--tc-primary, #2ed573);
+	opacity: 0.6;
 }
 .activity-title {
 	font-size: 36rpx;
@@ -586,9 +687,13 @@ export default {
 .desc-card {
 	margin: 0 24rpx 24rpx;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 32rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 /* 顶部渐变装饰线 */
@@ -599,7 +704,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
 	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
@@ -636,9 +741,13 @@ export default {
 .signup-info-card {
 	margin: 0 24rpx 24rpx;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 32rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 /* 顶部渐变装饰线 */
@@ -705,21 +814,22 @@ export default {
 	right: 0;
 	padding: 20rpx 30rpx;
 	padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
-	background: rgba(255, 255, 255, 0.8);
+	background: rgba(255, 255, 255, 0.95);
 	backdrop-filter: blur(24rpx);
 	-webkit-backdrop-filter: blur(24rpx);
-	box-shadow: 0 -4rpx 24rpx rgba(46,213,115, 0.08);
+	box-shadow: 0 -2rpx 12rpx rgba(0,0,0,0.04);
 	z-index: 100;
 }
 .btn-signup {
-	background: linear-gradient(135deg, #2ed573 0%, #27ae60 100%);
 	text-align: center;
 	padding: 28rpx;
 	border-radius: 48rpx;
 	font-size: 32rpx;
 	font-weight: 700;
 	color: #fff;
-	box-shadow: 0 8rpx 28rpx rgba(46,213,115, 0.35);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	position: relative;
 	overflow: hidden;
@@ -742,7 +852,7 @@ export default {
 }
 .btn-signup:active {
 	transform: scale(0.97);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.25);
+	opacity: 0.85;
 }
 .btn-disabled {
 	background: #e8e8f0;
@@ -780,8 +890,6 @@ export default {
 	font-size: 30rpx;
 	font-weight: 700;
 	color: #fff;
-	background: linear-gradient(135deg, #2ed573, #3be88a);
-	box-shadow: 0 6rpx 24rpx rgba(46,213,115, 0.3);
 }
 
 /* ===== 弹窗 - 毛玻璃 ===== */
@@ -918,5 +1026,103 @@ export default {
 }
 .modal-btn-confirm.disabled {
 	opacity: 0.45;
+}
+
+/* ===== 公告详情 ===== */
+.announcement-view {
+	padding: 32rpx;
+	margin: 24rpx 24rpx 0;
+	background: #fff;
+	border-radius: 24rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
+}
+.ann-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 24rpx;
+}
+.ann-tag {
+	font-size: 22rpx;
+	padding: 4rpx 16rpx;
+	border-radius: 8rpx;
+	font-weight: 700;
+	letter-spacing: 0.5rpx;
+}
+.ann-time {
+	font-size: 24rpx;
+	color: #aaa;
+}
+.ann-title {
+	font-size: 36rpx;
+	font-weight: 800;
+	color: #1a1a2e;
+	line-height: 1.5;
+	letter-spacing: 1rpx;
+	margin-bottom: 24rpx;
+}
+.ann-divider {
+	height: 1rpx;
+	background: linear-gradient(90deg, transparent 0%, #eee 50%, transparent 100%);
+	margin-bottom: 24rpx;
+}
+.ann-content {
+	font-size: 28rpx;
+	color: #444;
+	line-height: 1.8;
+	letter-spacing: 0.3rpx;
+}
+
+/* 公告图片 */
+.ann-images {
+	margin-top: 28rpx;
+	display: flex;
+	flex-direction: column;
+	gap: 16rpx;
+}
+.ann-image {
+	width: 100%;
+	border-radius: 16rpx;
+}
+
+/* 公告附件 */
+.ann-attachments {
+	margin-top: 28rpx;
+	padding-top: 24rpx;
+	border-top: 1rpx solid #f0f0f0;
+}
+.ann-attach-title {
+	font-size: 26rpx;
+	font-weight: 700;
+	margin-bottom: 16rpx;
+}
+.ann-attach-item {
+	display: flex;
+	align-items: center;
+	padding: 18rpx 20rpx;
+	background: #f8f9fb;
+	border-radius: 14rpx;
+	margin-bottom: 12rpx;
+	border: 1rpx solid #eef0f3;
+}
+.ann-attach-icon {
+	font-size: 32rpx;
+	margin-right: 14rpx;
+}
+.ann-attach-name {
+	flex: 1;
+	font-size: 26rpx;
+	color: #333;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.ann-attach-dl {
+	flex-shrink: 0;
+	font-size: 24rpx;
+	font-weight: 600;
+	margin-left: 16rpx;
 }
 </style>

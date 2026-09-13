@@ -126,7 +126,6 @@ export default {
 			currentTab: 'net',
 			list: [],
 			page: 1,
-			pageSize: 10,
 			total: 0,
 			totalPages: 0,
 			loading: false,
@@ -203,15 +202,16 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 
-/* ===== 紫色渐变顶部背景 ===== */
+/* ===== 渐变顶部背景 ===== */
 .header-bg {
 	height: 200rpx;
 	background: linear-gradient(135deg, #2ed573 0%, #27ae60 40%, #1abc9c 100%);
 	position: relative;
 	overflow: hidden;
+	box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.04);
 }
 .header-bg::after {
 	content: '';
@@ -238,12 +238,15 @@ export default {
 .tab-bar {
 	display: flex;
 	margin: -60rpx 28rpx 24rpx;
-	background: rgba(255, 255, 255, 0.9);
-	backdrop-filter: blur(20rpx);
-	-webkit-backdrop-filter: blur(20rpx);
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: blur(24rpx);
+	-webkit-backdrop-filter: blur(24rpx);
 	border-radius: 24rpx;
 	padding: 8rpx;
-	box-shadow: 0 12rpx 40rpx rgba(46,213,115, 0.12), 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.04),
+		0 12rpx 40rpx rgba(0,0,0,0.08);
+	border: 1rpx solid rgba(255,255,255,0.8);
 	position: relative;
 	z-index: 10;
 }
@@ -269,9 +272,11 @@ export default {
 	transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .tab-item.active {
-	background: linear-gradient(135deg, #2ed573, #27ae60);
-	box-shadow: 0 6rpx 24rpx rgba(46,213,115, 0.35);
-	transform: scale(1.02);
+	background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(0,0,0,0.03));
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.08),
+		inset 0 1rpx 0 rgba(255,255,255,0.5);
+	transform: scale(1.01);
 }
 .tab-icon {
 	font-size: 32rpx;
@@ -284,7 +289,8 @@ export default {
 	transition: color 0.3s ease;
 }
 .tab-item.active .tab-text {
-	color: #fff;
+	color: #1a1a2e;
+	font-weight: 700;
 }
 
 /* ===== 滚动区域 ===== */
@@ -301,7 +307,11 @@ export default {
 	border-radius: 24rpx;
 	padding: 24rpx;
 	margin-bottom: 20rpx;
-	box-shadow: 0 8rpx 32rpx rgba(46,213,115, 0.06), 0 2rpx 8rpx rgba(0, 0, 0, 0.03);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 16rpx 40rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	transition: transform 0.25s ease, box-shadow 0.25s ease;
 	position: relative;
 }
@@ -313,7 +323,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
 	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
@@ -447,6 +457,8 @@ export default {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
+	letter-spacing: 0.5rpx;
+	line-height: 1.6;
 	line-height: 1.5;
 }
 .rank-tags {
@@ -455,12 +467,13 @@ export default {
 	flex-wrap: wrap;
 }
 .tag {
-	font-size: 22rpx;
-	background: rgba(46,213,115, 0.08);
-	padding: 4rpx 16rpx;
-	border-radius: 20rpx;
-	font-weight: 500;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.08);
+	font-size: 20rpx;
+	background: rgba(0,0,0,0.04);
+	padding: 5rpx 16rpx;
+	border-radius: 16rpx;
+	font-weight: 600;
+	letter-spacing: 0.3rpx;
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .rank-votes {
 	display: flex;
@@ -502,8 +515,11 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 0 20rpx;
 	background: #fff;
-	border-radius: 16rpx;
-	box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.06);
+	border-radius: 20rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .pager-btn {
 	padding: 12rpx 28rpx;
@@ -551,7 +567,7 @@ export default {
 	width: 260rpx;
 	height: 260rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.08), rgba(126, 217, 87, 0.04));
+	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
 	top: 80rpx;
 }
 .empty-icon {
@@ -584,12 +600,16 @@ export default {
 /* ===== 骨架屏 ===== */
 .skeleton-card {
 	background: #fff;
+	border-radius: 24rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.05);
 }
 .skeleton-num {
 	width: 40rpx;
 	height: 40rpx;
 	border-radius: 10rpx;
-	background: linear-gradient(90deg, #e8e8f0 25%, #f0f0f8 50%, #e8e8f0 75%);
+	background: linear-gradient(90deg, #eef0f5 25%, #f5f6fa 50%, #eef0f5 75%);
 	background-size: 200% 100%;
 	animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
@@ -599,14 +619,14 @@ export default {
 	border-radius: 18rpx;
 	flex-shrink: 0;
 	margin-right: 20rpx;
-	background: linear-gradient(90deg, #e8e8f0 25%, #f0f0f8 50%, #e8e8f0 75%);
+	background: linear-gradient(90deg, #eef0f5 25%, #f5f6fa 50%, #eef0f5 75%);
 	background-size: 200% 100%;
 	animation: skeleton-shimmer 1.5s ease-in-out infinite;
 }
 .skeleton-text {
 	height: 28rpx;
 	border-radius: 10rpx;
-	background: linear-gradient(90deg, #e8e8f0 25%, #f0f0f8 50%, #e8e8f0 75%);
+	background: linear-gradient(90deg, #eef0f5 25%, #f5f6fa 50%, #eef0f5 75%);
 	background-size: 200% 100%;
 	animation: skeleton-shimmer 1.5s ease-in-out infinite;
 	margin-bottom: 12rpx;

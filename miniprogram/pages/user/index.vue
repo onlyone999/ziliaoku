@@ -182,6 +182,14 @@
 					<text class="stat-num" :style="tPri">{{ stats.order_count || 0 }}</text>
 					<text class="stat-label">订单</text>
 				</view>
+				<view class="stat-divider"></view>
+				<view class="stat-item" @tap="goPage('/pages/points/index')">
+					<view class="stat-icon-wrap" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
+						<text class="stat-emoji">💰</text>
+					</view>
+					<text class="stat-num" :style="tPri">{{ stats.points || 0 }}</text>
+					<text class="stat-label">积分</text>
+				</view>
 			</view>
 
 			<!-- 菜单列表 -->
@@ -212,6 +220,13 @@
 						<text class="menu-emoji">👑</text>
 					</view>
 					<text class="menu-text">VIP中心</text>
+					<text class="menu-arrow">></text>
+				</view>
+				<view class="menu-item" @tap="goPage('/pages/points/index')">
+					<view class="menu-icon-wrap" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
+						<text class="menu-emoji">💰</text>
+					</view>
+					<text class="menu-text">积分中心</text>
 					<text class="menu-arrow">></text>
 				</view>
 				<view class="menu-item" v-if="feedbackEnabled" @tap="goPage('/pages/user/feedback')">
@@ -343,17 +358,15 @@ export default {
 		},
 		async loadUserInfo() {
 			try {
-				const res = await http.get('/api/user/info');
+				const res = await http.get('/api/user/info', {}, { silent: true });
 				if (res.code === 0) {
 					this.userInfo = res.data || {};
 				}
-			} catch (e) {
-				console.error('加载用户信息失败', e);
-			}
+			} catch (e) {}
 		},
 		async loadStats() {
 			try {
-				const res = await http.get('/api/user/stats');
+				const res = await http.get('/api/user/stats', {}, { silent: true });
 				if (res.code === 0) {
 					this.stats = res.data || {};
 					if (res.data && res.data.feedback_enabled !== undefined) {
@@ -522,29 +535,7 @@ export default {
 			uni.navigateTo({ url: '/pages/user/vip' });
 		},
 		async showAbout() {
-			try {
-				const res = await http.get('/api/user/about');
-				if (res.code === 0 && res.data) {
-					const d = res.data;
-					uni.showModal({
-						title: '关于我们',
-						content: `版本: ${d.about_version || 'v1.0.0'}\n\n${d.about_content || ''}\n\n${d.about_copyright || ''}`,
-						showCancel: false
-					});
-				} else {
-					uni.showModal({
-						title: '关于我们',
-						content: '资源下载平台 v1.0.0\n海量优质资源，助力高效工作',
-						showCancel: false
-					});
-				}
-			} catch (e) {
-				uni.showModal({
-					title: '关于我们',
-					content: '资源下载平台 v1.0.0\n海量优质资源，助力高效工作',
-					showCancel: false
-				});
-			}
+			uni.navigateTo({ url: '/pages/about/index' });
 		},
 
 		openThemePicker() {
@@ -643,7 +634,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
 }
 .main-scroll {
 	height: 100vh;
@@ -666,8 +657,8 @@ export default {
 	width: 360rpx;
 	height: 360rpx;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.03) 60%, transparent 70%);
-	border: 2rpx solid rgba(255,255,255,0.08);
+	background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 60%, transparent 70%);
+	border: 1rpx solid rgba(255,255,255,0.1);
 }
 .user-card::before {
 	content: '';
@@ -734,11 +725,13 @@ export default {
 	width: 120rpx;
 	height: 120rpx;
 	border-radius: 50%;
-	border: 5rpx solid #fff;
+	border: 4rpx solid rgba(255,255,255,0.9);
 	flex-shrink: 0;
 	position: relative;
 	z-index: 1;
-	box-shadow: 0 4rpx 20rpx rgba(0,0,0,0.15);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.1),
+		0 8rpx 24rpx rgba(0,0,0,0.08);
 }
 .avatar-wrap::before {
 	content: '';
@@ -1159,9 +1152,12 @@ export default {
 	border-radius: 32rpx;
 	overflow: hidden;
 	background: linear-gradient(150deg, #f0fdf4 0%, #d1fae5 35%, #a7f3d0 65%, #f0fdf4 100%);
-	box-shadow: 0 12rpx 40rpx rgba(0,0,0,0.18), 0 4rpx 12rpx rgba(0,0,0,0.03);
+	box-shadow:
+		0 4rpx 12rpx rgba(0,0,0,0.06),
+		0 12rpx 36rpx rgba(0,0,0,0.1),
+		0 24rpx 60rpx rgba(0,0,0,0.06);
 	position: relative;
-	border: 2rpx solid rgba(0,0,0,0.2);
+	border: 1rpx solid rgba(255,255,255,0.5);
 }
 .vip-banner::before {
 	content: '';
@@ -1266,8 +1262,12 @@ export default {
 	background: #fff;
 	margin: 0 24rpx 24rpx;
 	padding: 36rpx 0;
-	border-radius: 24rpx;
-	box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.06);
+	border-radius: 28rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 20rpx 48rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 	position: relative;
 }
 .stat-item {
@@ -1295,16 +1295,16 @@ export default {
 	opacity: 0.12;
 }
 .download-bg {
-	background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.08));
+	background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(99,102,241,0.06));
 }
 .fav-bg {
-	background: linear-gradient(135deg, rgba(255,71,87,0.15), rgba(255,107,129,0.08));
+	background: linear-gradient(135deg, rgba(255,71,87,0.10), rgba(255,107,129,0.06));
 }
 .points-bg {
-	background: linear-gradient(135deg, rgba(255,159,67,0.15), rgba(255,183,77,0.08));
+	background: linear-gradient(135deg, rgba(255,159,67,0.10), rgba(255,183,77,0.06));
 }
 .orders-bg {
-	background: linear-gradient(135deg, rgba(0,0,0,0.15), rgba(105,230,153,0.08));
+	background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(105,230,153,0.06));
 }
 .stat-emoji {
 	font-size: 30rpx;
@@ -1331,20 +1331,24 @@ export default {
 .menu-card {
 	background: #fff;
 	margin: 0 24rpx 24rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	overflow: hidden;
-	box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.06);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06),
+		0 20rpx 48rpx rgba(0,0,0,0.04);
+	border: 1rpx solid rgba(0,0,0,0.03);
 }
 .menu-item {
 	display: flex;
 	align-items: center;
-	padding: 30rpx 32rpx;
-	border-bottom: 1rpx solid rgba(245,245,248,0.8);
+	padding: 34rpx 32rpx;
+	border-bottom: 1rpx solid rgba(0,0,0,0.04);
 	transition: all 0.2s ease;
 	position: relative;
 }
 .menu-item:active {
-	background: rgba(0,0,0,0.04);
+	background: rgba(0,0,0,0.03);
 	transform: scale(0.99);
 }
 .menu-item:last-child {
@@ -1377,25 +1381,25 @@ export default {
 	font-size: 28rpx;
 }
 .download-bg {
-	background: linear-gradient(135deg, rgba(59,130,246,0.15), rgba(99,102,241,0.08));
+	background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(99,102,241,0.06));
 }
 .fav-bg {
-	background: linear-gradient(135deg, rgba(255,71,87,0.15), rgba(255,107,129,0.08));
+	background: linear-gradient(135deg, rgba(255,71,87,0.10), rgba(255,107,129,0.06));
 }
 .order-bg {
-	background: linear-gradient(135deg, rgba(0,184,148,0.15), rgba(72,219,185,0.08));
+	background: linear-gradient(135deg, rgba(0,184,148,0.10), rgba(72,219,185,0.06));
 }
 .vip-bg {
-	background: linear-gradient(135deg, rgba(249,202,36,0.15), rgba(255,215,0,0.08));
+	background: linear-gradient(135deg, rgba(249,202,36,0.10), rgba(255,215,0,0.06));
 }
 .fb-bg {
-	background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(0,0,0,0.08));
+	background: linear-gradient(135deg, rgba(99,102,241,0.10), rgba(139,92,246,0.06));
 }
 .about-bg {
-	background: linear-gradient(135deg, rgba(148,163,184,0.15), rgba(176,190,210,0.08));
+	background: linear-gradient(135deg, rgba(148,163,184,0.10), rgba(176,190,210,0.06));
 }
 .theme-bg {
-	background: linear-gradient(135deg, rgba(236,72,153,0.15), rgba(139,92,246,0.08));
+	background: linear-gradient(135deg, rgba(236,72,153,0.10), rgba(139,92,246,0.06));
 }
 .theme-dot {
 	width: 24rpx;
@@ -1412,6 +1416,7 @@ export default {
 	font-size: 28rpx;
 	color: #1a1a2e;
 	font-weight: 600;
+	letter-spacing: 0.5rpx;
 }
 .menu-arrow {
 	font-size: 28rpx;
@@ -1439,7 +1444,9 @@ export default {
 	font-weight: 600;
 	position: relative;
 	overflow: hidden;
-	box-shadow: 0 4rpx 24rpx rgba(0,0,0,0.06);
+	box-shadow:
+		0 2rpx 8rpx rgba(0,0,0,0.03),
+		0 8rpx 24rpx rgba(0,0,0,0.06);
 	border: 2rpx solid transparent;
 	background-clip: padding-box;
 }

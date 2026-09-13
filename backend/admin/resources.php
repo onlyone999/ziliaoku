@@ -7,6 +7,7 @@ session_start();
 if (empty($_SESSION['admin_id'])) { header('Location: login.php'); exit; }
 
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/helper.php';
 require_once __DIR__ . '/../core/AdminLog.php';
 $db = Database::getInstance();
 $adminId = $_SESSION['admin_id'];
@@ -225,7 +226,7 @@ $filterPriceType = $_GET['price_type'] ?? '';
 $sortBy = $_GET['sort_by'] ?? '';
 $rankView = isset($_GET['rank_view']) && $_GET['rank_view'] === '1';
 $page       = max(1, (int)($_GET['page'] ?? 1));
-$perPage    = 20;
+$perPage    = getPerPage(20);
 $offset     = ($page - 1) * $perPage;
 
 // 构建WHERE

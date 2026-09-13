@@ -55,7 +55,7 @@
 						@tap="selectedPlan = idx"
 					>
 						<view class="p-left">
-							<view class="p-radio" :class="{ sel: selectedPlan === idx }">
+							<view class="p-radio" :class="{ sel: selectedPlan === idx }" :style="selectedPlan === idx ? 'background:' + tc.primary + ';border-color:transparent;box-shadow:0 0 12rpx ' + tc.primary + '4c;' : ''">
 								<view class="p-dot" v-if="selectedPlan === idx"></view>
 							</view>
 							<view class="p-info">
@@ -162,20 +162,20 @@ export default {
 </script>
 
 <style scoped>
-.page{min-height:100vh;background:#f5f5f7;}
+.page{min-height:100vh;background:linear-gradient(180deg,#eef0f8 0%,#f3f4f8 8%,#f7f8fc 20%,#fafbfe 50%,#f8f9fc 100%);}
 .scroll{height:100vh;}
 
 /* 顶部 */
-.header{background:#fff;padding:80rpx 40rpx 48rpx;}
+.header{background:#fff;padding:80rpx 40rpx 48rpx;box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.06);border-bottom:1rpx solid rgba(0,0,0,0.03);}
 .header-inner{display:flex;flex-direction:column;align-items:center;}
 .h-crown{font-size:72rpx;margin-bottom:16rpx;}
 .h-title{font-size:40rpx;font-weight:700;color:#1d1d1f;letter-spacing:2rpx;}
 .h-sub{font-size:26rpx;color:#86868b;margin-top:10rpx;}
-.h-tag{margin-top:16rpx;background:#f5f5f7;padding:8rpx 24rpx;border-radius:20rpx;}
+.h-tag{margin-top:16rpx;background:rgba(0,0,0,0.04);padding:8rpx 24rpx;border-radius:20rpx;border:1rpx solid rgba(0,0,0,0.03);}
 .h-tag-t{font-size:24rpx;color:#1d1d1f;font-weight:500;}
 
 /* 卡片 */
-.card{background:#fff;margin:24rpx;border-radius:20rpx;padding:32rpx;}
+.card{background:#fff;margin:24rpx;border-radius:28rpx;padding:32rpx;box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.06),0 16rpx 40rpx rgba(0,0,0,0.04);border:1rpx solid rgba(0,0,0,0.03);}
 .card-title{font-size:30rpx;font-weight:700;color:#1d1d1f;margin-bottom:24rpx;display:block;}
 
 /* 权益 */
@@ -185,8 +185,8 @@ export default {
 .ben-t{font-size:24rpx;color:#1d1d1f;font-weight:500;}
 
 /* 对比表 */
-.tbl{border:1rpx solid #e8e8e8;border-radius:12rpx;overflow:hidden;}
-.tbl-hd{display:flex;background:#fafafa;padding:20rpx 0;}
+.tbl{border:1rpx solid rgba(0,0,0,0.04);border-radius:16rpx;overflow:hidden;}
+.tbl-hd{display:flex;background:rgba(0,0,0,0.02);padding:20rpx 0;}
 .tbl-c{flex:1;text-align:center;font-size:24rpx;color:#86868b;}
 .tbl-c.l{flex:1.2;text-align:left;padding-left:24rpx;font-weight:600;color:#1d1d1f;}
 .tbl-hd .tbl-c{font-weight:600;color:#1d1d1f;font-size:26rpx;}
@@ -200,17 +200,19 @@ export default {
 .p{
 	display:flex;align-items:center;justify-content:space-between;
 	background:#fff;
-	border:2rpx solid #e8e8e8;
-	border-radius:20rpx;
+	border:1rpx solid rgba(0,0,0,0.06);
+	border-radius:24rpx;
 	padding:28rpx 24rpx;
 	margin-bottom:16rpx;
 	transition:all .2s;
 	position:relative;
+	box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.05);
 }
 .p:last-child{margin-bottom:0;}
 .p.on{
 	background:#f8fef9;
-	box-shadow:0 0 0 4rpx rgba(46,213,115,.08);
+	box-shadow:0 2rpx 8rpx rgba(0,0,0,0.04),0 8rpx 24rpx rgba(0,0,0,0.08);
+	border-color:rgba(0,0,0,0.04);
 }
 .p.hot::before{
 	content:'';
@@ -226,7 +228,11 @@ export default {
 	flex-shrink:0;
 	transition:all .2s;
 }
-.p-radio.sel{}
+.p-radio.sel{
+	border-color:transparent;
+	background:#2ed573;
+	box-shadow:0 0 12rpx rgba(46,213,115,.3);
+}
 .p-dot{width:16rpx;height:16rpx;border-radius:50%;background:#fff;}
 .p-info{display:flex;flex-direction:column;gap:6rpx;}
 .p-name-row{display:flex;align-items:center;gap:10rpx;}
@@ -266,10 +272,13 @@ export default {
 .bar{
 	position:fixed;bottom:0;left:0;right:0;
 	display:flex;align-items:center;justify-content:space-between;
-	background:#fff;
+	background:rgba(255,255,255,0.95);
+	backdrop-filter:blur(24px);
+	-webkit-backdrop-filter:blur(24px);
 	padding:20rpx 32rpx;
 	padding-bottom:calc(20rpx + env(safe-area-inset-bottom));
-	border-top:1rpx solid #e8e8e8;
+	border-top:1rpx solid rgba(0,0,0,0.04);
+	box-shadow:0 -2rpx 12rpx rgba(0,0,0,0.04);
 	z-index:100;
 }
 .bar-left{display:flex;align-items:baseline;}

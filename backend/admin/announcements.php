@@ -7,6 +7,7 @@ session_start();
 if (empty($_SESSION['admin_id'])) { header('Location: login.php'); exit; }
 
 require_once __DIR__ . '/../core/Database.php';
+require_once __DIR__ . '/helper.php';
 require_once __DIR__ . '/../core/AdminLog.php';
 $db = Database::getInstance();
 $csrfToken = $_SESSION['csrf_token'] ?? '';
@@ -70,7 +71,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $content  = trim($_POST['content'] ?? '');
             $type     = $_POST['type'] ?? 'info';
             $isTop    = isset($_POST['is_top']) ? 1 : 0;
+            $isVisible = isset($_POST['is_visible']) ? 1 : 0;
             $status   = $_POST['status'] ?? 'draft';
+            $images   = trim($_POST['images_json'] ?? '[]');
+            $attachments = trim($_POST['attachments_json'] ?? '[]');
 
             if ($title === '') {
                 $msg = '标题为必填项'; $msgType = 'error';
@@ -80,12 +84,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msg = '状态无效'; $msgType = 'error';
             } else {
                 $data = [
-                    'title'   => $title,
-                    'content' => $content,
-                    'type'    => $type,
-                    'is_top'  => $isTop,
-                    'status'  => $status,
-                    'admin_id'=> (int)$_SESSION['admin_id'],
+                    'title'       => $title,
+                    'content'     => $content,
+                    'images'      => $images,
+                    'attachments' => $attachments,
+                    'type'        => $type,
+                    'is_top'      => $isTop,
+                    'is_visible'  => $isVisible,
+                    'status'      => $status,
+                    'admin_id'    => (int)$_SESSION['admin_id'],
                 ];
                 if ($editId > 0) {
                     $db->update('announcements', $data, 'id = :id', [':id' => $editId]);
@@ -108,7 +115,7 @@ $search      = trim($_GET['search'] ?? '');
 $filterType  = $_GET['type'] ?? '';
 $filterStatus= $_GET['status'] ?? '';
 $page        = max(1, (int)($_GET['page'] ?? 1));
-$perPage     = 15;
+$perPage     = getPerPage(15);
 $offset      = ($page - 1) * $perPage;
 
 $where = '1=1';
@@ -199,6 +206,53 @@ include __DIR__ . '/header.php';
                   placeholder="请输入公告内容"><?php echo htmlspecialchars($editAnn['content'] ?? ''); ?></textarea>
       </div>
 
+      <!-- 图片上传 -->
+      <div class="form-group">
+        <label>公告图片 <small class="text-muted">（可多张，支持 jpg/png/gif）</small></label>
+        <div id="image-preview" class="upload-preview">
+          <?php
+          $existingImages = [];
+          if ($editAnn && !empty($editAnn['images'])) {
+              $existingImages = json_decode($editAnn['images'], true) ?: [];
+          }
+          foreach ($existingImages as $img): ?>
+          <div class="upload-item">
+            <img src="<?php echo htmlspecialchars($img); ?>" onerror="this.src='/static/placeholder.png'">
+            <button type="button" class="upload-remove" onclick="removeUploadItem(this)">&times;</button>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="upload-btn-wrap">
+          <input type="file" id="image-input" accept="image/*" multiple style="display:none">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('image-input').click()">+ 添加图片</button>
+        </div>
+        <input type="hidden" name="images_json" id="images_json" value="<?php echo htmlspecialchars($editAnn['images'] ?? '[]'); ?>">
+      </div>
+
+      <!-- 附件上传 -->
+      <div class="form-group">
+        <label>附件 <small class="text-muted">（支持 pdf/doc/xls/zip/rar 等）</small></label>
+        <div id="attachment-preview" class="upload-preview upload-attach-list">
+          <?php
+          $existingAttach = [];
+          if ($editAnn && !empty($editAnn['attachments'])) {
+              $existingAttach = json_decode($editAnn['attachments'], true) ?: [];
+          }
+          foreach ($existingAttach as $at): ?>
+          <div class="attach-item">
+            <span class="attach-icon">📎</span>
+            <span class="attach-name"><?php echo htmlspecialchars(basename($at)); ?></span>
+            <button type="button" class="upload-remove" onclick="removeAttachItem(this)">&times;</button>
+          </div>
+          <?php endforeach; ?>
+        </div>
+        <div class="upload-btn-wrap">
+          <input type="file" id="attachment-input" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip,.rar,.7z,.txt,.csv" multiple style="display:none">
+          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('attachment-input').click()">+ 添加附件</button>
+        </div>
+        <input type="hidden" name="attachments_json" id="attachments_json" value="<?php echo htmlspecialchars($editAnn['attachments'] ?? '[]'); ?>">
+      </div>
+
       <div class="form-row">
         <div class="form-group">
           <label>状态</label>
@@ -214,6 +268,14 @@ include __DIR__ . '/header.php';
             <input type="checkbox" name="is_top" value="1"
                    <?php echo (!empty($editAnn['is_top'])) ? 'checked' : ''; ?>>
             置顶显示
+          </label>
+        </div>
+        <div class="form-group">
+          <label>&nbsp;</label>
+          <label class="checkbox-label" style="display:flex;align-items:center;gap:8px;height:38px;">
+            <input type="checkbox" name="is_visible" value="1"
+                   <?php echo (($editAnn['is_visible'] ?? 1) == 1) ? 'checked' : ''; ?>>
+            前端显示
           </label>
         </div>
       </div>
@@ -274,6 +336,7 @@ include __DIR__ . '/header.php';
             <th>类型</th>
             <th>状态</th>
             <th>置顶</th>
+            <th>显示</th>
             <th>创建时间</th>
             <th>操作</th>
           </tr>
@@ -301,6 +364,13 @@ include __DIR__ . '/header.php';
               <span class="badge badge-warning">📌 已置顶</span>
               <?php else: ?>
               <span class="text-muted">-</span>
+              <?php endif; ?>
+            </td>
+            <td>
+              <?php if (($a['is_visible'] ?? 1) == 1): ?>
+              <span class="badge badge-success">显示</span>
+              <?php else: ?>
+              <span class="badge badge-default">隐藏</span>
               <?php endif; ?>
             </td>
             <td><?php echo substr($a['created_at'], 0, 16); ?></td>
@@ -376,5 +446,115 @@ include __DIR__ . '/header.php';
 </div>
 
 <?php endif; ?>
+
+<style>
+.upload-preview { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:8px; min-height:20px; }
+.upload-item { position:relative; width:100px; height:100px; border-radius:8px; overflow:hidden; border:1px solid #e5e7eb; }
+.upload-item img { width:100%; height:100%; object-fit:cover; }
+.upload-remove { position:absolute; top:2px; right:2px; width:22px; height:22px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; border:none; cursor:pointer; font-size:14px; line-height:1; display:flex; align-items:center; justify-content:center; }
+.upload-remove:hover { background:#ef4444; }
+.upload-btn-wrap { margin-bottom:10px; }
+.upload-attach-list { flex-direction:column; }
+.attach-item { display:flex; align-items:center; gap:8px; padding:8px 12px; background:#f9fafb; border:1px solid #e5e7eb; border-radius:6px; font-size:13px; }
+.attach-icon { font-size:16px; }
+.attach-name { flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#374151; }
+.upload-item.uploading { opacity:0.5; }
+.upload-item.uploading::after { content:'上传中'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(0,0,0,0.3); color:#fff; font-size:12px; }
+.attach-item.uploading { opacity:0.5; }
+</style>
+
+<script>
+// ============ 图片上传 ============
+var imageList = <?php echo $editAnn['images'] ?? '[]'; ?>;
+
+document.getElementById('image-input').addEventListener('change', function(e) {
+    var files = e.target.files;
+    for (var i = 0; i < files.length; i++) {
+        uploadFile(files[i], 'image');
+    }
+    e.target.value = '';
+});
+
+function uploadFile(file, fileType) {
+    var formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', fileType);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'upload_api.php', true);
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            try {
+                var res = JSON.parse(xhr.responseText);
+                if (res.code === 0 && res.data && res.data.url) {
+                    if (fileType === 'image') {
+                        imageList.push(res.data.url);
+                        document.getElementById('images_json').value = JSON.stringify(imageList);
+                        addImagePreview(res.data.url);
+                    } else {
+                        var attachList = JSON.parse(document.getElementById('attachments_json').value || '[]');
+                        attachList.push({ url: res.data.url, name: file.name });
+                        document.getElementById('attachments_json').value = JSON.stringify(attachList);
+                        addAttachPreview(res.data.url, file.name);
+                    }
+                } else {
+                    alert('上传失败: ' + (res.message || '未知错误'));
+                }
+            } catch(e) {
+                alert('上传失败: 响应解析错误');
+            }
+        } else {
+            alert('上传失败: HTTP ' + xhr.status);
+        }
+    };
+    xhr.onerror = function() { alert('上传失败: 网络错误'); };
+    xhr.send(formData);
+}
+
+function addImagePreview(url) {
+    var div = document.createElement('div');
+    div.className = 'upload-item';
+    div.innerHTML = '<img src="' + url + '" onerror="this.src=\'/static/placeholder.png\'">' +
+        '<button type="button" class="upload-remove" onclick="removeUploadItem(this)">&times;</button>';
+    document.getElementById('image-preview').appendChild(div);
+}
+
+function removeUploadItem(btn) {
+    var item = btn.parentElement;
+    var img = item.querySelector('img');
+    var src = img ? img.getAttribute('src') : '';
+    imageList = imageList.filter(function(u) { return u !== src; });
+    document.getElementById('images_json').value = JSON.stringify(imageList);
+    item.remove();
+}
+
+// ============ 附件上传 ============
+document.getElementById('attachment-input').addEventListener('change', function(e) {
+    var files = e.target.files;
+    for (var i = 0; i < files.length; i++) {
+        uploadFile(files[i], 'attachment');
+    }
+    e.target.value = '';
+});
+
+function addAttachPreview(url, name) {
+    var div = document.createElement('div');
+    div.className = 'attach-item';
+    div.innerHTML = '<span class="attach-icon">📎</span>' +
+        '<span class="attach-name">' + name + '</span>' +
+        '<button type="button" class="upload-remove" onclick="removeAttachItem(this)">&times;</button>';
+    document.getElementById('attachment-preview').appendChild(div);
+}
+
+function removeAttachItem(btn) {
+    var item = btn.parentElement;
+    var nameEl = item.querySelector('.attach-name');
+    var name = nameEl ? nameEl.textContent : '';
+    var attachList = JSON.parse(document.getElementById('attachments_json').value || '[]');
+    attachList = attachList.filter(function(a) { return a.name !== name; });
+    document.getElementById('attachments_json').value = JSON.stringify(attachList);
+    item.remove();
+}
+</script>
 
 <?php include __DIR__ . '/footer.php'; ?>
