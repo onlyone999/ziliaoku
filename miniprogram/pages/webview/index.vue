@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<web-view :src="url" v-if="url"></web-view>
 		<view class="loading" v-else>
 			<text>加载中...</text>

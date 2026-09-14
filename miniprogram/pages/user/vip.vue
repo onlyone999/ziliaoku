@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="scroll">
 			<!-- 顶部 -->
 			<view class="header">
@@ -162,35 +162,49 @@ export default {
 </script>
 
 <style scoped>
-.page{min-height:100vh;background:linear-gradient(180deg,#eef0f8 0%,#f3f4f8 8%,#f7f8fc 20%,#fafbfe 50%,#f8f9fc 100%);}
+.page{min-height:100vh;background: transparent;}
 .scroll{height:100vh;}
 
 /* 顶部 */
-.header{background:#fff;padding:80rpx 40rpx 48rpx;box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.06);border-bottom:1rpx solid rgba(0,0,0,0.03);}
+.header{
+	background:linear-gradient(180deg, #a8e063 0%, #b5e87a 40%, #ddf5b8 100%);
+	padding:96rpx 40rpx 56rpx;
+	box-shadow:0 16rpx 40rpx rgba(124,179,66,0.18);
+}
 .header-inner{display:flex;flex-direction:column;align-items:center;}
-.h-crown{font-size:72rpx;margin-bottom:16rpx;}
-.h-title{font-size:40rpx;font-weight:700;color:#1d1d1f;letter-spacing:2rpx;}
-.h-sub{font-size:26rpx;color:#86868b;margin-top:10rpx;}
-.h-tag{margin-top:16rpx;background:rgba(0,0,0,0.04);padding:8rpx 24rpx;border-radius:20rpx;border:1rpx solid rgba(0,0,0,0.03);}
-.h-tag-t{font-size:24rpx;color:#1d1d1f;font-weight:500;}
+.h-crown{font-size:64rpx;margin-bottom:16rpx;}
+.h-title{font-size:44rpx;font-weight:800;color:#ffffff;letter-spacing:2rpx;}
+.h-sub{font-size:26rpx;color:rgba(255,255,255,0.85);margin-top:10rpx;letter-spacing:0.5rpx;}
+.h-tag{
+	margin-top:20rpx;
+	background:rgba(255,255,255,0.2);
+	padding:8rpx 24rpx;
+	border-radius:999rpx;
+	border:none;
+}
+.h-tag-t{font-size:24rpx;color:#5d4037;font-weight:700;}
 
 /* 卡片 */
-.card{background:#fff;margin:24rpx;border-radius:28rpx;padding:32rpx;box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.06),0 16rpx 40rpx rgba(0,0,0,0.04);border:1rpx solid rgba(0,0,0,0.03);}
-.card-title{font-size:30rpx;font-weight:700;color:#1d1d1f;margin-bottom:24rpx;display:block;}
+.card{
+	background:#fff;margin:24rpx;border-radius:36rpx;padding:32rpx;
+	box-shadow:0 1px 1px rgba(15,23,42,0.02),0 4px 12px rgba(15,23,42,0.04),0 16px 32px -8px rgba(15,23,42,0.05);
+	border:none;
+}
+.card-title{font-size:30rpx;font-weight:700;color:#1a1a1a;margin-bottom:24rpx;display:block;letter-spacing:0.3rpx;}
 
 /* 权益 */
 .ben-row{display:flex;flex-wrap:wrap;}
 .ben{width:33.333%;display:flex;flex-direction:column;align-items:center;padding:20rpx 0;}
-.ben-ico{font-size:48rpx;margin-bottom:10rpx;}
-.ben-t{font-size:24rpx;color:#1d1d1f;font-weight:500;}
+.ben-ico{font-size:44rpx;margin-bottom:10rpx;}
+.ben-t{font-size:24rpx;color:#1e293b;font-weight:500;}
 
 /* 对比表 */
-.tbl{border:1rpx solid rgba(0,0,0,0.04);border-radius:16rpx;overflow:hidden;}
-.tbl-hd{display:flex;background:rgba(0,0,0,0.02);padding:20rpx 0;}
-.tbl-c{flex:1;text-align:center;font-size:24rpx;color:#86868b;}
-.tbl-c.l{flex:1.2;text-align:left;padding-left:24rpx;font-weight:600;color:#1d1d1f;}
-.tbl-hd .tbl-c{font-weight:600;color:#1d1d1f;font-size:26rpx;}
-.tbl-row{display:flex;padding:18rpx 0;border-top:1rpx solid #f0f0f0;}
+.tbl{border:1rpx solid rgba(20,30,50,0.06);border-radius:16rpx;overflow:hidden;}
+.tbl-hd{display:flex;background:#f0f7e6;padding:20rpx 0;}
+.tbl-c{flex:1;text-align:center;font-size:24rpx;color:#9aa3b2;}
+.tbl-c.l{flex:1.2;text-align:left;padding-left:24rpx;font-weight:600;color:#1a1a1a;}
+.tbl-hd .tbl-c{font-weight:600;color:#1a1a1a;font-size:26rpx;}
+.tbl-row{display:flex;padding:18rpx 0;border-top:1rpx solid rgba(20,30,50,0.05);}
 .tbl-c.r.vip{font-weight:700;}
 
 /* 套餐 */
@@ -200,90 +214,93 @@ export default {
 .p{
 	display:flex;align-items:center;justify-content:space-between;
 	background:#fff;
-	border:1rpx solid rgba(0,0,0,0.06);
-	border-radius:24rpx;
+	border:1rpx solid rgba(15,23,42,0.055);
+	border-radius:20rpx;
 	padding:28rpx 24rpx;
 	margin-bottom:16rpx;
 	transition:all .2s;
 	position:relative;
-	box-shadow:0 2rpx 8rpx rgba(0,0,0,0.03),0 8rpx 24rpx rgba(0,0,0,0.05);
+	box-shadow:0 1px 1px rgba(15,23,42,0.02),0 4px 12px rgba(15,23,42,0.04);
 }
 .p:last-child{margin-bottom:0;}
 .p.on{
-	background:#f8fef9;
-	box-shadow:0 2rpx 8rpx rgba(0,0,0,0.04),0 8rpx 24rpx rgba(0,0,0,0.08);
-	border-color:rgba(0,0,0,0.04);
+	background:#f8fafc;
+	box-shadow:0 1rpx 2rpx rgba(20,30,50,0.03),0 8rpx 24rpx rgba(20,30,50,0.06);
+	border-color:rgba(124,179,66,0.28);
 }
 .p.hot::before{
 	content:'';
-	position:absolute;left:0;top:20%;bottom:20%;width:6rpx;
-	border-radius:0 4rpx 4rpx 0;
+	position:absolute;left:0;top:18%;bottom:18%;width:4rpx;
+	border-radius:0 2rpx 2rpx 0;
+	background:#f0c14b;
 }
 .p-left{display:flex;align-items:center;gap:20rpx;flex:1;}
 .p-radio{
-	width:40rpx;height:40rpx;
+	width:36rpx;height:36rpx;
 	border-radius:50%;
-	border:3rpx solid #d4d4d4;
+	border:2rpx solid #cbd5e1;
 	display:flex;align-items:center;justify-content:center;
 	flex-shrink:0;
 	transition:all .2s;
 }
 .p-radio.sel{
 	border-color:transparent;
-	background:#2ed573;
-	box-shadow:0 0 12rpx rgba(46,213,115,.3);
+	background:#7cb342;
+	box-shadow:none;
 }
-.p-dot{width:16rpx;height:16rpx;border-radius:50%;background:#fff;}
+.p-dot{width:14rpx;height:14rpx;border-radius:50%;background:#fff;}
 .p-info{display:flex;flex-direction:column;gap:6rpx;}
 .p-name-row{display:flex;align-items:center;gap:10rpx;}
-.p-name{font-size:30rpx;font-weight:700;color:#1d1d1f;}
+.p-name{font-size:30rpx;font-weight:700;color:#1a1a1a;}
 .p-badge{
 	font-size:18rpx;font-weight:600;color:#fff;
-	padding:4rpx 14rpx;
-	border-radius:8rpx;
+	padding:4rpx 12rpx;
+	border-radius:6rpx;
+	background:linear-gradient(135deg,#f0c14b,#e6a817);
 }
 .p-save{
 	font-size:18rpx;font-weight:600;
-	background:rgba(46,213,115,.08);
+	background:rgba(201,162,39,.1);
+	color:#a06e00;
 	padding:4rpx 12rpx;
-	border-radius:8rpx;
+	border-radius:6rpx;
 }
-.p-daily{font-size:22rpx;color:#86868b;}
+.p-daily{font-size:22rpx;color:#9aa3b2;}
 .p-right{display:flex;flex-direction:column;align-items:flex-end;gap:4rpx;}
 .p-pr{display:flex;align-items:baseline;}
-.p-sym{font-size:22rpx;color:#1d1d1f;font-weight:600;}
-.p-val{font-size:44rpx;color:#1d1d1f;font-weight:700;line-height:1;}
-.p-ori{font-size:20rpx;color:#ccc;text-decoration:line-through;}
+.p-sym{font-size:22rpx;color:#1a1a1a;font-weight:600;}
+.p-val{font-size:44rpx;color:#1a1a1a;font-weight:700;line-height:1;letter-spacing:-1rpx;}
+.p-ori{font-size:20rpx;color:#c0c6d0;text-decoration:line-through;}
 
 /* 保障 */
 .trusts{display:flex;justify-content:center;gap:32rpx;margin:24rpx;padding:20rpx 0;}
-.tr{font-size:22rpx;color:#86868b;}
+.tr{font-size:22rpx;color:#9aa3b2;}
 
 /* FAQ */
-.faq{border-bottom:1rpx solid #f0f0f0;padding:24rpx 0;}
+.faq{border-bottom:1rpx solid rgba(20,30,50,0.05);padding:24rpx 0;}
 .faq:last-child{border-bottom:none;}
 .faq-q{display:flex;justify-content:space-between;align-items:center;}
-.faq-qt{font-size:28rpx;color:#1d1d1f;font-weight:500;flex:1;}
-.faq-ar{font-size:32rpx;color:#ccc;transition:transform .2s;}
+.faq-qt{font-size:28rpx;color:#1a1a1a;font-weight:500;flex:1;}
+.faq-ar{font-size:32rpx;color:#c0c6d0;transition:transform .2s;}
 .faq-ar.open{transform:rotate(90deg);}
-.faq-a{font-size:26rpx;color:#86868b;line-height:1.7;margin-top:16rpx;display:block;}
+.faq-a{font-size:26rpx;color:#6b7a5a;line-height:1.7;margin-top:16rpx;display:block;}
 
 /* 底部 */
 .bar{
 	position:fixed;bottom:0;left:0;right:0;
 	display:flex;align-items:center;justify-content:space-between;
-	background:rgba(255,255,255,0.95);
-	backdrop-filter:blur(24px);
-	-webkit-backdrop-filter:blur(24px);
+	background:rgba(255,255,255,0.98);
+	backdrop-filter:blur(20px);
+	-webkit-backdrop-filter:blur(20px);
 	padding:20rpx 32rpx;
 	padding-bottom:calc(20rpx + env(safe-area-inset-bottom));
-	border-top:1rpx solid rgba(0,0,0,0.04);
-	box-shadow:0 -2rpx 12rpx rgba(0,0,0,0.04);
+	border-top:1rpx solid rgba(20,30,50,0.05);
+	box-shadow:0 -12rpx 32rpx rgba(20,30,50,0.04);
 	z-index:100;
 }
 .bar-left{display:flex;align-items:baseline;}
-.bar-lab{font-size:24rpx;color:#1d1d1f;font-weight:600;}
-.bar-num{font-size:48rpx;color:#1d1d1f;font-weight:700;line-height:1;margin-left:4rpx;}
+.bar-lab{font-size:24rpx;color:#1a1a1a;font-weight:600;}
+.bar-num{font-size:48rpx;color:#1a1a1a;font-weight:700;line-height:1;margin-left:4rpx;letter-spacing:-1rpx;}
 .bar-btn{
 	padding:24rpx 56rpx;
 	border-radius:48rpx;

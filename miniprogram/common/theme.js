@@ -1,167 +1,161 @@
 /**
- * 主题管理模块
- * 6套预设风格 + CSS变量注入 + 原生栏动态切换 + 图标着色
+ * 主题管理 - 灵溪风多主题联动
+ * 导航 / 页面底 / tabBar / 变量同步
  */
 
 import tabbarIcons from './tabbar-icons.js'
 
 const THEMES = {
   green: {
-    name: '默认绿',
+    name: '清新绿',
     emoji: '🌿',
-    primary: '#2ed573',
-    primaryDark: '#27ae60',
-    primaryLight: '#3be88a',
-    accent: '#1abc9c',
-    gradientStart: '#26c67a',
-    gradientEnd: '#1abc9c',
-    navBg: '#2ed573',
-    tabBarSelected: '#2ed573',
-    rgbPrimary: '46,213,115',
-    rgbAccent: '26,188,156',
-    tintLight: '#f0fdf4',
-    tintMedium: '#d1fae5',
-    tintStrong: '#a7f3d0'
+    primary: '#7cb342',
+    primaryDark: '#558b2f',
+    primaryLight: '#9ccc65',
+    accent: '#ffb300',
+    gradientStart: '#9ccc65',
+    gradientEnd: '#558b2f',
+    navBg: '#7cb342',
+    tabBarSelected: '#7cb342',
+    tabBarColor: '#7a8a68',
+    tabBarBg: '#ffffff',
+    pageBg: '#f0f7e6',
+    pageBgAlt: '#e8f2d8',
+    rgbPrimary: '124,179,66',
+    rgbAccent: '255,179,0',
+    tintLight: '#f1f8e9',
+    tintMedium: '#dcedc8',
+    tintStrong: '#c5e1a5',
+    tabFade: 'rgba(240,247,230,0)'
+  },
+  yellow: {
+    name: '暖阳黄',
+    emoji: '🌻',
+    primary: '#f9a825',
+    primaryDark: '#f57f17',
+    primaryLight: '#ffca28',
+    accent: '#ff8a65',
+    gradientStart: '#ffca28',
+    gradientEnd: '#f57f17',
+    navBg: '#f9a825',
+    tabBarSelected: '#f9a825',
+    tabBarColor: '#9a8a5a',
+    tabBarBg: '#ffffff',
+    pageBg: '#fff8e1',
+    pageBgAlt: '#fff3c4',
+    rgbPrimary: '249,168,37',
+    rgbAccent: '255,138,101',
+    tintLight: '#fff8e1',
+    tintMedium: '#ffecb3',
+    tintStrong: '#ffe082',
+    tabFade: 'rgba(255,248,225,0)'
+  },
+  coral: {
+    name: '珊瑚橙',
+    emoji: '🍊',
+    primary: '#ff7043',
+    primaryDark: '#e64a19',
+    primaryLight: '#ff8a65',
+    accent: '#ffd54f',
+    gradientStart: '#ff8a65',
+    gradientEnd: '#e64a19',
+    navBg: '#ff7043',
+    tabBarSelected: '#ff7043',
+    tabBarColor: '#a87868',
+    tabBarBg: '#ffffff',
+    pageBg: '#fff3ee',
+    pageBgAlt: '#ffe4dc',
+    rgbPrimary: '255,112,67',
+    rgbAccent: '255,213,79',
+    tintLight: '#fbe9e7',
+    tintMedium: '#ffccbc',
+    tintStrong: '#ffab91',
+    tabFade: 'rgba(255,243,238,0)'
   },
   blue: {
-    name: '海洋蓝',
-    emoji: '🔵',
-    primary: '#3b82f6',
-    primaryDark: '#2563eb',
-    primaryLight: '#60a5fa',
-    accent: '#06b6d4',
-    gradientStart: '#60a5fa',
-    gradientEnd: '#3b82f6',
-    navBg: '#3b82f6',
-    tabBarSelected: '#3b82f6',
-    rgbPrimary: '59,130,246',
-    rgbAccent: '6,182,212',
-    tintLight: '#eff6ff',
-    tintMedium: '#dbeafe',
-    tintStrong: '#bfdbfe'
-  },
-  purple: {
-    name: '星空紫',
-    emoji: '🟣',
-    primary: '#8b5cf6',
-    primaryDark: '#7c3aed',
-    primaryLight: '#a78bfa',
-    accent: '#c084fc',
-    gradientStart: '#a78bfa',
-    gradientEnd: '#7c3aed',
-    navBg: '#8b5cf6',
-    tabBarSelected: '#8b5cf6',
-    rgbPrimary: '139,92,246',
-    rgbAccent: '192,132,252',
-    tintLight: '#f5f3ff',
-    tintMedium: '#ede9fe',
-    tintStrong: '#ddd6fe'
-  },
-  orange: {
-    name: '暖阳橙',
-    emoji: '🟠',
-    primary: '#f59e0b',
-    primaryDark: '#d97706',
-    primaryLight: '#fbbf24',
-    accent: '#f97316',
-    gradientStart: '#fbbf24',
-    gradientEnd: '#f59e0b',
-    navBg: '#f59e0b',
-    tabBarSelected: '#f59e0b',
-    rgbPrimary: '245,158,11',
-    rgbAccent: '249,115,22',
-    tintLight: '#fffbeb',
-    tintMedium: '#fef3c7',
-    tintStrong: '#fde68a'
+    name: '晴空蓝',
+    emoji: '☁️',
+    primary: '#42a5f5',
+    primaryDark: '#1e88e5',
+    primaryLight: '#64b5f6',
+    accent: '#ffd54f',
+    gradientStart: '#64b5f6',
+    gradientEnd: '#1e88e5',
+    navBg: '#42a5f5',
+    tabBarSelected: '#42a5f5',
+    tabBarColor: '#6a8aaa',
+    tabBarBg: '#ffffff',
+    pageBg: '#f0f7ff',
+    pageBgAlt: '#e3f0fc',
+    rgbPrimary: '66,165,245',
+    rgbAccent: '255,213,79',
+    tintLight: '#e3f2fd',
+    tintMedium: '#bbdefb',
+    tintStrong: '#90caf9',
+    tabFade: 'rgba(240,247,255,0)'
   },
   pink: {
-    name: '樱花粉',
+    name: '蜜桃粉',
     emoji: '🌸',
-    primary: '#ec4899',
-    primaryDark: '#db2777',
-    primaryLight: '#f472b6',
-    accent: '#f9a8d4',
-    gradientStart: '#f472b6',
-    gradientEnd: '#db2777',
-    navBg: '#ec4899',
-    tabBarSelected: '#ec4899',
-    rgbPrimary: '236,72,153',
-    rgbAccent: '249,168,212',
-    tintLight: '#fdf2f8',
-    tintMedium: '#fce7f3',
-    tintStrong: '#fbcfe8'
-  },
-  red: {
-    name: '中国红',
-    emoji: '🔴',
-    primary: '#ef4444',
-    primaryDark: '#dc2626',
-    primaryLight: '#f87171',
-    accent: '#fca5a5',
-    gradientStart: '#f87171',
-    gradientEnd: '#dc2626',
-    navBg: '#ef4444',
-    tabBarSelected: '#ef4444',
-    rgbPrimary: '239,68,68',
-    rgbAccent: '252,165,165',
-    tintLight: '#fef2f2',
-    tintMedium: '#fee2e2',
-    tintStrong: '#fecaca'
+    primary: '#ec407a',
+    primaryDark: '#d81b60',
+    primaryLight: '#f48fb1',
+    accent: '#ffd54f',
+    gradientStart: '#f48fb1',
+    gradientEnd: '#d81b60',
+    navBg: '#ec407a',
+    tabBarSelected: '#ec407a',
+    tabBarColor: '#b07088',
+    tabBarBg: '#ffffff',
+    pageBg: '#fff0f5',
+    pageBgAlt: '#fde2eb',
+    rgbPrimary: '236,64,122',
+    rgbAccent: '255,213,79',
+    tintLight: '#fce4ec',
+    tintMedium: '#f8bbd0',
+    tintStrong: '#f48fb1',
+    tabFade: 'rgba(255,240,245,0)'
   }
 }
 
 const THEME_LIST = Object.keys(THEMES)
 const DEFAULT_THEME = 'green'
 
-/**
- * 从缓存加载主题并应用
- * @returns {string} 当前主题名
- */
 function loadTheme () {
   const name = uni.getStorageSync('theme') || DEFAULT_THEME
   applyTheme(name)
   return name
 }
 
-/**
- * 应用主题到全局
- * @param {string} name 主题名
- */
 function applyTheme (name) {
   const theme = THEMES[name] || THEMES[DEFAULT_THEME]
-
-  // 1. 持久化
   uni.setStorageSync('theme', name)
 
-  // 2. 更新 globalData
   const app = getApp()
   if (app) {
     app.globalData.currentTheme = name
   }
 
-  // 3. 注入 CSS 变量到页面根元素
-  _injectCssVars(theme)
+  _injectCssVars(theme, name)
 
-  // 4. 更新 tabBar 颜色 + 图标着色
   try {
     uni.setTabBarStyle({
-      color: '#999999',
+      color: theme.tabBarColor,
       selectedColor: theme.tabBarSelected,
-      backgroundColor: '#ffffff',
+      backgroundColor: theme.tabBarBg,
       borderStyle: 'white'
     })
-    // 动态着色选中图标
-    tabbarIcons.updateTabBarIcons(name, theme.tabBarSelected)
   } catch (e) {}
 
-  // 5. 更新当前页面导航栏颜色
   _updateNavBar(theme)
+  _updateWindowBg(theme)
+
+  try {
+    uni.$emit('__themeChanged', name)
+  } catch (e) {}
 }
 
-/**
- * 注入 CSS 变量到 page 元素
- */
-function _injectCssVars (theme) {
+function _injectCssVars (theme, name) {
   // #ifdef H5
   const root = document.documentElement
   if (root) {
@@ -176,11 +170,10 @@ function _injectCssVars (theme) {
     root.style.setProperty('--c-tint-light', theme.tintLight)
     root.style.setProperty('--c-tint-medium', theme.tintMedium)
     root.style.setProperty('--c-tint-strong', theme.tintStrong)
+    root.style.setProperty('--page-bg', theme.pageBg)
   }
   // #endif
 
-  // 小程序：写入 globalData，各页面 onShow 中读取并注入到自身 page 节点
-  // 同时存一份到 storage 以便跨页面读取
   uni.setStorageSync('themeVars', {
     '--c-primary': theme.primary,
     '--c-primary-dark': theme.primaryDark,
@@ -192,13 +185,11 @@ function _injectCssVars (theme) {
     '--c-rgb-accent': theme.rgbAccent,
     '--c-tint-light': theme.tintLight,
     '--c-tint-medium': theme.tintMedium,
-    '--c-tint-strong': theme.tintStrong
+    '--c-tint-strong': theme.tintStrong,
+    '--page-bg': theme.pageBg
   })
 }
 
-/**
- * 更新当前页面导航栏颜色
- */
 function _updateNavBar (theme) {
   try {
     uni.setNavigationBarColor({
@@ -209,17 +200,21 @@ function _updateNavBar (theme) {
   } catch (e) {}
 }
 
-/**
- * 获取当前主题配置对象
- */
+function _updateWindowBg (theme) {
+  try {
+    uni.setBackgroundColor({
+      backgroundColor: theme.pageBg,
+      backgroundColorTop: theme.pageBg,
+      backgroundColorBottom: theme.pageBg
+    })
+  } catch (e) {}
+}
+
 function getTheme () {
   const name = uni.getStorageSync('theme') || DEFAULT_THEME
   return THEMES[name] || THEMES[DEFAULT_THEME]
 }
 
-/**
- * 获取当前主题名
- */
 function getThemeName () {
   return uni.getStorageSync('theme') || DEFAULT_THEME
 }

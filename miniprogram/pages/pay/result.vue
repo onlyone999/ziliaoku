@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<view class="result-container">
 			<!-- 状态图标 -->
 			<view class="status-icon" :class="status" :style="status === 'success' ? 'background:' + tc.primary + ';' : ''">
@@ -133,7 +133,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: transparent;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -160,9 +160,9 @@ export default {
 }
 /* 成功：呼吸灯 + 外环旋转 + 金色粒子散射 */
 .status-icon.success {
-	background: linear-gradient(135deg, #2ed573, #3be88a);
+	background: linear-gradient(135deg, #7cb342, #9ccc65);
 	box-shadow:
-		0 8rpx 36rpx rgba(46,213,115, 0.35),
+		0 8rpx 36rpx rgba(124,179,66, 0.35),
 		0 0 60rpx rgba(255, 215, 0, 0.15),
 		20rpx -30rpx 0 -14rpx rgba(255, 215, 0, 0.5),
 		-25rpx -20rpx 0 -14rpx rgba(255, 200, 0, 0.4),
@@ -179,8 +179,8 @@ export default {
 	bottom: -12rpx;
 	border-radius: 50%;
 	border: 4rpx solid transparent;
-	border-top-color: #2ed573;
-	border-right-color: rgba(46,213,115, 0.4);
+	border-top-color: #7cb342;
+	border-right-color: rgba(124,179,66, 0.4);
 	animation: ringRotate 1.5s linear infinite;
 }
 .status-icon.success::after {
@@ -193,7 +193,7 @@ export default {
 	border-radius: 50%;
 	border: 2rpx solid transparent;
 	border-bottom-color: rgba(123, 237, 159, 0.3);
-	border-left-color: rgba(46,213,115, 0.15);
+	border-left-color: rgba(124,179,66, 0.15);
 	animation: ringRotate 2.5s linear infinite reverse;
 }
 
@@ -238,8 +238,8 @@ export default {
 }
 
 @keyframes breatheSuccess {
-	0%, 100% { box-shadow: 0 8rpx 36rpx rgba(46,213,115, 0.3), 0 0 60rpx rgba(255, 215, 0, 0.1), 20rpx -30rpx 0 -14rpx rgba(255, 215, 0, 0.5), -25rpx -20rpx 0 -14rpx rgba(255, 200, 0, 0.4), 30rpx 10rpx 0 -14rpx rgba(255, 180, 0, 0.35), -20rpx 25rpx 0 -14rpx rgba(255, 215, 0, 0.45); transform: scale(1); }
-	50% { box-shadow: 0 12rpx 50rpx rgba(46,213,115, 0.5), 0 0 80rpx rgba(255, 215, 0, 0.25), 25rpx -38rpx 0 -12rpx rgba(255, 215, 0, 0.7), -30rpx -25rpx 0 -12rpx rgba(255, 200, 0, 0.6), 38rpx 14rpx 0 -12rpx rgba(255, 180, 0, 0.5), -25rpx 32rpx 0 -12rpx rgba(255, 215, 0, 0.6); transform: scale(1.04); }
+	0%, 100% { box-shadow: 0 8rpx 36rpx rgba(124,179,66, 0.3), 0 0 60rpx rgba(255, 215, 0, 0.1), 20rpx -30rpx 0 -14rpx rgba(255, 215, 0, 0.5), -25rpx -20rpx 0 -14rpx rgba(255, 200, 0, 0.4), 30rpx 10rpx 0 -14rpx rgba(255, 180, 0, 0.35), -20rpx 25rpx 0 -14rpx rgba(255, 215, 0, 0.45); transform: scale(1); }
+	50% { box-shadow: 0 12rpx 50rpx rgba(124,179,66, 0.5), 0 0 80rpx rgba(255, 215, 0, 0.25), 25rpx -38rpx 0 -12rpx rgba(255, 215, 0, 0.7), -30rpx -25rpx 0 -12rpx rgba(255, 200, 0, 0.6), 38rpx 14rpx 0 -12rpx rgba(255, 180, 0, 0.5), -25rpx 32rpx 0 -12rpx rgba(255, 215, 0, 0.6); transform: scale(1.04); }
 }
 @keyframes breatheFail {
 	0%, 100% { box-shadow: 0 8rpx 36rpx rgba(255, 71, 87, 0.3); opacity: 1; }
@@ -265,7 +265,7 @@ export default {
 .status-title {
 	font-size: 38rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	margin-bottom: 12rpx;
 }
 .status-desc {
@@ -278,7 +278,7 @@ export default {
 .order-card {
 	width: 100%;
 	background: #fff;
-	border-radius: 28rpx;
+	border-radius: 36rpx;
 	padding: 32rpx;
 	margin-bottom: 48rpx;
 	box-shadow:
@@ -297,21 +297,21 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #2ed573);
+	background: linear-gradient(90deg, #7cb342, #558b2f, #7cb342);
 	border-radius: 2rpx 2rpx 0 0;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.3);
 }
 .card-row {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
 	padding: 16rpx 0;
-	border-bottom: 1rpx solid rgba(46,213,115, 0.04);
+	border-bottom: 1rpx solid rgba(124,179,66, 0.04);
 	transition: background 0.2s ease;
 }
 /* 交替背景色 */
 .card-row:nth-child(odd) {
-	background: rgba(46,213,115, 0.015);
+	background: rgba(124,179,66, 0.015);
 	border-radius: 8rpx;
 }
 .card-row:last-child {
@@ -354,7 +354,7 @@ export default {
 }
 /* 主要CTA按钮shimmer */
 .action-btn.primary {
-	background: linear-gradient(135deg, #2ed573 0%, #27ae60 100%);
+	background: linear-gradient(135deg, #7cb342 0%, #558b2f 100%);
 	color: #fff;
 	box-shadow:
 		0 4rpx 12rpx rgba(0,0,0,0.1),
@@ -376,14 +376,14 @@ export default {
 	100% { left: 100%; }
 }
 .action-btn.primary:active {
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.2);
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.2);
 }
 .action-btn.secondary {
 	background: rgba(255, 255, 255, 0.85);
 	backdrop-filter: blur(16rpx);
 	-webkit-backdrop-filter: blur(16rpx);
 
-	border: 2rpx solid rgba(46,213,115, 0.2);
+	border: 2rpx solid rgba(124,179,66, 0.2);
 	box-shadow:
 		0 2rpx 8rpx rgba(0,0,0,0.04),
 		0 8rpx 24rpx rgba(0,0,0,0.06);

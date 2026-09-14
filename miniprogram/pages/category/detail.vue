@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 分类信息头部 -->
 		<view class="cat-header" :style="'background:' + (categoryInfo.color || tc.primary) + ';'">
 			<view class="cat-header-content">
@@ -104,14 +104,14 @@
 
 			<!-- 分页栏 -->
 			<view class="pager-bar" v-if="resources.length > 0">
-				<view class="pager-btn" :class="{ disabled: page <= 1 }" :style="page > 1 ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page - 1)">
+				<view class="pager-btn" :class="{ disabled: page <= 1 }" @tap="goPage(page - 1)">
 					<text>‹ 上一页</text>
 				</view>
 				<view class="pager-info">
 					<text class="pager-current">{{ page }}/{{ totalPages || 1 }}</text>
 					<text class="pager-total">共{{ total }}条</text>
 				</view>
-				<view class="pager-btn" :class="{ disabled: page >= totalPages }" :style="page < totalPages ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page + 1)">
+				<view class="pager-btn" :class="{ disabled: page >= totalPages }" @tap="goPage(page + 1)">
 					<text>下一页 ›</text>
 				</view>
 			</view>
@@ -256,7 +256,7 @@ export default {
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 	overflow: hidden;
 }
 
@@ -314,7 +314,7 @@ export default {
 .cat-icon {
 	width: 100rpx;
 	height: 100rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	background: rgba(255, 255, 255, 0.2);
 	display: flex;
 	align-items: center;
@@ -326,7 +326,7 @@ export default {
 .cat-icon-img {
 	width: 60rpx;
 	height: 60rpx;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 }
 .cat-emoji {
 	font-size: 48rpx;
@@ -361,7 +361,7 @@ export default {
 	background: rgba(255, 255, 255, 0.15);
 	display: inline-block;
 	padding: 4rpx 16rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	margin-top: 12rpx;
 }
 
@@ -394,7 +394,7 @@ export default {
 	font-size: 24rpx;
 	color: #666;
 	background: rgba(245, 245, 245, 0.8);
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	display: inline-block;
 	transition: all 0.3s ease;
 	background-size: 200% 100%;
@@ -405,7 +405,7 @@ export default {
 }
 .sub-tag.active {
 	color: #fff;
-	background: #2ed573;
+	background: #7cb342;
 	box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.15);
 	transform: scale(0.97);
 }
@@ -420,13 +420,13 @@ export default {
 	position: relative;
 	transition: all 0.3s ease;
 	padding: 8rpx 24rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	background: #f5f5f5;
 }
 .sort-btn.active {
 	font-weight: 600;
 	color: #fff;
-	background: #2ed573;
+	background: #7cb342;
 }
 
 /* 资源列表 */
@@ -440,7 +440,7 @@ export default {
 .resource-card {
 	display: flex;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 36rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
 	box-shadow:
@@ -462,14 +462,14 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 1rpx;
 	filter: blur(1rpx);
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4), 0 0 12rpx rgba(46,213,115, 0.15);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.4), 0 0 12rpx rgba(124,179,66, 0.15);
 	opacity: 0.8;
 	z-index: 1;
 }
 .resource-card:active {
 	transform: scale(0.97);
 	box-shadow:
-		0 1rpx 4rpx rgba(46,213,115, 0.04),
+		0 1rpx 4rpx rgba(124,179,66, 0.04),
 		0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 /* 封面图片 hover 缩放 */
@@ -478,7 +478,7 @@ export default {
 	height: 180rpx;
 	flex-shrink: 0;
 	border-radius: 24rpx 0 0 24rpx;
-	border-right: 2rpx solid rgba(46,213,115, 0.06);
+	border-right: 2rpx solid rgba(124,179,66, 0.06);
 	overflow: hidden;
 }
 .card-cover image,
@@ -498,7 +498,7 @@ export default {
 }
 .card-title {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -518,7 +518,7 @@ export default {
 .badge {
 	font-size: 20rpx;
 	padding: 4rpx 16rpx;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
 }
 .badge:active {
@@ -569,23 +569,16 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 0 20rpx;
 	background: #fff;
-	border-radius: 20rpx;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
-	border: 1rpx solid rgba(0,0,0,0.03);
+	border-radius: 36rpx;
+	border: none;
+	box-shadow: 0 10rpx 36rpx rgba(90, 120, 50, 0.07);
 }
 .pager-btn {
-	padding: 12rpx 28rpx;
-	border-radius: 24rpx;
-	background: #e8e8e8;
-	font-size: 24rpx;
-	color: #333;
-	font-weight: 600;
-	transition: all 0.2s;
+	padding: 14rpx 28rpx;
+	border-radius: 999rpx;
+	transition: all 0.2s ease;
 }
 .pager-btn.disabled {
-	opacity: 0.4;
 	pointer-events: none;
 }
 .pager-btn:active {
@@ -598,12 +591,12 @@ export default {
 }
 .pager-current {
 	font-size: 26rpx;
-	color: #333;
+	color: #1a1a1a;
 	font-weight: 700;
 }
 .pager-total {
 	font-size: 20rpx;
-	color: #aaa;
+	color: #a3b08a;
 	margin-top: 4rpx;
 }
 
@@ -649,7 +642,7 @@ export default {
 }
 .load-status text {
 	display: inline-block;
-	background: linear-gradient(90deg, #bbb 0%, #2ed573 40%, #bbb 80%);
+	background: linear-gradient(90deg, #bbb 0%, #7cb342 40%, #bbb 80%);
 	background-size: 200% 100%;
 	animation: loadShimmer 2s linear infinite;
 }

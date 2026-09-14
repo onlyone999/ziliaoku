@@ -1,5 +1,5 @@
 <template>
-	<view class="page" :style="'--tc-primary:' + tc.primary + ';'">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle + '--tc-primary:' + tc.primary + ';'">
 		<!-- 顶部分类标签 -->
 		<view class="tabs-bar">
 			<view
@@ -263,7 +263,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 }
 
 /* ===== 分类标签 ===== */
@@ -277,7 +277,7 @@ export default {
 	position: sticky;
 	top: 0;
 	z-index: 10;
-	box-shadow: 0 4rpx 20rpx var(--tc-primary, #2ed573)0f;
+	box-shadow: 0 4rpx 20rpx var(--tc-primary, #7cb342)0f;
 }
 .tab-item {
 	flex: 1;
@@ -307,7 +307,7 @@ export default {
 }
 .skeleton-card {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	overflow: hidden;
 	margin-bottom: 24rpx;
 	box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.05);
@@ -365,7 +365,7 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 5;
-	box-shadow: 0 0 6rpx var(--tc-primary, #2ed573)40;
+	box-shadow: 0 0 6rpx var(--tc-primary, #7cb342)40;
 }
 .activity-card:active {
 	transform: scale(0.985);
@@ -417,7 +417,7 @@ export default {
 	top: 20rpx;
 	left: 20rpx;
 	padding: 8rpx 22rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	color: #fff;
 	animation: tagGlow 2s ease-in-out infinite alternate;
@@ -432,7 +432,7 @@ export default {
 	top: 20rpx;
 	right: 20rpx;
 	padding: 8rpx 22rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	color: #fff;
 }
@@ -444,7 +444,7 @@ export default {
 .card-title {
 	font-size: 32rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	display: block;
 	margin-bottom: 16rpx;
 	overflow: hidden;
@@ -472,7 +472,7 @@ export default {
 	align-items: center;
 	margin-top: 16rpx;
 	padding-top: 16rpx;
-	border-top: 1rpx solid var(--tc-primary, #2ed573)0f;
+	border-top: 1rpx solid var(--tc-primary, #7cb342)0f;
 }
 .progress-info {
 	flex: 1;
@@ -514,12 +514,12 @@ export default {
 
 .status-badge {
 	padding: 6rpx 20rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	font-weight: 600;
 }
 .status-badge.open {
-	background: var(--tc-primary, #2ed573)1a;
+	background: var(--tc-primary, #7cb342)1a;
 }
 .status-badge.full {
 	color: #ff6b6b;
@@ -547,7 +547,7 @@ export default {
 	width: 240rpx;
 	height: 240rpx;
 	border-radius: 50%;
-	background: var(--tc-primary, #2ed573)14;
+	background: var(--tc-primary, #7cb342)14;
 	top: 80rpx;
 }
 .empty-icon {

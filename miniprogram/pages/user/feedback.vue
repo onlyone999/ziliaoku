@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="main-scroll">
 			<!-- 反馈类型 -->
 			<view class="form-section">
@@ -190,7 +190,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 }
 .main-scroll {
 	height: 100vh;
@@ -225,7 +225,7 @@ export default {
 .form-label {
 	font-size: 28rpx;
 	font-weight: 600;
-	color: #1a1a2e;
+	color: #1c2333;
 	margin-bottom: 20rpx;
 	display: block;
 }
@@ -242,13 +242,13 @@ export default {
 	align-items: center;
 	padding: 24rpx 0;
 	background: linear-gradient(135deg, #f8f9fe, #f0f2ff);
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	border: 2rpx solid transparent;
 	transition: all 0.3s ease;
 }
 .type-item.active {
-	background: linear-gradient(135deg, rgba(46,213,115, 0.1), rgba(145, 228, 50, 0.06));
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.15);
+	background: linear-gradient(135deg, rgba(124,179,66, 0.1), rgba(145, 228, 50, 0.06));
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.15);
 }
 .type-icon {
 	font-size: 44rpx;
@@ -259,7 +259,7 @@ export default {
 	color: #666;
 }
 .type-item.active .type-name {
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	font-weight: 600;
 }
 
@@ -271,10 +271,10 @@ export default {
 	width: 100%;
 	height: 300rpx;
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	padding: 20rpx;
 	background: rgba(0,0,0,0.02);
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	border: 1rpx solid rgba(0,0,0,0.04);
 	box-sizing: border-box;
 	line-height: 1.6;
@@ -283,8 +283,8 @@ export default {
 }
 .form-textarea:focus {
 	background: #fff;
-	border-color: rgba(46,213,115, 0.3);
-	box-shadow: 0 0 0 4rpx rgba(46,213,115, 0.08), 0 4rpx 16rpx rgba(46,213,115, 0.06);
+	border-color: rgba(124,179,66, 0.3);
+	box-shadow: 0 0 0 4rpx rgba(124,179,66, 0.08), 0 4rpx 16rpx rgba(124,179,66, 0.06);
 }
 .char-count {
 	position: absolute;
@@ -298,17 +298,17 @@ export default {
 .form-input {
 	height: 80rpx;
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	padding: 0 24rpx;
 	background: #f8f9fe;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	border: 2rpx solid transparent;
 	transition: all 0.3s ease;
 }
 .form-input:focus {
 	background: #fff;
-	border-color: rgba(46,213,115, 0.3);
-	box-shadow: 0 0 0 4rpx rgba(46,213,115, 0.08), 0 4rpx 16rpx rgba(46,213,115, 0.06);
+	border-color: rgba(124,179,66, 0.3);
+	box-shadow: 0 0 0 4rpx rgba(124,179,66, 0.08), 0 4rpx 16rpx rgba(124,179,66, 0.06);
 }
 
 /* ===== 提交按钮 ===== */
@@ -316,7 +316,7 @@ export default {
 	margin: 40rpx 24rpx;
 }
 .submit-btn {
-	background: #2ed573;
+	background: #7cb342;
 	text-align: center;
 	padding: 26rpx;
 	border-radius: 44rpx;
@@ -349,7 +349,7 @@ export default {
 }
 .submit-btn:active {
 	transform: scale(0.97);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.4);
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.4);
 }
 .submit-btn.disabled {
 	opacity: 0.5;
@@ -369,7 +369,7 @@ export default {
 .history-title {
 	font-size: 32rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 }
 .history-count {
 	font-size: 24rpx;
@@ -416,16 +416,16 @@ export default {
 }
 .history-type-badge {
 	font-size: 22rpx;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.12), rgba(145, 228, 50, 0.06));
+	background: linear-gradient(135deg, rgba(124,179,66, 0.12), rgba(145, 228, 50, 0.06));
 	padding: 6rpx 18rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.08);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.08);
 }
 .history-status-badge {
 	font-size: 22rpx;
 	padding: 6rpx 18rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
 }
 .history-status-badge.pending {
@@ -435,13 +435,13 @@ export default {
 }
 .history-status-badge.processing {
 
-	background: linear-gradient(135deg, rgba(46,213,115, 0.14), rgba(46,213,115, 0.06));
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.12);
+	background: linear-gradient(135deg, rgba(124,179,66, 0.14), rgba(124,179,66, 0.06));
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.12);
 }
 .history-status-badge.resolved {
 
-	background: linear-gradient(135deg, rgba(46,213,115, 0.14), rgba(46,213,115, 0.06));
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.12);
+	background: linear-gradient(135deg, rgba(124,179,66, 0.14), rgba(124,179,66, 0.06));
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.12);
 }
 .history-status-badge.closed {
 	color: #999;
@@ -458,8 +458,8 @@ export default {
 	margin-top: 14rpx;
 	padding: 14rpx 18rpx;
 	background: linear-gradient(135deg, #f8f9fe, #f0f2ff);
-	border-radius: 16rpx;
-	border-left: 4rpx solid #2ed573;
+	border-radius: 28rpx;
+	border-left: 4rpx solid #7cb342;
 	position: relative;
 }
 /* 回复区域左侧装饰条发光 */
@@ -470,13 +470,13 @@ export default {
 	top: 0;
 	bottom: 0;
 	width: 4rpx;
-	background: linear-gradient(180deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(180deg, #7cb342, #558b2f, #558b2f);
 	border-radius: 4rpx;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4), 0 0 12rpx rgba(46,213,115, 0.15);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.4), 0 0 12rpx rgba(124,179,66, 0.15);
 }
 .reply-label {
 	font-size: 22rpx;
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	font-weight: 600;
 	margin-right: 8rpx;
 }

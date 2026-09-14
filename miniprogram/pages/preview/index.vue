@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 加载中 -->
 		<view class="loading-wrap" v-if="loading">
 			<view class="loading-spinner"></view>
@@ -159,7 +159,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #f0f2ff 0%, #f5f6fa 200rpx);
+	background: transparent;
 }
 
 /* ===== 加载 ===== */
@@ -173,11 +173,11 @@ export default {
 .loading-spinner {
 	width: 64rpx;
 	height: 64rpx;
-	border: 4rpx solid rgba(46,213,115, 0.12);
-	border-top-color: #2ed573;
+	border: 4rpx solid rgba(124,179,66, 0.12);
+	border-top-color: #7cb342;
 	border-radius: 50%;
 	animation: spin 0.8s linear infinite;
-	box-shadow: 0 0 20rpx rgba(46,213,115, 0.15);
+	box-shadow: 0 0 20rpx rgba(124,179,66, 0.15);
 }
 @keyframes spin {
 	to { transform: rotate(360deg); }
@@ -203,7 +203,7 @@ export default {
 	left: 0;
 	right: 0;
 	height: 1rpx;
-	background: rgba(46,213,115,0.08);
+	background: rgba(124,179,66,0.08);
 	z-index: 5;
 }
 .preview-img {
@@ -233,14 +233,14 @@ export default {
 	left: 0;
 	right: 0;
 	height: 6rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, #7cb342, #558b2f, #558b2f);
 	border-radius: 6rpx 6rpx 0 0;
-	box-shadow: 0 0 16rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 0 16rpx rgba(124,179,66, 0.3);
 }
 .title {
 	font-size: 34rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	line-height: 1.5;
 	display: block;
 }
@@ -253,18 +253,18 @@ export default {
 .category-badge {
 	font-size: 22rpx;
 
-	background: rgba(46,213,115, 0.08);
+	background: rgba(124,179,66, 0.08);
 	padding: 6rpx 20rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.08);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.08);
 }
 .file-type {
 	font-size: 22rpx;
 	color: #00b894;
 	background: rgba(0, 184, 148, 0.08);
 	padding: 6rpx 20rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
 	box-shadow: 0 2rpx 8rpx rgba(0, 184, 148, 0.08);
 }
@@ -279,7 +279,7 @@ export default {
 	gap: 28rpx;
 	margin-top: 20rpx;
 	padding-top: 16rpx;
-	border-top: 1rpx solid rgba(46,213,115, 0.04);
+	border-top: 1rpx solid rgba(124,179,66, 0.04);
 }
 .stat {
 	font-size: 24rpx;
@@ -328,15 +328,15 @@ export default {
 	left: 0;
 	right: 0;
 	height: 4rpx;
-	background: linear-gradient(90deg, #2ed573, #27ae60, #1abc9c);
+	background: linear-gradient(90deg, #7cb342, #558b2f, #558b2f);
 	border-radius: 4rpx 4rpx 0 0;
 	z-index: 2;
-	box-shadow: 0 0 12rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 0 12rpx rgba(124,179,66, 0.25);
 }
 .card-title {
 	font-size: 30rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	margin-bottom: 20rpx;
 	display: block;
 	position: relative;
@@ -350,13 +350,13 @@ export default {
 	bottom: 4rpx;
 	width: 6rpx;
 	border-radius: 6rpx;
-	background: linear-gradient(180deg, #2ed573, #27ae60);
+	background: linear-gradient(180deg, #7cb342, #558b2f);
 }
 .info-item {
 	display: flex;
 	justify-content: space-between;
 	padding: 14rpx 0;
-	border-bottom: 1rpx solid rgba(46,213,115, 0.04);
+	border-bottom: 1rpx solid rgba(124,179,66, 0.04);
 }
 .info-item:last-child {
 	border-bottom: none;
@@ -383,7 +383,7 @@ export default {
 	background: rgba(255, 255, 255, 0.7);
 	backdrop-filter: blur(40rpx) saturate(150%);
 	-webkit-backdrop-filter: blur(40rpx) saturate(150%);
-	box-shadow: 0 -4rpx 30rpx rgba(46,213,115, 0.06), 0 -1rpx 0 rgba(255, 255, 255, 0.5) inset;
+	box-shadow: 0 -4rpx 30rpx rgba(124,179,66, 0.06), 0 -1rpx 0 rgba(255, 255, 255, 0.5) inset;
 	z-index: 100;
 }
 .btn-fav {
@@ -393,15 +393,15 @@ export default {
 	justify-content: center;
 	height: 84rpx;
 	border-radius: 42rpx;
-	background: rgba(46,213,115, 0.06);
+	background: rgba(124,179,66, 0.06);
 	margin-right: 16rpx;
 	font-size: 26rpx;
 	color: #666;
-	border: 1rpx solid rgba(46,213,115, 0.08);
+	border: 1rpx solid rgba(124,179,66, 0.08);
 	transition: all 0.2s ease;
 }
 .btn-fav:active {
-	background: rgba(46,213,115, 0.12);
+	background: rgba(124,179,66, 0.12);
 	transform: translateY(2rpx);
 }
 .btn-download {
@@ -411,11 +411,11 @@ export default {
 	justify-content: center;
 	height: 84rpx;
 	border-radius: 42rpx;
-	background: linear-gradient(135deg, #2ed573 0%, #27ae60 100%);
+	background: linear-gradient(135deg, #7cb342 0%, #558b2f 100%);
 	font-size: 28rpx;
 	color: #fff;
 	font-weight: 700;
-	box-shadow: 0 8rpx 28rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 8rpx 28rpx rgba(124,179,66, 0.3);
 	transition: all 0.2s ease;
 	position: relative;
 	overflow: hidden;
@@ -438,7 +438,7 @@ export default {
 }
 .btn-download:active {
 	transform: scale(0.97) translateY(2rpx);
-	box-shadow: 0 4rpx 14rpx rgba(46,213,115, 0.2);
+	box-shadow: 0 4rpx 14rpx rgba(124,179,66, 0.2);
 }
 
 /* ===== 空状态 ===== */
@@ -455,7 +455,7 @@ export default {
 	width: 240rpx;
 	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.06), rgba(126, 217, 87, 0.03));
+	background: linear-gradient(135deg, rgba(124,179,66, 0.06), rgba(126, 217, 87, 0.03));
 	top: 240rpx;
 }
 .empty-icon {

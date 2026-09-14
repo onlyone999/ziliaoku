@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 顶部渐变区 -->
 		<view class="header" :style="'background:' + tc.primary + ';'">
 			<!-- 返回按钮 -->
@@ -216,7 +216,7 @@ export default {
 </script>
 
 <style scoped>
-.page { width: 100%; height: 100vh; background: #f2f3f8; overflow: hidden; display: flex; flex-direction: column; }
+.page { width: 100%; height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
 page { overflow: hidden; height: 100vh; }
 
 /* ===== 顶部 ===== */
@@ -226,17 +226,7 @@ page { overflow: hidden; height: 100vh; }
 	border-radius: 0 0 44rpx 44rpx;
 }
 .header::after {
-	content: '';
-	position: absolute;
-	bottom: -30rpx;
-	left: 0;
-	right: 0;
-	height: 60rpx;
-	background: inherit;
-	border-radius: 0 0 44rpx 44rpx;
-	filter: blur(20rpx);
-	opacity: 0.3;
-	pointer-events: none;
+	display: none;
 }
 .back-btn {
 	position: absolute;
@@ -263,7 +253,7 @@ page { overflow: hidden; height: 100vh; }
 	align-items: center;
 	gap: 0;
 	background: rgba(255,255,255,0.12);
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	padding: 20rpx 0;
 }
 .hs-item { flex: 1; text-align: center; }
@@ -279,7 +269,7 @@ page { overflow: hidden; height: 100vh; }
 	align-items: center;
 	justify-content: space-between;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 28rpx;
 	margin-bottom: 20rpx;
 	box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
@@ -289,7 +279,7 @@ page { overflow: hidden; height: 100vh; }
 .signin-card.signed { background: #fafffe; }
 .sc-left { display: flex; align-items: center; gap: 18rpx; }
 .sc-emoji { font-size: 40rpx; }
-.sc-title { font-size: 28rpx; font-weight: 700; color: #1a1a2e; display: block; }
+.sc-title { font-size: 28rpx; font-weight: 700; color: #1c2333; display: block; }
 .sc-desc { font-size: 22rpx; color: #aaa; margin-top: 4rpx; }
 .sc-btn { padding: 14rpx 32rpx; border-radius: 32rpx; font-size: 24rpx; font-weight: 700; }
 .sc-btn:active { opacity: 0.8; }
@@ -297,7 +287,7 @@ page { overflow: hidden; height: 100vh; }
 /* ===== 卡片通用 ===== */
 .card {
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 36rpx;
 	padding: 28rpx;
 	margin-bottom: 20rpx;
 	box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
@@ -305,7 +295,7 @@ page { overflow: hidden; height: 100vh; }
 	overflow: hidden;
 }
 .card-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20rpx; }
-.card-title { font-size: 30rpx; font-weight: 700; color: #1a1a2e; }
+.card-title { font-size: 30rpx; font-weight: 700; color: #1c2333; }
 .card-sub { font-size: 22rpx; font-weight: 500; }
 
 /* ===== 赚取积分 ===== */
@@ -320,7 +310,7 @@ page { overflow: hidden; height: 100vh; }
 .er-icon {
 	width: 68rpx;
 	height: 68rpx;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -328,13 +318,13 @@ page { overflow: hidden; height: 100vh; }
 	font-size: 28rpx;
 }
 .er-mid { flex: 1; margin: 0 16rpx; min-width: 0; }
-.er-name { font-size: 26rpx; color: #1a1a2e; font-weight: 600; display: block; }
+.er-name { font-size: 26rpx; color: #1c2333; font-weight: 600; display: block; }
 .er-sub { font-size: 20rpx; color: #bbb; margin-top: 2rpx; }
 .er-pts { font-size: 30rpx; font-weight: 800; flex-shrink: 0; }
 
 /* ===== 积分用途 ===== */
 .use-row { display: flex; margin-top: 8rpx; }
-.ur-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 16rpx 0; border-radius: 16rpx; }
+.ur-item { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 16rpx 0; border-radius: 28rpx; }
 .ur-item:active { background: #f6f6f9; }
 .ur-icon { font-size: 44rpx; margin-bottom: 8rpx; }
 .ur-name { font-size: 22rpx; color: #555; font-weight: 600; }

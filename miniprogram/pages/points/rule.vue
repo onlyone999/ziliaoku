@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="scroll" :show-scrollbar="false">
 			<!-- 获取积分 -->
 			<view class="card">
@@ -136,12 +136,12 @@ export default {
 </script>
 
 <style scoped>
-.page { height: 100vh; background: #f5f6fa; overflow: hidden; display: flex; flex-direction: column; }
+.page { height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
 page { overflow: hidden; height: 100vh; }
 .scroll { flex: 1; height: 0; padding: 24rpx 28rpx; box-sizing: border-box; }
 .card {
 	background: #fff;
-	border-radius: 20rpx;
+	border-radius: 36rpx;
 	padding: 28rpx;
 	margin-bottom: 20rpx;
 	box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.04);
@@ -164,7 +164,7 @@ page { overflow: hidden; height: 100vh; }
 	flex: 1;
 	height: 72rpx;
 	border: 1rpx solid #e5e7eb;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 	padding: 0 20rpx;
 	font-size: 28rpx;
 	box-sizing: border-box;
@@ -172,7 +172,7 @@ page { overflow: hidden; height: 100vh; }
 .invite-btn {
 	padding: 0 32rpx;
 	height: 72rpx;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -185,7 +185,7 @@ page { overflow: hidden; height: 100vh; }
 	display: flex;
 	align-items: center;
 	background: #f8f9fb;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 	padding: 18rpx 20rpx;
 }
 .my-code-label { font-size: 24rpx; color: #888; flex-shrink: 0; }

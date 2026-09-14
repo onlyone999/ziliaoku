@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 订单状态标签 -->
 		<view class="tabs-bar">
 			<view
@@ -333,7 +333,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 	display: flex;
 	flex-direction: column;
 }
@@ -344,7 +344,7 @@ export default {
 	background: #fff;
 	padding: 0 12rpx;
 	flex-shrink: 0;
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.06);
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.06);
 	position: relative;
 }
 /* Tab栏底部光晕 */
@@ -355,7 +355,7 @@ export default {
 	left: 15%;
 	right: 15%;
 	height: 12rpx;
-	background: linear-gradient(90deg, transparent, rgba(46,213,115, 0.12), transparent);
+	background: linear-gradient(90deg, transparent, rgba(124,179,66, 0.12), transparent);
 	border-radius: 50%;
 	filter: blur(6rpx);
 }
@@ -379,9 +379,9 @@ export default {
 	transform: translateX(-50%);
 	width: 56rpx;
 	height: 6rpx;
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	border-radius: 3rpx;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.3);
 }
 
 .list-scroll {
@@ -394,7 +394,7 @@ export default {
 }
 .order-card {
 	background: #fff;
-	border-radius: 28rpx;
+	border-radius: 36rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
 	box-shadow:
@@ -416,7 +416,7 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.25);
 }
 .order-card:active {
 	transform: scale(0.985);
@@ -426,7 +426,7 @@ export default {
 	justify-content: space-between;
 	align-items: center;
 	padding: 20rpx 24rpx;
-	border-bottom: 1rpx solid rgba(46,213,115, 0.06);
+	border-bottom: 1rpx solid rgba(124,179,66, 0.06);
 }
 .order-no {
 	font-size: 24rpx;
@@ -434,7 +434,7 @@ export default {
 }
 .order-status-badge {
 	padding: 6rpx 18rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	font-weight: 600;
 }
@@ -451,7 +451,7 @@ export default {
 }
 /* 已完成脉冲 */
 .order-status-badge.paid {
-	background: rgba(46,213,115, 0.10);
+	background: rgba(124,179,66, 0.10);
 	box-shadow: 0 2rpx 4rpx rgba(0,0,0,0.04);
 	animation: pulse-green 2s ease-in-out infinite;
 }
@@ -482,7 +482,7 @@ export default {
 .order-cover {
 	width: 160rpx;
 	height: 120rpx;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 	flex-shrink: 0;
 	transition: transform 0.4s ease;
 }
@@ -498,7 +498,7 @@ export default {
 }
 .order-title {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -522,7 +522,7 @@ export default {
 	justify-content: space-between;
 	align-items: center;
 	padding: 18rpx 24rpx;
-	border-top: 1rpx solid rgba(46,213,115, 0.06);
+	border-top: 1rpx solid rgba(124,179,66, 0.06);
 }
 .amount-row {
 	display: flex;
@@ -581,13 +581,13 @@ export default {
 	box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 .download-btn {
-	background: linear-gradient(135deg, #2ed573, #5A52D5);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	color: #fff;
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.3);
 }
 .detail-btn {
 	background: linear-gradient(135deg, #f0eeff, #e8e5ff);
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.08);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.08);
 }
 
 /* ===== 空状态 ===== */
@@ -595,33 +595,33 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 120rpx 0;
+	padding: 100rpx 0;
 	position: relative;
 }
 .empty::before {
 	content: '';
 	position: absolute;
-	top: 40rpx;
-	width: 320rpx;
-	height: 320rpx;
+	top: 50rpx;
+	width: 240rpx;
+	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.06), rgba(255, 159, 67, 0.06));
-	filter: blur(2rpx);
+	background: linear-gradient(160deg, #ffffff 0%, #e8f2dc 100%);
+	filter: none;
 }
 .empty-icon {
-	font-size: 120rpx;
-	margin-bottom: 32rpx;
+	font-size: 96rpx;
+	margin-bottom: 28rpx;
 	position: relative;
 	z-index: 1;
-	animation: breathe 3s ease-in-out infinite;
+	animation: none;
 }
 @keyframes breathe {
 	0%, 100% { transform: scale(1); }
 	50% { transform: scale(1.04); }
 }
 .empty-title {
-	font-size: 34rpx;
-	color: #1a1a2e;
+	font-size: 32rpx;
+	color: #1a1a1a;
 	font-weight: 700;
 	margin-bottom: 12rpx;
 	position: relative;
@@ -629,7 +629,7 @@ export default {
 }
 .empty-desc {
 	font-size: 26rpx;
-	color: #aaa;
+	color: #a3b08a;
 	position: relative;
 	z-index: 1;
 }

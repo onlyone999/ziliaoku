@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="scroll" :show-scrollbar="false">
 			<view v-if="list.length === 0 && !loading" class="empty">
 				<text class="empty-text">暂无排行数据</text>
@@ -53,14 +53,14 @@ export default {
 </script>
 
 <style scoped>
-.page { height: 100vh; background: #f5f6fa; overflow: hidden; display: flex; flex-direction: column; }
+.page { height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
 page { overflow: hidden; height: 100vh; }
 .scroll { flex: 1; height: 0; padding: 24rpx 28rpx; box-sizing: border-box; }
 .rank-item {
 	display: flex;
 	align-items: center;
 	background: #fff;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	padding: 20rpx 24rpx;
 	margin-bottom: 12rpx;
 	box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);

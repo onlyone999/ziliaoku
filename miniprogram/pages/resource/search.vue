@@ -1,13 +1,14 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 搜索头部 -->
 		<view class="search-header">
 			<view class="search-box">
-				🔍
+				<text class="search-icon">🔍</text>
 				<input
-					class="search-input"
+					class="search-field"
 					v-model="keyword"
 					placeholder="搜索资源、模板、素材..."
+					placeholder-class="search-placeholder"
 					:focus="true"
 					confirm-type="search"
 					@confirm="doSearch"
@@ -131,14 +132,14 @@
 
 				<!-- 分页栏 -->
 				<view class="pager-bar" v-if="results.length > 0">
-					<view class="pager-btn" :class="{ disabled: page <= 1 }" :style="page > 1 ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page - 1)">
+					<view class="pager-btn" :class="{ disabled: page <= 1 }" @tap="goPage(page - 1)">
 						<text>‹ 上一页</text>
 					</view>
 					<view class="pager-info">
 						<text class="pager-current">{{ page }}/{{ totalPages || 1 }}</text>
 						<text class="pager-total">共{{ total }}条</text>
 					</view>
-					<view class="pager-btn" :class="{ disabled: page >= totalPages }" :style="page < totalPages ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page + 1)">
+					<view class="pager-btn" :class="{ disabled: page >= totalPages }" @tap="goPage(page + 1)">
 						<text>下一页 ›</text>
 					</view>
 				</view>
@@ -359,7 +360,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 }
 
 /* 搜索头部 */
@@ -367,40 +368,59 @@ export default {
 	display: flex;
 	align-items: center;
 	padding: 16rpx 24rpx;
-	background: rgba(255, 255, 255, 0.9);
-	backdrop-filter: blur(24px);
-	-webkit-backdrop-filter: blur(24px);
-	border-bottom: 1rpx solid rgba(0,0,0,0.04);
+	background: rgba(244, 247, 239, 0.96);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-bottom: 1rpx solid rgba(80, 110, 40, 0.06);
 	position: sticky;
 	top: 0;
 	z-index: 100;
+	box-sizing: border-box;
 }
 .search-box {
 	flex: 1;
+	min-width: 0;
 	display: flex;
 	align-items: center;
-	height: 72rpx;
+	height: 80rpx;
 	padding: 0 24rpx;
-	background: rgba(245, 247, 250, 0.9);
-	border-radius: 36rpx;
-	border: 2rpx solid rgba(0,0,0,0.04);
-	transition: all 0.3s ease;
+	background: #ffffff;
+	border-radius: 999rpx;
+	border: none;
+	box-shadow: 0 4rpx 16rpx rgba(80, 110, 40, 0.08);
+	overflow: hidden;
 }
 .search-box:focus-within {
-	border-color: rgba(0,0,0,0.08);
-	box-shadow: 0 0 0 4rpx rgba(0,0,0,0.03);
+	box-shadow: 0 4rpx 20rpx rgba(124, 179, 66, 0.18);
 }
-.search-input {
-	flex: 1;
-	margin-left: 12rpx;
+.search-icon {
 	font-size: 28rpx;
-	color: #333;
+	line-height: 1;
+	flex-shrink: 0;
+}
+.search-field {
+	flex: 1;
+	min-width: 0;
+	height: 80rpx;
+	line-height: 80rpx;
+	margin-left: 12rpx;
+	margin-right: 8rpx;
+	font-size: 28rpx;
+	color: #1a1a1a;
+	background: transparent;
+	border: none;
+	padding: 0;
+}
+.search-placeholder {
+	color: #a3b08a;
+	font-size: 28rpx;
 }
 .clear-btn {
 	font-size: 28rpx;
-	color: #bbb;
+	color: #c5cdb5;
 	padding: 10rpx;
-	transition: all 0.2s ease;
+	line-height: 1;
+	flex-shrink: 0;
 }
 .clear-btn:active {
 	transform: scale(0.9);
@@ -410,6 +430,7 @@ export default {
 	font-size: 28rpx;
 	flex-shrink: 0;
 	font-weight: 500;
+	line-height: 80rpx;
 }
 
 /* 内容区 */
@@ -420,11 +441,10 @@ export default {
 /* 搜索建议 */
 .suggest-list {
 	background: #fff;
-	margin: 12rpx 24rpx;
-	border-radius: 24rpx;
-	box-shadow:
-		0 2rpx 8rpx rgba(46,213,115, 0.04),
-		0 8rpx 24rpx rgba(0, 0, 0, 0.06);
+	margin: 16rpx 24rpx;
+	border-radius: 36rpx;
+	box-shadow: 0 10rpx 36rpx rgba(90, 120, 50, 0.07);
+	border: none;
 	overflow: hidden;
 }
 .suggest-item {
@@ -441,7 +461,7 @@ export default {
 }
 /* 搜索建议项 active 增加左侧紫色边条 */
 .suggest-item:active {
-	background: rgba(46,213,115, 0.03);
+	background: rgba(124,179,66, 0.03);
 	transform: scale(0.97);
 }
 .suggest-item:active::before {
@@ -451,9 +471,9 @@ export default {
 	top: 20%;
 	height: 60%;
 	width: 3rpx;
-	background: linear-gradient(180deg, #26c67a, #2ed573);
+	background: linear-gradient(180deg, #9ccc65, #7cb342);
 	border-radius: 0 2rpx 2rpx 0;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.4);
 	animation: slideIn 0.2s ease-out;
 }
 @keyframes slideIn {
@@ -482,7 +502,7 @@ export default {
 .panel-title {
 	font-size: 30rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 }
 .clear-all {
 	font-size: 24rpx;
@@ -503,14 +523,14 @@ export default {
 	font-size: 26rpx;
 	color: #666;
 	box-shadow:
-		0 2rpx 6rpx rgba(46,213,115, 0.04),
+		0 2rpx 6rpx rgba(124,179,66, 0.04),
 		0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 	transition: all 0.2s ease;
 }
 .history-tag:active {
 	transform: scale(0.97);
 	box-shadow:
-		0 1rpx 3rpx rgba(46,213,115, 0.04),
+		0 1rpx 3rpx rgba(124,179,66, 0.04),
 		0 2rpx 6rpx rgba(0, 0, 0, 0.03);
 }
 .hot-tag {
@@ -519,12 +539,12 @@ export default {
 	width: 100%;
 	padding: 16rpx 24rpx;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	margin-bottom: 12rpx;
 	font-size: 28rpx;
 	color: #333;
 	box-shadow:
-		0 2rpx 6rpx rgba(46,213,115, 0.03),
+		0 2rpx 6rpx rgba(124,179,66, 0.03),
 		0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 	transition: all 0.2s ease;
 }
@@ -561,7 +581,7 @@ export default {
 .sort-tabs {
 	display: flex;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 8rpx;
 	margin-bottom: 16rpx;
 	box-shadow:
@@ -575,17 +595,17 @@ export default {
 	padding: 16rpx 0;
 	font-size: 26rpx;
 	color: #999;
-	border-radius: 18rpx;
+	border-radius: 999rpx;
 	transition: all 0.3s ease;
 	background-size: 200% 100%;
-	background-image: linear-gradient(135deg, transparent 0%, transparent 50%, rgba(46,213,115, 0.05) 100%);
+	background-image: linear-gradient(135deg, transparent 0%, transparent 50%, rgba(124,179,66, 0.05) 100%);
 }
 .sort-tab:active {
 	background-position: 100% 0;
 }
 .sort-tab.active {
 	color: #fff;
-	background: #2ed573;
+	background: #7cb342;
 	font-weight: 700;
 	box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15);
 	transform: scale(0.97);
@@ -602,18 +622,18 @@ export default {
 /* 搜索结果数量标签胶囊样式 */
 .result-count {
 	font-size: 24rpx;
-	background: rgba(46,213,115, 0.08);
+	background: rgba(124,179,66, 0.08);
 	padding: 6rpx 24rpx;
 	border-radius: 30rpx;
 	display: inline-block;
 	font-weight: 500;
-	color: #27ae60;
-	border: 1rpx solid rgba(46,213,115, 0.15);
+	color: #558b2f;
+	border: 1rpx solid rgba(124,179,66, 0.15);
 }
 .result-card {
 	display: flex;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 36rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
 	box-shadow:
@@ -635,14 +655,14 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 1rpx;
 	filter: blur(1rpx);
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4), 0 0 6rpx rgba(46,213,115, 0.15);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.4), 0 0 6rpx rgba(124,179,66, 0.15);
 	opacity: 0.8;
 	z-index: 1;
 }
 .result-card:active {
 	transform: scale(0.97);
 	box-shadow:
-		0 1rpx 4rpx rgba(46,213,115, 0.04),
+		0 1rpx 4rpx rgba(124,179,66, 0.04),
 		0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 /* 封面图片 hover 缩放 */
@@ -651,7 +671,7 @@ export default {
 	height: 180rpx;
 	flex-shrink: 0;
 	border-radius: 24rpx 0 0 24rpx;
-	border-right: 2rpx solid rgba(46,213,115, 0.06);
+	border-right: 2rpx solid rgba(124,179,66, 0.06);
 	transition: transform 0.4s ease;
 }
 .result-card:active .result-cover {
@@ -667,7 +687,7 @@ export default {
 }
 .result-title {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -684,12 +704,12 @@ export default {
 .result-badge {
 	display: inline-block;
 	font-size: 20rpx;
-	background: rgba(46,213,115, 0.08);
+	background: rgba(124,179,66, 0.08);
 	padding: 4rpx 16rpx;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
-	color: #27ae60;
-	border: 1rpx solid rgba(46,213,115, 0.12);
+	color: #558b2f;
+	border: 1rpx solid rgba(124,179,66, 0.12);
 }
 .result-badge:active {
 	animation: badgeGradientShift 0.6s ease;
@@ -719,7 +739,7 @@ export default {
 }
 .result-price.free {
 	font-size: 24rpx;
-	background: #2ed573;
+	background: #7cb342;
 	color: #fff;
 }
 
@@ -731,23 +751,16 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 0 20rpx;
 	background: #fff;
-	border-radius: 20rpx;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
-	border: 1rpx solid rgba(0,0,0,0.03);
+	border-radius: 36rpx;
+	border: none;
+	box-shadow: 0 10rpx 36rpx rgba(90, 120, 50, 0.07);
 }
 .pager-btn {
-	padding: 12rpx 28rpx;
-	border-radius: 24rpx;
-	background: #e8e8e8;
-	font-size: 24rpx;
-	color: #333;
-	font-weight: 600;
-	transition: all 0.2s;
+	padding: 14rpx 28rpx;
+	border-radius: 999rpx;
+	transition: all 0.2s ease;
 }
 .pager-btn.disabled {
-	opacity: 0.4;
 	pointer-events: none;
 }
 .pager-btn:active {
@@ -760,12 +773,12 @@ export default {
 }
 .pager-current {
 	font-size: 26rpx;
-	color: #333;
+	color: #1a1a1a;
 	font-weight: 700;
 }
 .pager-total {
 	font-size: 20rpx;
-	color: #aaa;
+	color: #a3b08a;
 	margin-top: 4rpx;
 }
 
@@ -774,24 +787,24 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 120rpx 0;
+	padding: 100rpx 0;
 	position: relative;
 }
 .empty-result::before {
 	content: '';
 	position: absolute;
-	top: 60rpx;
-	width: 280rpx;
-	height: 280rpx;
+	top: 50rpx;
+	width: 240rpx;
+	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
+	background: linear-gradient(160deg, #ffffff 0%, #e8f2dc 100%);
 }
 .empty-icon {
-	font-size: 100rpx;
+	font-size: 96rpx;
 	margin-bottom: 24rpx;
 	position: relative;
 	z-index: 1;
-	animation: breathe 3s ease-in-out infinite;
+	animation: none;
 }
 @keyframes breathe {
 	0%, 100% { transform: scale(1); }
@@ -799,15 +812,15 @@ export default {
 }
 .empty-title {
 	font-size: 32rpx;
-	color: #333;
-	font-weight: 600;
+	color: #1a1a1a;
+	font-weight: 700;
 	margin-bottom: 12rpx;
 	position: relative;
 	z-index: 1;
 }
 .empty-desc {
 	font-size: 26rpx;
-	color: #bbb;
+	color: #a3b08a;
 	position: relative;
 	z-index: 1;
 }
@@ -820,7 +833,7 @@ export default {
 }
 .load-status text {
 	display: inline-block;
-	background: linear-gradient(90deg, #bbb 0%, #2ed573 40%, #bbb 80%);
+	background: linear-gradient(90deg, #bbb 0%, #7cb342 40%, #bbb 80%);
 	background-size: 200% 100%;
 	animation: loadShimmer 2s linear infinite;
 }

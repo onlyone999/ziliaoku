@@ -1,314 +1,373 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
+		<view
+			class="header-bg"
+			:style="'background:' + tc.headerGradientLong + ';'"
+		>
+			<view class="soft-orb o1" :style="'background:' + tc.primary + '30;'"></view>
+			<view class="soft-orb o2"></view>
+			<view class="soft-orb o3"></view>
+			<view class="header-fade" :style="'background:linear-gradient(180deg, rgba(240,247,230,0) 0%, ' + tc.pageBg + ' 100%);'"></view>
+		</view>
+
 		<scroll-view scroll-y class="main-scroll">
-			<!-- 用户信息卡 -->
-			<view class="user-card" v-if="isLoggedIn" :style="'background:' + tc.headerGradientLong + ';'">
-				<view class="user-bg-decor"></view>
-				<view class="user-header">
-					<view class="avatar-wrap">
-						<image class="user-avatar" :src="avatarSrc" mode="aspectFill" @error="onAvatarError"></image>
-						<view class="vip-ring" v-if="userInfo.is_vip"></view>
+			<!-- 自定义顶栏 -->
+			<view class="user-nav">
+				<view class="status-bar"></view>
+				<view class="nav-row">
+					<view class="nav-spacer"></view>
+					<text class="nav-title">我的</text>
+					<view class="nav-right">
+						<view class="nav-icon-btn" @tap="openThemePicker">
+							<text class="nav-icon">▦</text>
+						</view>
+						<view class="nav-icon-btn" @tap="openThemePicker">
+							<text class="nav-icon nav-dots">•••</text>
+						</view>
 					</view>
-					<view class="user-meta">
-						<view class="name-row">
-							<text class="user-name">{{ userInfo.nickname || '用户' }}</text>
-							<view class="vip-badge" v-if="userInfo.is_vip">
-								<text class="vip-icon">👑</text>
-								<text class="vip-text">VIP</text>
+				</view>
+			</view>
+
+			<!-- 已登录 -->
+			<view class="hero" v-if="isLoggedIn">
+				<view class="hi-row">
+					<view class="avatar-ring" :style="'background:linear-gradient(145deg,#ffffff 0%,' + tc.primaryLight + 'aa 100%);box-shadow:0 8rpx 24rpx ' + tc.primary + '2e, 0 2rpx 6rpx rgba(70,100,30,0.04);'" @tap="openEditProfile">
+						<image class="avatar" :src="avatarSrc" mode="aspectFill" @error="onAvatarError"></image>
+						<view class="avatar-badge" v-if="userInfo.is_vip">
+							<text>V</text>
+						</view>
+					</view>
+					<view class="hi-info">
+						<text class="hi-title">Hi, {{ maskName }}</text>
+						<text class="hi-sub">{{ hiTagline }}</text>
+					</view>
+					<view class="edit-btn" @tap="openEditProfile">
+						<text>编辑</text>
+					</view>
+				</view>
+
+				<view class="level-stage">
+					<view class="level-main" @tap="goVip">
+						<view class="level-row">
+							<text class="level-name">{{ userInfo.is_vip ? '尊享会员' : '新鲜人' }}</text>
+							<view class="info-dot" @tap.stop="goVip">
+								<text>i</text>
 							</view>
 						</view>
-						<text class="user-id">ID: {{ userInfo.id }}</text>
+						<text class="level-sub">{{ levelUpgradeText }}</text>
+						<view class="level-progress" v-if="!userInfo.is_vip">
+							<view
+								class="level-progress-bar"
+								:style="'width:' + vipProgress + '%;background:linear-gradient(90deg,' + tc.primaryLight + ',' + tc.primary + ');'"
+							></view>
+						</view>
+						<view class="level-cta" @tap.stop="goVip">
+							<text>{{ userInfo.is_vip ? '查看权益' : '去开通' }}</text>
+							<text class="cta-arrow">›</text>
+						</view>
 					</view>
-					<view class="edit-profile-btn" :style="'border:1rpx solid rgba(255,255,255,0.4);'" @tap="openEditProfile">
-						<text>编辑 ›</text>
+					<view class="hero-character" aria-hidden="true">
+						<image class="hero-illu" src="/static/user-hero.png" mode="aspectFit"></image>
 					</view>
 				</view>
 			</view>
 
 			<!-- 未登录 -->
-			<view class="login-section" v-if="!isLoggedIn">
-				<view class="login-header-bg" :style="'background:' + tc.headerGradientLong + ';'">
-					<view class="lh-inner">
-						<view class="lh-ring" :style="'border-color:' + tc.primary + ';'">
-							<view class="lh-avatar-box" :style="'background:' + tc.primary + ';'">
-								<text class="lh-avatar-icon">👤</text>
-							</view>
-						</view>
-						<view class="lh-info">
-							<text class="lh-name">未登录</text>
-							<text class="lh-tip" :style="'color:' + tc.primary + ';'">登录后享受更多功能</text>
-						</view>
+			<view class="hero" v-if="!isLoggedIn">
+				<view class="hi-row">
+					<view class="avatar-ring" :style="'background:linear-gradient(145deg,#ffffff 0%,' + tc.primaryLight + 'aa 100%);box-shadow:0 8rpx 24rpx ' + tc.primary + '2e, 0 2rpx 6rpx rgba(70,100,30,0.04);'">
+						<image class="avatar" src="/static/default-avatar.png" mode="aspectFill"></image>
+					</view>
+					<view class="hi-info">
+						<text class="hi-title">Hi, 你好</text>
+						<text class="hi-sub">登录后同步下载、收藏与积分</text>
+					</view>
+					<view class="edit-btn edit-btn-login" @tap="quickLogin">
+						<text>{{ loginLoading ? '登录中' : '登录' }}</text>
 					</view>
 				</view>
-				<view class="login-card">
-					<view class="lc-row">
-						<view class="lc-feat">
-							<view class="lf-icon-wrap g1"><text class="lf-ico">📥</text></view>
-							<text class="lf-name" :style="'color:' + tc.primary + ';'">免费下载</text>
+
+				<view class="level-stage">
+					<view class="level-main">
+						<view class="level-row">
+							<text class="level-name">访客</text>
 						</view>
-						<view class="lc-feat">
-							<view class="lf-icon-wrap g2"><text class="lf-ico">⭐</text></view>
-							<text class="lf-name" :style="'color:' + tc.primary + ';'">收藏资源</text>
-						</view>
-						<view class="lc-feat">
-							<view class="lf-icon-wrap g3"><text class="lf-ico">📦</text></view>
-							<text class="lf-name" :style="'color:' + tc.primary + ';'">下载记录</text>
-						</view>
+						<text class="level-sub">登录后可查看等级与成长权益</text>
 					</view>
-					<view class="lc-btn-area">
-						<view class="lc-btn" @tap="quickLogin" :style="'background:' + tc.btnGradient + ';'">
-							<text class="lc-btn-t">{{ loginLoading ? '登录中...' : '微信登录' }}</text>
-						</view>
+					<view class="hero-character" aria-hidden="true">
+						<image class="hero-illu" src="/static/user-hero.png" mode="aspectFit"></image>
 					</view>
 				</view>
 			</view>
 
-			<!-- 授权弹窗（底部弹出） -->
-			<view class="auth-mask" v-if="showAuthPopup" @tap="showAuthPopup = false">
-				<view class="auth-popup" @tap.stop>
-					<!-- 顶部拖拽条 -->
-					<view class="popup-drag"></view>
-					<text class="popup-title">完善个人信息</text>
-					<!-- 头像选择（官方chooseAvatar） -->
-					<view class="popup-avatar-row">
-						<text class="popup-label">头像</text>
-						<view class="popup-avatar-btn-wrap">
-							<button
-								v-if="!avatarChosen"
-								class="popup-avatar-btn"
-								open-type="chooseAvatar"
-								@chooseavatar="onChooseAvatar"
-							>
-								<image class="popup-avatar-img" :src="loginAvatar || '/static/default-avatar.png'" mode="aspectFill"></image>
-								<text class="popup-arrow">›</text>
-							</button>
-							<view v-else class="popup-avatar-btn" @tap="resetAvatar">
-								<image class="popup-avatar-img" :src="loginAvatar || '/static/default-avatar.png'" mode="aspectFill"></image>
-								<text class="popup-arrow">›</text>
-							</view>
+			<!-- 快捷入口 -->
+			<view class="wrap quick-wrap">
+				<view class="quick-bar">
+					<view class="qk" @tap="goPage('/pages/user/downloads')">
+						<view class="qk-ico" :style="'background:linear-gradient(160deg,' + tc.primaryLight + '2e 0%,' + tc.primary + '14 100%);color:' + tc.primary + ';'">
+							<text class="qk-glyph">↓</text>
 						</view>
+						<text class="qk-t">下载</text>
 					</view>
-					<!-- 昵称输入（官方type=nickname） -->
-					<view class="popup-nickname-row">
-						<text class="popup-label">昵称</text>
-						<input
-							type="nickname"
-							class="popup-nickname-input"
-							v-model="loginNickname"
-							placeholder="请输入昵称"
-							placeholder-class="popup-placeholder"
-							maxlength="16"
-						/>
+					<view class="qk" @tap="goPage('/pages/user/favorites')">
+						<view class="qk-ico" :style="'background:linear-gradient(160deg,' + tc.primaryLight + '2e 0%,' + tc.primary + '14 100%);color:' + tc.primary + ';'">
+							<text class="qk-glyph">♡</text>
+						</view>
+						<text class="qk-t">收藏</text>
 					</view>
-					<!-- 保存按钮 -->
-					<view class="popup-save-btn" @tap="submitLogin" :style="'background:' + tc.btnGradient + ';box-shadow:0 6rpx 24rpx rgba(' + tc.rgbPrimary + ',0.35);'">
-						<text>{{ loginLoading ? '登录中...' : '保存并登录' }}</text>
+					<view class="qk" @tap="goPage('/pages/points/index')">
+						<view class="qk-ico" :style="'background:linear-gradient(160deg,' + tc.primaryLight + '2e 0%,' + tc.primary + '14 100%);color:' + tc.primary + ';'">
+							<text class="qk-glyph">◎</text>
+						</view>
+						<text class="qk-t">签到</text>
+					</view>
+					<view class="qk" @tap="goPage('/pages/user/orders')">
+						<view class="qk-ico" :style="'background:linear-gradient(160deg,' + tc.primaryLight + '2e 0%,' + tc.primary + '14 100%);color:' + tc.primary + ';'">
+							<text class="qk-glyph">≡</text>
+						</view>
+						<text class="qk-t">订单</text>
+					</view>
+					<view class="qk" @tap="openThemePicker">
+						<view class="qk-ico qk-ico-more" :style="'background:linear-gradient(160deg,' + tc.primaryLight + '2e 0%,' + tc.primary + '14 100%);color:' + tc.primary + ';'">
+							<text class="qk-glyph qk-dots">•••</text>
+						</view>
+						<text class="qk-t">更多</text>
 					</view>
 				</view>
 			</view>
 
-			<!-- VIP横幅 -->
-				<!-- 编辑资料弹窗 -->
-				<view class="auth-mask" v-if="showEditPopup" @tap="showEditPopup = false">
-					<view class="auth-popup" @tap.stop>
-						<view class="popup-drag"></view>
-						<text class="popup-title">编辑个人资料</text>
-						<view class="popup-avatar-row">
-							<text class="popup-label">头像</text>
-							<view class="popup-avatar-btn-wrap">
-								<button class="popup-avatar-btn" open-type="chooseAvatar" @chooseavatar="onEditAvatar">
-									<image class="popup-avatar-img" :src="editAvatar || avatarSrc" mode="aspectFill"></image>
-									<text class="popup-arrow">›</text>
-								</button>
-							</view>
+			<!-- 数据卡（已登录） -->
+			<view class="wrap stats-wrap" v-if="isLoggedIn">
+				<view class="stats">
+					<view class="st" @tap="goPage('/pages/user/downloads')">
+						<view class="st-num-row">
+							<text class="st-num">{{ stats.download_count || 0 }}</text>
+							<text class="st-unit">次</text>
 						</view>
-						<view class="popup-nickname-row">
-							<text class="popup-label">昵称</text>
-							<input type="nickname" class="popup-nickname-input" v-model="editNickname" placeholder="请输入昵称" placeholder-class="popup-placeholder" maxlength="16" />
-						</view>
-						<view class="popup-save-btn" @tap="saveProfile" :style="'background:' + tc.btnGradient + ';box-shadow:0 6rpx 24rpx rgba(' + tc.rgbPrimary + ',0.35);'">
-							<text>{{ saving ? '保存中...' : '保存' }}</text>
-						</view>
+						<text class="st-lab">下载</text>
 					</view>
-				</view>
-
-			<view class="vip-banner" v-if="isLoggedIn" @tap="goVip" :style="'background:' + tc.vipBannerBg + ';'">
-				<view class="vip-content">
-					<view class="vip-left">
-						<view class="vip-title-row">
-							<text class="vip-crown" v-if="userInfo.is_vip">👑</text>
-							<text class="vip-crown" v-else>💎</text>
-							<text class="vip-title" v-if="userInfo.is_vip" :style="'color:' + tc.vipTextColor + ';'">VIP会员</text>
-							<text class="vip-title" v-else :style="'color:' + tc.vipTextColor + ';'">开通VIP会员</text>
+					<view class="st" @tap="goPage('/pages/user/favorites')">
+						<view class="st-num-row">
+							<text class="st-num">{{ stats.favorite_count || 0 }}</text>
+							<text class="st-unit">个</text>
 						</view>
-						<text class="vip-desc" v-if="userInfo.is_vip && userInfo.vip_expire_at" :style="'color:' + tc.vipDescColor + ';'">
-							有效期至 {{ userInfo.vip_expire_at.slice(0,10) }}
-						</text>
-						<text class="vip-desc" v-else :style="'color:' + tc.vipDescColor + ';'">全站资源免费下载 · 极速不限速</text>
+						<text class="st-lab">收藏</text>
 					</view>
-					<view class="vip-action" :style="'background:' + tc.primary + ';box-shadow:0 6rpx 18rpx rgba(' + tc.rgbPrimary + ',0.25);'">
-						<text class="vip-action-t">{{ userInfo.is_vip ? '续费' : '开通' }}</text>
+					<view class="st" @tap="goPage('/pages/user/orders')">
+						<view class="st-num-row">
+							<text class="st-num">{{ stats.order_count || 0 }}</text>
+							<text class="st-unit">单</text>
+						</view>
+						<text class="st-lab">订单</text>
 					</view>
-				</view>
-				<view class="vip-features">
-					<text class="vip-feat" :style="'color:' + tc.vipDescColor + ';background:rgba(255,255,255,0.45);border-color:rgba(' + tc.rgbPrimary + ',0.08);'">📥 免费下载</text>
-					<text class="vip-feat" :style="'color:' + tc.vipDescColor + ';background:rgba(255,255,255,0.45);border-color:rgba(' + tc.rgbPrimary + ',0.08);'">⚡ 极速通道</text>
-					<text class="vip-feat" :style="'color:' + tc.vipDescColor + ';background:rgba(255,255,255,0.45);border-color:rgba(' + tc.rgbPrimary + ',0.08);'">🎯 专属资源</text>
+					<view class="st" @tap="goPage('/pages/points/index')">
+						<view class="st-num-row">
+							<text class="st-num">{{ stats.points || 0 }}</text>
+							<text class="st-unit">分</text>
+						</view>
+						<text class="st-lab">积分</text>
+					</view>
 				</view>
 			</view>
 
-			<!-- 数据统计 -->
-			<view class="stats-card" v-if="isLoggedIn">
-				<view class="stat-item" @tap="goPage('/pages/user/downloads')">
-					<view class="stat-icon-wrap download-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="stat-emoji">📥</text>
+			<!-- 未登录：登录引导 -->
+			<view class="wrap stats-wrap" v-if="!isLoggedIn">
+				<view class="login-panel" :style="'background:linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.55) 38%, ' + tc.tintMedium + 'aa 100%);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);'">
+					<view class="login-panel-orb login-panel-orb-a" :style="'background:' + tc.primaryLight + '30;'"></view>
+					<view class="login-panel-orb login-panel-orb-b"></view>
+					<view class="login-panel-head">
+						<view class="login-panel-bar" :style="'background:linear-gradient(180deg,' + tc.primaryLight + ',' + tc.primary + ');'"></view>
+						<view class="login-panel-copy">
+							<text class="login-panel-t">登录后体验完整功能</text>
+							<text class="login-panel-s">同步下载、收藏与积分，换设备也不丢</text>
+						</view>
 					</view>
-					<text class="stat-num" :style="tPri">{{ stats.download_count || 0 }}</text>
-					<text class="stat-label">下载</text>
-				</view>
-				<view class="stat-divider"></view>
-				<view class="stat-item" @tap="goPage('/pages/user/favorites')">
-					<view class="stat-icon-wrap fav-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="stat-emoji">❤️</text>
+					<view class="login-perks">
+						<view class="login-perk">
+							<text class="login-perk-t" :style="'color:' + tc.primaryDark + ';'">免费下载</text>
+							<text class="login-perk-s">海量资源</text>
+						</view>
+						<view class="login-perk">
+							<text class="login-perk-t" :style="'color:' + tc.primaryDark + ';'">收藏资源</text>
+							<text class="login-perk-s">随时回看</text>
+						</view>
+						<view class="login-perk">
+							<text class="login-perk-t" :style="'color:' + tc.primaryDark + ';'">积分成长</text>
+							<text class="login-perk-s">等级权益</text>
+						</view>
 					</view>
-					<text class="stat-num" :style="tPri">{{ stats.favorite_count || 0 }}</text>
-					<text class="stat-label">收藏</text>
-				</view>
-				<view class="stat-divider"></view>
-				<view class="stat-item" @tap="goPage('/pages/user/orders')">
-					<view class="stat-icon-wrap orders-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="stat-emoji">📦</text>
+					<view
+						class="login-btn"
+						:style="'background:linear-gradient(180deg,' + tc.primaryLight + ' 0%,' + tc.primary + ' 100%);box-shadow:0 12rpx 28rpx ' + tc.primary + '40, inset 0 1rpx 0 rgba(255,255,255,0.22);'"
+						@tap="quickLogin"
+					>
+						<text v-if="!loginLoading" class="login-btn-icon">微</text>
+						<text class="login-btn-t">{{ loginLoading ? '登录中...' : '微信一键登录' }}</text>
 					</view>
-					<text class="stat-num" :style="tPri">{{ stats.order_count || 0 }}</text>
-					<text class="stat-label">订单</text>
-				</view>
-				<view class="stat-divider"></view>
-				<view class="stat-item" @tap="goPage('/pages/points/index')">
-					<view class="stat-icon-wrap" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="stat-emoji">💰</text>
-					</view>
-					<text class="stat-num" :style="tPri">{{ stats.points || 0 }}</text>
-					<text class="stat-label">积分</text>
-				</view>
-			</view>
-
-			<!-- 菜单列表 -->
-			<view class="menu-card">
-				<view class="menu-item" @tap="goPage('/pages/user/downloads')">
-					<view class="menu-icon-wrap download-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="menu-emoji">📥</text>
-					</view>
-					<text class="menu-text">我的下载</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="goPage('/pages/user/favorites')">
-					<view class="menu-icon-wrap fav-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="menu-emoji">❤️</text>
-					</view>
-					<text class="menu-text">我的收藏</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="goPage('/pages/user/orders')">
-					<view class="menu-icon-wrap order-bg" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="menu-emoji">📋</text>
-					</view>
-					<text class="menu-text">我的订单</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="goPage('/pages/user/vip')">
-					<view class="menu-icon-wrap vip-bg">
-						<text class="menu-emoji">👑</text>
-					</view>
-					<text class="menu-text">VIP中心</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="goPage('/pages/points/index')">
-					<view class="menu-icon-wrap" :style="'background:rgba(' + tc.rgbPrimary + ',0.15);'">
-						<text class="menu-emoji">💰</text>
-					</view>
-					<text class="menu-text">积分中心</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" v-if="feedbackEnabled" @tap="goPage('/pages/user/feedback')">
-					<view class="menu-icon-wrap fb-bg">
-						<text class="menu-emoji">💬</text>
-					</view>
-					<text class="menu-text">意见反馈</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="showAbout">
-					<view class="menu-icon-wrap about-bg">
-						<text class="menu-emoji">ℹ️</text>
-					</view>
-					<text class="menu-text">关于我们</text>
-					<text class="menu-arrow">></text>
-				</view>
-				<view class="menu-item" @tap="openThemePicker">
-					<view class="menu-icon-wrap theme-bg">
-						<text class="menu-emoji">🎨</text>
-					</view>
-					<text class="menu-text">主题风格</text>
-					<view class="theme-dot" :style="'background:' + currentThemeColor + ';'"></view>
-					<text class="menu-arrow">></text>
+					<text class="login-panel-tip">登录即代表同意用户协议与隐私政策</text>
 				</view>
 			</view>
 
-			<!-- 退出登录 -->
-			<view class="logout-btn" v-if="isLoggedIn" @tap="handleLogout">
-				<text>退出登录</text>
+			<!-- VIP -->
+			<view class="wrap" v-if="isLoggedIn">
+				<view class="vip-card" :style="'background:' + tc.vipBannerBg + ';'" @tap="goVip">
+					<view class="vip-l">
+						<text class="vip-t">{{ userInfo.is_vip ? 'VIP 会员' : '开通 VIP 会员' }}</text>
+						<text class="vip-s">全站资源免费下载 · 极速不限速</text>
+					</view>
+					<text class="vip-go">{{ userInfo.is_vip ? '续费' : '开通' }}</text>
+				</view>
 			</view>
 
-			<view style="height: 60rpx;"></view>
+			<!-- 功能 -->
+			<view class="wrap">
+				<text class="sec-label">功能</text>
+				<view class="menu">
+					<view class="mi" @tap="goPage('/pages/user/downloads')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">↓</view>
+						<text class="mi-t">我的下载</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="goPage('/pages/user/favorites')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">♡</view>
+						<text class="mi-t">我的收藏</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="goPage('/pages/user/orders')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">≡</view>
+						<text class="mi-t">我的订单</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="goPage('/pages/user/vip')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">V</view>
+						<text class="mi-t">VIP 中心</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="goPage('/pages/points/index')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">◎</view>
+						<text class="mi-t">积分中心</text>
+						<text class="mi-a">›</text>
+					</view>
+				</view>
+			</view>
+
+			<!-- 设置 -->
+			<view class="wrap">
+				<text class="sec-label">设置</text>
+				<view class="menu">
+					<view class="mi" v-if="feedbackEnabled" @tap="goPage('/pages/user/feedback')">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">✎</view>
+						<text class="mi-t">意见反馈</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="showAbout">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">i</view>
+						<text class="mi-t">关于我们</text>
+						<text class="mi-a">›</text>
+					</view>
+					<view class="mi" @tap="openThemePicker">
+						<view class="mi-ico" :style="'background:' + tc.tintMedium + ';color:' + tc.primary + ';'">◐</view>
+						<text class="mi-t">主题风格</text>
+						<view class="dot" :style="'background:' + tc.primary + ';'"></view>
+						<text class="mi-a">›</text>
+					</view>
+				</view>
+			</view>
+
+			<view class="wrap" v-if="isLoggedIn">
+				<view class="logout" @tap="handleLogout">退出登录</view>
+			</view>
+
+			<view class="foot">资料库</view>
 		</scroll-view>
 
-		<!-- 主题选择弹窗 -->
-		<view class="auth-mask" v-if="showThemePopup" @tap="showThemePopup = false">
-			<view class="theme-popup" @tap.stop>
-				<view class="popup-drag"></view>
-				<text class="popup-title">选择主题风格</text>
+		<view class="mask" v-if="showAuthPopup" @tap="showAuthPopup = false">
+			<view class="popup" @tap.stop>
+				<view class="drag"></view>
+				<text class="pop-title">完善个人信息</text>
+				<view class="field">
+					<text class="label">头像</text>
+					<button v-if="!avatarChosen" class="av-btn" open-type="chooseAvatar" @chooseavatar="onChooseAvatar">
+						<image class="av-img" :src="loginAvatar || '/static/default-avatar.png'" mode="aspectFill"></image>
+						<text class="arrow">›</text>
+					</button>
+					<view v-else class="av-btn" @tap="resetAvatar">
+						<image class="av-img" :src="loginAvatar || '/static/default-avatar.png'" mode="aspectFill"></image>
+						<text class="arrow">›</text>
+					</view>
+				</view>
+				<view class="field">
+					<text class="label">昵称</text>
+					<input type="nickname" class="input" v-model="loginNickname" placeholder="请输入昵称" placeholder-class="ph" maxlength="16" />
+				</view>
+				<view class="btn-main pop-btn" @tap="submitLogin">
+					<text>{{ loginLoading ? '登录中...' : '保存并登录' }}</text>
+				</view>
+			</view>
+		</view>
+
+		<view class="mask" v-if="showEditPopup" @tap="showEditPopup = false">
+			<view class="popup" @tap.stop>
+				<view class="drag"></view>
+				<text class="pop-title">编辑个人资料</text>
+				<view class="field">
+					<text class="label">头像</text>
+					<button class="av-btn" open-type="chooseAvatar" @chooseavatar="onEditAvatar">
+						<image class="av-img" :src="editAvatar || avatarSrc" mode="aspectFill"></image>
+						<text class="arrow">›</text>
+					</button>
+				</view>
+				<view class="field">
+					<text class="label">昵称</text>
+					<input type="nickname" class="input" v-model="editNickname" placeholder="请输入昵称" placeholder-class="ph" maxlength="16" />
+				</view>
+				<view class="btn-main pop-btn" @tap="saveProfile">
+					<text>{{ saving ? '保存中...' : '保存' }}</text>
+				</view>
+			</view>
+		</view>
+
+		<view class="mask" v-if="showThemePopup" @tap="showThemePopup = false">
+			<view class="popup" @tap.stop>
+				<view class="drag"></view>
+				<text class="pop-title">选择主题风格</text>
 				<view class="theme-grid">
 					<view
-						class="theme-item"
+						class="th"
 						v-for="item in themeList"
 						:key="item.key"
 						:class="{ active: activeTheme === item.key }"
-						:style="activeTheme === item.key ? 'border-color:' + item.primary + ';' : ''"
+						:style="activeTheme === item.key ? 'border-color:' + item.primary + ';background:' + item.tintLight + ';' : ''"
 						@tap="switchTheme(item.key)"
 					>
-						<view class="theme-circle" :style="'background:' + item.primary + ';'">
-							<text class="theme-check" v-if="activeTheme === item.key">✓</text>
+						<view class="th-ball" :style="'background:' + item.primary + ';'">
+							<text v-if="activeTheme === item.key">✓</text>
 						</view>
-						<text class="theme-label">{{ item.emoji }} {{ item.name }}</text>
+						<text class="th-name">{{ item.name }}</text>
 					</view>
 				</view>
 			</view>
 		</view>
+
+		<lingxi-tabbar :current="2"></lingxi-tabbar>
 	</view>
 </template>
 
 <script>
 import http from '@/utils/http.js';
 import theme from '@/common/theme.js';
+import LingxiTabbar from '@/components/lingxi-tabbar/lingxi-tabbar.vue';
 
 export default {
+	components: { LingxiTabbar },
 	data() {
 		return {
 			isLoggedIn: false,
 			userInfo: {},
-			stats: {
-				download_count: 0,
-				favorite_count: 0,
-				order_count: 0,
-				points: 0
-			},
+			stats: { download_count: 0, favorite_count: 0, order_count: 0, points: 0 },
 			loginAvatar: '',
 			loginNickname: '',
 			loginLoading: false,
-			loginFeatures: [
-				{ icon: '📥', name: '免费下载' },
-				{ icon: '⭐', name: '收藏资源' },
-				{ icon: '📦', name: '下载记录' }
-			],
 			showAuthPopup: false,
 			avatarChosen: false,
 			loginCode: '',
@@ -327,17 +386,31 @@ export default {
 	computed: {
 		avatarSrc() {
 			const url = this.userInfo.avatar_url;
-			if (!url || url.indexOf('default_avatar') !== -1) {
-				return '/static/default-avatar.png';
-			}
-			// 相对路径补全为完整URL
-			if (url.startsWith('/')) {
-				return http.getBaseUrl() + url;
-			}
+			if (!url || url.indexOf('default_avatar') !== -1) return '/static/default-avatar.png';
+			if (url.startsWith('/')) return http.getBaseUrl() + url;
 			return url;
 		},
-		currentThemeColor() {
-			return this.tc.primary;
+		maskName() {
+			const n = String(this.userInfo.nickname || '用户');
+			if (/^1\d{10}$/.test(n)) return n.slice(0, 3) + '*******' + n.slice(7);
+			if (n.length > 8) return n.slice(0, 8) + '**';
+			return n;
+		},
+		hiTagline() {
+			if (this.userInfo.is_vip) return '尊享会员权益已生效';
+			return this.userInfo.id ? 'ID ' + this.userInfo.id + ' · 资料库会员' : '资料库会员';
+		},
+		levelUpgradeText() {
+			if (this.userInfo.is_vip && this.userInfo.vip_expire_at) {
+				return '有效期至 ' + this.userInfo.vip_expire_at.slice(0, 10);
+			}
+			const pts = Number(this.stats.points || 0);
+			if (pts > 0) return '还差 ' + Math.max(1, 100 - (pts % 100)) + ' 成长值可享更多权益';
+			return '还差一步升级，开通 VIP 全站免费下载';
+		},
+		vipProgress() {
+			if (this.userInfo.is_vip) return 100;
+			return Math.min(92, Math.max(18, Number(this.stats.points || 0) % 40 + 28));
 		}
 	},
 	methods: {
@@ -359,9 +432,7 @@ export default {
 		async loadUserInfo() {
 			try {
 				const res = await http.get('/api/user/info', {}, { silent: true });
-				if (res.code === 0) {
-					this.userInfo = res.data || {};
-				}
+				if (res.code === 0) this.userInfo = res.data || {};
 			} catch (e) {}
 		},
 		async loadStats() {
@@ -375,14 +446,10 @@ export default {
 				}
 			} catch (e) {}
 		},
-		goLogin() {
-			// 登录卡片默认展示，无需此方法
-		},
 		async quickLogin() {
 			if (this.loginLoading) return;
 			this.loginLoading = true;
 			try {
-				// 第一步：有 token 尝试静默登录
 				const savedToken = uni.getStorageSync('token') || '';
 				if (savedToken) {
 					const checkRes = await http.get('/api/auth/silent-check');
@@ -397,12 +464,9 @@ export default {
 						this.loginLoading = false;
 						return;
 					}
-					// token 无效，清除
 					uni.removeStorageSync('token');
 					uni.removeStorageSync('userInfo');
 				}
-
-				// 第二步：wx.login 登录（后端用固定 openid 识别用户，不受 code 变化影响）
 				const loginRes = await new Promise((resolve, reject) => {
 					uni.login({ provider: 'weixin', success: resolve, fail: reject });
 				});
@@ -410,14 +474,12 @@ export default {
 				if (res.code === 0 && res.data && res.data.user) {
 					const user = res.data.user;
 					if (user.openid) uni.setStorageSync('openid', user.openid);
-					// 老用户（已自定义昵称）→ 直接登录
 					if (!res.data.is_new_user && user.nickname && user.nickname !== '微信用户') {
 						this.handleLoginSuccess(res.data);
 						this.loginLoading = false;
 						return;
 					}
 				}
-				// 新用户 → 弹窗填写资料
 				this.loginCode = loginRes.code;
 				this.showAuthPopup = true;
 			} catch (e) {
@@ -434,9 +496,9 @@ export default {
 			}
 		},
 		onChooseAvatar(e) {
-			const avatarUrl = e.detail.avatarUrl;
-			if (avatarUrl) {
-				this.loginAvatar = avatarUrl;
+			const url = e.detail.avatarUrl;
+			if (url) {
+				this.loginAvatar = url;
 				this.avatarChosen = true;
 			}
 		},
@@ -446,51 +508,37 @@ export default {
 		async submitLogin() {
 			if (this.loginLoading) return;
 			this.loginLoading = true;
-
 			try {
-				// 1. 使用已保存的 code（quickLogin 中获取的）
 				const code = this.loginCode;
 				if (!code) {
 					uni.showToast({ title: '请重新点击登录', icon: 'none' });
 					return;
 				}
-
-				// 2. 构造上传数据
 				const nickname = this.loginNickname || '微信用户';
 				const savedOpenid = uni.getStorageSync('openid') || '';
-
-				// 3. 如果有头像，用 uploadFile 上传；否则用普通 POST
 				if (this.loginAvatar) {
 					const uploadRes = await new Promise((resolve, reject) => {
 						uni.uploadFile({
 							url: http.getBaseUrl() + '/api/auth/fill-login',
 							filePath: this.loginAvatar,
 							name: 'avatar',
-							formData: { code: code, nickname: nickname, openid: savedOpenid },
-							success: (res) => {
-								try { resolve(JSON.parse(res.data)); }
-								catch (e) { reject(new Error('解析响应失败')); }
+							formData: { code, nickname, openid: savedOpenid },
+							success: res => {
+								try {
+									resolve(JSON.parse(res.data));
+								} catch (e) {
+									reject(new Error('解析响应失败'));
+								}
 							},
 							fail: reject
 						});
 					});
-					if (uploadRes.code === 0) {
-						this.handleLoginSuccess(uploadRes.data);
-					} else {
-						uni.showToast({ title: uploadRes.message || '登录失败', icon: 'none' });
-					}
+					if (uploadRes.code === 0) this.handleLoginSuccess(uploadRes.data);
+					else uni.showToast({ title: uploadRes.message || '登录失败', icon: 'none' });
 				} else {
-					// 无头像，普通 POST
-					const res = await http.post('/api/auth/fill-login', {
-						code: code,
-						nickname: nickname,
-						openid: savedOpenid
-					});
-					if (res.code === 0) {
-						this.handleLoginSuccess(res.data);
-					} else {
-						uni.showToast({ title: res.message || '登录失败', icon: 'none' });
-					}
+					const res = await http.post('/api/auth/fill-login', { code, nickname, openid: savedOpenid });
+					if (res.code === 0) this.handleLoginSuccess(res.data);
+					else uni.showToast({ title: res.message || '登录失败', icon: 'none' });
 				}
 			} catch (e) {
 				console.error('登录失败', e);
@@ -503,10 +551,7 @@ export default {
 			uni.setStorageSync('token', data.token);
 			if (data.user) {
 				uni.setStorageSync('userInfo', JSON.stringify(data.user));
-				// 保存openid供后续登录识别老用户
-				if (data.user.openid) {
-					uni.setStorageSync('openid', data.user.openid);
-				}
+				if (data.user.openid) uni.setStorageSync('openid', data.user.openid);
 			}
 			this.loginAvatar = '';
 			this.loginNickname = '';
@@ -521,10 +566,8 @@ export default {
 					title: '提示',
 					content: '请先登录',
 					confirmText: '去登录',
-					success: (res) => {
-						if (res.confirm) {
-							uni.pageScrollTo({ scrollTop: 0, duration: 300 });
-						}
+					success: res => {
+						if (res.confirm) uni.pageScrollTo({ scrollTop: 0, duration: 300 });
 					}
 				});
 				return;
@@ -537,22 +580,22 @@ export default {
 		async showAbout() {
 			uni.navigateTo({ url: '/pages/about/index' });
 		},
-
 		openThemePicker() {
 			this.showThemePopup = true;
 		},
 		switchTheme(name) {
 			this.activeTheme = name;
 			uni.setStorageSync('theme', name);
-			uni.$emit('__themeChanged', name);
 			theme.applyTheme(name);
+			uni.$emit('__themeChanged', name);
 			this.showThemePopup = false;
+			const t = theme.getTheme();
+			try {
+				uni.setNavigationBarColor({ frontColor: '#ffffff', backgroundColor: t.navBg });
+				uni.setBackgroundColor({ backgroundColor: t.pageBg, backgroundColorTop: t.pageBg, backgroundColorBottom: t.pageBg });
+			} catch (e) {}
 			uni.showToast({ title: '已切换', icon: 'success', duration: 800 });
-			setTimeout(() => {
-				uni.switchTab({ url: '/pages/index/index' });
-			}, 1000);
 		},
-
 		openEditProfile() {
 			this.editNickname = this.userInfo.nickname || '';
 			this.editAvatar = '';
@@ -572,7 +615,6 @@ export default {
 			try {
 				let res;
 				if (this.editAvatar) {
-					// 有新头像，用 uploadFile
 					res = await new Promise((resolve, reject) => {
 						const token = uni.getStorageSync('token') || '';
 						uni.uploadFile({
@@ -580,20 +622,23 @@ export default {
 							filePath: this.editAvatar,
 							name: 'avatar',
 							formData: { nickname: this.editNickname.trim() },
-							header: { 'Authorization': 'Bearer ' + token },
-							success: (r) => { try { resolve(JSON.parse(r.data)); } catch(e) { reject(e); } },
+							header: { Authorization: 'Bearer ' + token },
+							success: r => {
+								try {
+									resolve(JSON.parse(r.data));
+								} catch (e) {
+									reject(e);
+								}
+							},
 							fail: reject
 						});
 					});
 				} else {
-					res = await http.post('/api/auth/update-profile', {
-						nickname: this.editNickname.trim()
-					});
+					res = await http.post('/api/auth/update-profile', { nickname: this.editNickname.trim() });
 				}
 				if (res.code === 0) {
 					uni.showToast({ title: '保存成功', icon: 'success' });
 					this.showEditPopup = false;
-					// 刷新用户信息
 					this.loadUserInfo();
 				} else {
 					uni.showToast({ title: res.message || '保存失败', icon: 'none' });
@@ -608,11 +653,10 @@ export default {
 			uni.showModal({
 				title: '确认退出',
 				content: '确定要退出登录吗？',
-				success: (res) => {
+				success: res => {
 					if (res.confirm) {
 						uni.removeStorageSync('token');
 						uni.removeStorageSync('userInfo');
-						// openid 是用户唯一标识，退出时保留，用于下次识别老用户
 						this.isLoggedIn = false;
 						this.userInfo = {};
 						this.stats = { download_count: 0, favorite_count: 0, points: 0, order_count: 0 };
@@ -623,10 +667,7 @@ export default {
 		}
 	},
 	onShareAppMessage() {
-		return {
-			title: '海量资源免费下载',
-			path: '/pages/index/index'
-		};
+		return { title: '海量资源免费下载', path: '/pages/index/index' };
 	}
 };
 </script>
@@ -634,459 +675,841 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
-}
-.main-scroll {
-	height: 100vh;
+	background: transparent;
+	padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
 }
 
-/* ==================== 用户信息卡 ==================== */
-.user-card {
-	background: transparent;
-	padding: 158rpx 32rpx 80rpx;
-	min-height: 500rpx;
-	margin-bottom: 24rpx;
-	position: relative;
+.header-bg {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 820rpx;
+	z-index: 0;
+	pointer-events: none;
 	overflow: hidden;
 }
-/* 装饰圆环粒子 - 大圆 */
-.user-bg-decor {
+.soft-orb {
 	position: absolute;
-	top: -80rpx;
-	right: -80rpx;
-	width: 360rpx;
-	height: 360rpx;
 	border-radius: 50%;
-	background: radial-gradient(circle, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 60%, transparent 70%);
-	border: 1rpx solid rgba(255,255,255,0.1);
+	pointer-events: none;
 }
-.user-card::before {
-	content: '';
+.soft-orb.o1 {
+	width: 260rpx;
+	height: 260rpx;
+	right: -60rpx;
+	top: 140rpx;
+	opacity: 0.28;
+	filter: blur(6rpx);
+}
+.soft-orb.o2 {
+	width: 140rpx;
+	height: 140rpx;
+	left: -36rpx;
+	top: 320rpx;
+	background: rgba(255, 255, 255, 0.22);
+}
+.soft-orb.o3 {
+	width: 80rpx;
+	height: 80rpx;
+	right: 140rpx;
+	top: 460rpx;
+	background: rgba(255, 255, 255, 0.18);
+}
+.header-fade {
 	position: absolute;
-	top: 40rpx;
-	left: -40rpx;
-	width: 180rpx;
-	height: 180rpx;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-	border: 1rpx solid rgba(255,255,255,0.06);
-}
-.user-card::after {
-	content: '';
-	position: absolute;
-	bottom: 20rpx;
-	right: 120rpx;
-	width: 3rpx;
-	height: 3rpx;
-	border-radius: 50%;
-	background: #fff;
-	box-shadow:
-		60rpx 30rpx 0 0 rgba(255,255,255,0.6),
-		120rpx -10rpx 0 1rpx rgba(255,255,255,0.4),
-		30rpx -40rpx 0 0 rgba(255,255,255,0.35),
-		180rpx 20rpx 0 1rpx rgba(255,255,255,0.5),
-		-20rpx 60rpx 0 1rpx rgba(255,255,255,0.4),
-		150rpx 50rpx 0 0 rgba(255,255,255,0.35),
-		100rpx 40rpx 0 1rpx rgba(255,255,255,0.25),
-		220rpx 40rpx 0 1rpx rgba(255,255,255,0.4);
-	animation: float-particle 4s ease-in-out infinite, twinkle 3s ease-in-out infinite;
-}
-@keyframes float-particle {
-	0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
-	50% { transform: translateY(-16rpx) scale(1.1); opacity: 1; }
-}
-@keyframes twinkle {
-	0%, 100% { opacity: 0.6; }
-	25% { opacity: 1; }
-	50% { opacity: 0.4; }
-	75% { opacity: 0.9; }
-}
-@keyframes breathe-glow {
-	0%, 100% { opacity: 1; transform: scale(0.95); }
-	50% { opacity: 0.75; transform: scale(0.75); }
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 260rpx;
+	pointer-events: none;
 }
 
-.user-header {
-	display: flex;
-	align-items: center;
+.main-scroll {
+	height: 100vh;
 	position: relative;
 	z-index: 1;
 }
-.avatar-wrap {
+
+.user-nav {
 	position: relative;
-	flex-shrink: 0;
+	z-index: 3;
+}
+.status-bar {
+	height: 88rpx;
+	height: calc(88rpx + constant(safe-area-inset-top));
+	height: calc(88rpx + env(safe-area-inset-top));
+}
+.nav-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	height: 88rpx;
+	padding: 0 28rpx;
+}
+.nav-spacer {
 	width: 140rpx;
-	height: 140rpx;
+}
+.nav-title {
+	flex: 1;
+	text-align: center;
+	font-size: 34rpx;
+	font-weight: 700;
+	color: #1a1a1a;
+	letter-spacing: 4rpx;
+}
+.nav-right {
+	width: 140rpx;
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	gap: 14rpx;
+}
+.nav-icon-btn {
+	width: 68rpx;
+	height: 68rpx;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.72);
 	display: flex;
 	align-items: center;
 	justify-content: center;
+	border: 1rpx solid rgba(255, 255, 255, 0.85);
+	box-shadow: 0 6rpx 18rpx rgba(70, 100, 30, 0.08);
+	backdrop-filter: blur(8rpx);
 }
-.user-avatar {
-	width: 120rpx;
-	height: 120rpx;
-	border-radius: 50%;
-	border: 4rpx solid rgba(255,255,255,0.9);
-	flex-shrink: 0;
-	position: relative;
-	z-index: 1;
-	box-shadow:
-		0 4rpx 12rpx rgba(0,0,0,0.1),
-		0 8rpx 24rpx rgba(0,0,0,0.08);
+.nav-icon-btn:active {
+	transform: scale(0.94);
 }
-.avatar-wrap::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	background: rgba(255,255,255,0.25);
-	z-index: 0;
+.nav-icon {
+	font-size: 28rpx;
+	color: #2f3a24;
+	font-weight: 700;
+	line-height: 1;
 }
-.avatar-wrap::after {
-	content: '';
-	position: absolute;
-	inset: 4rpx;
-	border-radius: 50%;
-	background: transparent;
-	border: 2rpx solid rgba(255,255,255,0.2);
-	z-index: 0;
+.nav-dots {
+	font-size: 20rpx;
+	letter-spacing: 2rpx;
+	transform: translateY(-6rpx);
 }
 
-/* VIP 金色光环 */
-.vip-ring {
-	position: absolute;
-	top: -10rpx;
-	left: -10rpx;
-	right: -10rpx;
-	bottom: -10rpx;
-	border-radius: 50%;
-	border: 4rpx solid #f9ca24;
-	animation: vip-glow 2s ease-in-out infinite;
+.hero {
+	padding: 12rpx 40rpx 0;
+	position: relative;
 	z-index: 2;
 }
-@keyframes vip-glow {
-	0%, 100% {
-		box-shadow: 0 0 8rpx rgba(249,202,36,0.3), 0 0 20rpx rgba(249,202,36,0.1);
-		border-color: #f9ca24;
-	}
-	50% {
-		box-shadow: 0 0 24rpx rgba(249,202,36,0.6), 0 0 48rpx rgba(249,202,36,0.2);
-		border-color: #ffeaa7;
-	}
+.wrap.stats-wrap {
+	margin-top: 8rpx;
+}
+.wrap.quick-wrap {
+	margin-top: 36rpx;
+	margin-bottom: 16rpx;
+}
+.hi-row {
+	display: flex;
+	align-items: center;
+}
+.avatar-ring {
+	width: 108rpx;
+	height: 108rpx;
+	border-radius: 50%;
+	padding: 5rpx;
+	background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.4));
+	box-shadow:
+		0 8rpx 24rpx rgba(70, 100, 30, 0.1),
+		0 2rpx 6rpx rgba(70, 100, 30, 0.04);
+	flex-shrink: 0;
+	position: relative;
+}
+.avatar {
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+	background: #fff;
+	overflow: hidden;
+	display: block;
+}
+.avatar-badge {
+	position: absolute;
+	right: -2rpx;
+	bottom: 2rpx;
+	width: 32rpx;
+	height: 32rpx;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #ffd54f, #ffb300);
+	border: 3rpx solid #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 4rpx 10rpx rgba(180, 120, 0, 0.25);
+}
+.avatar-badge text {
+	font-size: 16rpx;
+	font-weight: 800;
+	color: #5c430c;
+	line-height: 1;
+}
+.hi-info {
+	flex: 1;
+	min-width: 0;
+	margin-left: 22rpx;
+}
+.hi-title {
+	display: block;
+	font-size: 36rpx;
+	font-weight: 800;
+	color: #161a12;
+	letter-spacing: 0.5rpx;
+	max-width: 340rpx;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.hi-sub {
+	display: block;
+	margin-top: 8rpx;
+	font-size: 20rpx;
+	color: rgba(55, 75, 35, 0.42);
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.edit-btn {
+	padding: 14rpx 28rpx;
+	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.94);
+	font-size: 22rpx;
+	font-weight: 700;
+	color: #558b2f;
+	flex-shrink: 0;
+	box-shadow: 0 6rpx 18rpx rgba(70, 100, 30, 0.08);
+	letter-spacing: 1rpx;
+	border: 1rpx solid rgba(255, 255, 255, 0.9);
+}
+.edit-btn:active {
+	transform: scale(0.96);
+}
+.edit-btn-login {
+	background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
+	color: #fff;
+	border-color: transparent;
+	box-shadow: 0 8rpx 20rpx rgba(0, 0, 0, 0.12);
 }
 
-.user-meta {
-	margin-left: 28rpx;
-	flex: 1;
+.level-stage {
+	margin-top: 28rpx;
+	display: flex;
+	align-items: flex-end;
+	justify-content: space-between;
+	min-height: 320rpx;
+	position: relative;
 }
-.name-row {
+.level-main {
+	flex: 1;
+	min-width: 0;
+	padding-right: 8rpx;
+	padding-bottom: 56rpx;
+	position: relative;
+	z-index: 2;
+}
+.level-row {
 	display: flex;
 	align-items: center;
 	gap: 14rpx;
 }
-.user-name {
-	font-size: 38rpx;
+.level-name {
+	font-size: 68rpx;
 	font-weight: 800;
-	color: #fff;
-	text-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
+	color: #11150c;
+	letter-spacing: 2rpx;
+	line-height: 1.05;
+	text-shadow: 0 2rpx 0 rgba(255, 255, 255, 0.28);
 }
-
-/* VIP徽章发光效果 */
-.vip-badge {
-	background: linear-gradient(135deg, #f9ca24, #f0932b);
-	padding: 6rpx 20rpx;
-	border-radius: 20rpx;
+.info-dot {
+	width: 32rpx;
+	height: 32rpx;
+	border-radius: 50%;
+	border: 2rpx solid rgba(55, 75, 35, 0.3);
 	display: flex;
 	align-items: center;
-	gap: 6rpx;
-	box-shadow: 0 4rpx 12rpx rgba(249,202,36,0.4), 0 0 24rpx rgba(249,202,36,0.2);
-	animation: badge-glow 2.5s ease-in-out infinite;
-}
-@keyframes badge-glow {
-	0%, 100% { box-shadow: 0 4rpx 12rpx rgba(249,202,36,0.4), 0 0 16rpx rgba(249,202,36,0.15); }
-	50% { box-shadow: 0 4rpx 20rpx rgba(249,202,36,0.6), 0 0 36rpx rgba(249,202,36,0.3); }
-}
-.vip-icon {
-	font-size: 22rpx;
-}
-.vip-text {
-	font-size: 22rpx;
-	color: #fff;
-	font-weight: 800;
-}
-.user-id {
-	font-size: 24rpx;
-	color: rgba(255,255,255,0.7);
-	margin-top: 10rpx;
-	display: block;
-}
-.edit-profile-btn {
-	margin-left: auto;
-	background: rgba(255,255,255,0.2);
-	padding: 8rpx 24rpx;
-	border-radius: 24rpx;
+	justify-content: center;
+	font-size: 18rpx;
+	font-weight: 700;
+	color: rgba(55, 75, 35, 0.5);
+	line-height: 1;
+	margin-top: 14rpx;
 	flex-shrink: 0;
-	backdrop-filter: blur(8rpx);
-	transition: all 0.2s;
+	background: rgba(255, 255, 255, 0.45);
 }
-.edit-profile-btn:active {
-	background: rgba(255,255,255,0.35);
+.info-dot:active {
+	transform: scale(0.92);
+}
+.level-sub {
+	display: block;
+	margin-top: 18rpx;
+	font-size: 22rpx;
+	color: rgba(55, 75, 35, 0.48);
+	font-weight: 500;
+	letter-spacing: 0.4rpx;
+	max-width: 360rpx;
+	line-height: 1.5;
+}
+.level-progress {
+	margin-top: 20rpx;
+	width: 300rpx;
+	height: 12rpx;
+	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.6);
+	overflow: hidden;
+	box-shadow: inset 0 1rpx 3rpx rgba(70, 100, 30, 0.08);
+}
+.level-progress-bar {
+	height: 100%;
+	border-radius: 999rpx;
+	box-shadow: 0 0 12rpx rgba(124, 179, 66, 0.35);
+	transition: width 0.4s ease;
+}
+.level-cta {
+	display: inline-flex;
+	align-items: center;
+	margin-top: 22rpx;
+	padding: 12rpx 24rpx;
+	border-radius: 999rpx;
+	background: rgba(255, 255, 255, 0.78);
+	border: 1rpx solid rgba(255, 255, 255, 0.95);
+	font-size: 20rpx;
+	font-weight: 700;
+	color: #3d4a2e;
+	box-shadow: 0 4rpx 14rpx rgba(70, 100, 30, 0.07);
+}
+.level-cta:active {
 	transform: scale(0.96);
 }
-.edit-profile-btn text {
-	font-size: 24rpx;
-	color: rgba(255,255,255,0.9);
-	font-weight: 500;
+.cta-arrow {
+	margin-left: 6rpx;
+	font-size: 22rpx;
+	opacity: 0.7;
 }
 
-/* ==================== 未登录 ==================== */
-.login-section {
+/* ===== 人物插画 ===== */
+.hero-character {
 	position: relative;
-	margin-bottom: 24rpx;
+	width: 300rpx;
+	height: 340rpx;
+	flex-shrink: 0;
+	margin-right: -8rpx;
+	margin-bottom: -8rpx;
+	z-index: 1;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
 }
-.login-header-bg {
-	height: 500rpx;
-	background: transparent;
+.hero-illu {
+	width: 300rpx;
+	height: 340rpx;
+	display: block;
+}
+
+.wrap {
+	padding: 0 28rpx;
+	margin-bottom: 18rpx;
+	position: relative;
+	z-index: 2;
+}
+.sec-label {
+	display: block;
+	margin: 20rpx 8rpx 12rpx;
+	font-size: 22rpx;
+	font-weight: 600;
+	color: #a0ab92;
+	letter-spacing: 3rpx;
+}
+
+/* ===== 快捷入口 ===== */
+.quick-bar {
 	display: flex;
 	align-items: flex-start;
-	padding: 140rpx 36rpx 0;
-	position: relative;
+	justify-content: space-between;
+	background: #ffffff;
+	border-radius: 36rpx;
+	padding: 28rpx 12rpx 22rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(70, 100, 30, 0.03),
+		0 14rpx 36rpx rgba(70, 100, 30, 0.08);
 }
-.login-header-bg::before {
-	content: '';
-	position: absolute;
-	top: 40rpx;
-	right: 30rpx;
-	width: 240rpx;
-	height: 240rpx;
-	border-radius: 50%;
-	background: rgba(255,255,255,0.04);
-	pointer-events: none;
-}
-.login-header-bg::after {
-	content: '';
-	position: absolute;
-	bottom: 20rpx;
-	left: 20rpx;
-	width: 180rpx;
-	height: 180rpx;
-	border-radius: 50%;
-	background: rgba(255,255,255,0.03);
-	pointer-events: none;
-}
-.lh-inner {
-	display: flex;
-	align-items: center;
-	position: relative;
-	z-index: 1;
-}
-.lh-ring {
-	width: 116rpx;
-	height: 116rpx;
-	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(255,255,255,0.95), rgba(255,255,255,0.8));
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	box-shadow: 0 10rpx 32rpx rgba(0,0,0,0.15);
-	border: 4rpx solid #2ed573;
-	box-sizing: border-box;
-	position: relative;
-}
-.lh-avatar-box {
-	width: 100rpx;
-	height: 100rpx;
-	border-radius: 50%;
-	overflow: hidden;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
-	background: #2ed573;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-.lh-avatar-icon {
-	font-size: 50rpx;
-}
-.lh-avatar {
-	width: 100%;
-	height: 100%;
-	display: block;
-}
-.lh-info {
-	margin-left: 36rpx;
-}
-.lh-name {
-	font-size: 44rpx;
-	font-weight: 900;
-	color: #fff;
-	display: block;
-	text-shadow: 0 4rpx 14rpx rgba(0,0,0,0.12);
-	letter-spacing: 5rpx;
-}
-.lh-tip {
-	font-size: 26rpx;
-	color: rgba(255,255,255,0.7);
-	display: block;
-	margin-top: 12rpx;
-	font-weight: 500;
-	letter-spacing: 1rpx;
-}
-.login-card {
-	margin: -180rpx 28rpx 0;
-	border-radius: 32rpx;
-	background: #fff;
-	box-shadow: 0 12rpx 48rpx rgba(0,0,0,0.09);
-	position: relative;
-	z-index: 1;
-	overflow: hidden;
-}
-.lc-row {
-	display: flex;
-	padding: 48rpx 20rpx;
-}
-.lc-feat {
+.qk {
 	flex: 1;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 16rpx;
+	gap: 12rpx;
+	min-width: 0;
 }
-.lf-icon-wrap {
-	width: 96rpx;
-	height: 96rpx;
+.qk:active {
+	transform: scale(0.94);
+}
+.qk-ico {
+	width: 84rpx;
+	height: 84rpx;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	box-shadow: 0 6rpx 18rpx rgba(0,0,0,0.04);
+	box-shadow: inset 0 -2rpx 6rpx rgba(255, 255, 255, 0.35);
 }
-.lf-icon-wrap.g1 { background: rgba(0,0,0,0.04); }
-.lf-icon-wrap.g2 { background: linear-gradient(135deg, #fff7ed, #ffedd5); }
-.lf-icon-wrap.g3 { background: linear-gradient(135deg, #f3e8ff, #e9d5ff); }
-.lf-ico { font-size: 44rpx; }
-.lf-name { font-size: 26rpx; color: #333; font-weight: 700; letter-spacing: 1rpx; }
-.lc-btn-area {
-	padding: 0 28rpx 48rpx;
+.qk-ico-more {
+	opacity: 0.92;
 }
-.lc-btn {
-	width: 100%;
-	background: transparent;
-	padding: 22rpx 0;
-	border-radius: 56rpx;
-	text-align: center;
-	box-shadow: 0 16rpx 44rpx rgba(0,0,0,0.2), 0 6rpx 18rpx rgba(0,0,0,0.1), inset 0 1rpx 0 rgba(255,255,255,0.2);
+.qk-glyph {
+	font-size: 34rpx;
+	font-weight: 700;
+	line-height: 1;
+}
+.qk-dots {
+	font-size: 22rpx;
+	letter-spacing: 2rpx;
+	transform: translateY(-4rpx);
+}
+.qk-t {
+	font-size: 20rpx;
+	color: #5a6650;
+	font-weight: 600;
+	letter-spacing: 0.5rpx;
+	line-height: 1.2;
+}
+
+.stats {
+	display: flex;
+	background: #fff;
+	border-radius: 36rpx;
+	padding: 38rpx 8rpx 34rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(70, 100, 30, 0.03),
+		0 16rpx 40rpx rgba(70, 100, 30, 0.08);
+}
+.st {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12rpx;
+	position: relative;
+}
+.st:active {
+	transform: scale(0.96);
+}
+.st + .st::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 16%;
+	height: 68%;
+	width: 1rpx;
+	background: linear-gradient(
+		180deg,
+		rgba(80, 110, 40, 0) 0%,
+		rgba(80, 110, 40, 0.1) 50%,
+		rgba(80, 110, 40, 0) 100%
+	);
+}
+.st-num-row {
+	display: flex;
+	align-items: baseline;
+	gap: 2rpx;
+}
+.st-num {
+	font-size: 48rpx;
+	font-weight: 800;
+	color: #1a1a1a;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	letter-spacing: -1.5rpx;
+}
+.st-unit {
+	font-size: 18rpx;
+	font-weight: 600;
+	color: rgba(26, 26, 26, 0.32);
+	margin-left: 2rpx;
+}
+.st-lab {
+	font-size: 20rpx;
+	color: #8f9c82;
+	font-weight: 600;
+	letter-spacing: 2rpx;
+}
+
+.login-panel {
+	border-radius: 40rpx;
+	padding: 44rpx 20rpx 30rpx;
+	margin-top: 48rpx;
+	box-shadow:
+		0 2rpx 8rpx rgba(70, 100, 30, 0.04),
+		0 18rpx 44rpx rgba(70, 100, 30, 0.1);
 	position: relative;
 	overflow: hidden;
-	animation: btn-gradient 4s ease infinite;
+	border: 1rpx solid rgba(255, 255, 255, 0.78);
 }
-@keyframes btn-gradient {
-	0% { background-position: 0% 50%; }
-	50% { background-position: 100% 50%; }
-	100% { background-position: 0% 50%; }
-}
-.lc-btn::before {
-	content: '';
+.login-panel-orb {
 	position: absolute;
-	top: -2rpx;
-	left: 4%;
-	right: 4%;
-	height: 6rpx;
-	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.8), transparent);
-	border-radius: 56rpx;
-	pointer-events: none;
-	animation: btn-shine 3s ease-in-out infinite;
-}
-@keyframes btn-shine {
-	0%, 100% { opacity: 0.2; left: 4%; right: 4%; }
-	50% { opacity: 1; left: 20%; right: 20%; }
-}
-.lc-btn::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 50%;
-	background: linear-gradient(to bottom, rgba(255,255,255,0.32), transparent);
-	border-radius: 56rpx 56rpx 0 0;
+	border-radius: 50%;
 	pointer-events: none;
 }
-.lc-btn-t {
-	font-size: 32rpx;
-	color: #fff;
+.login-panel-orb-a {
+	width: 200rpx;
+	height: 200rpx;
+	right: -56rpx;
+	top: -64rpx;
+	filter: blur(2rpx);
+}
+.login-panel-orb-b {
+	width: 110rpx;
+	height: 110rpx;
+	left: -32rpx;
+	bottom: 48rpx;
+	background: rgba(255, 255, 255, 0.4);
+}
+.login-panel-head {
+	position: relative;
+	z-index: 1;
+	display: flex;
+	align-items: flex-start;
+	gap: 18rpx;
+	padding: 0 8rpx;
+}
+.login-panel-bar {
+	width: 8rpx;
+	height: 68rpx;
+	border-radius: 999rpx;
+	flex-shrink: 0;
+	margin-top: 4rpx;
+	box-shadow: 0 4rpx 10rpx rgba(70, 100, 30, 0.12);
+}
+.login-panel-copy {
+	flex: 1;
+	min-width: 0;
+}
+.login-panel-t {
+	display: block;
+	font-size: 36rpx;
 	font-weight: 800;
-	letter-spacing: 4rpx;
-	text-shadow: 0 3rpx 10rpx rgba(0,0,0,0.25), 0 1rpx 3rpx rgba(0,0,0,0.15);
+	color: #141810;
+	letter-spacing: 0.5rpx;
+	line-height: 1.25;
+}
+.login-panel-s {
+	display: block;
+	margin-top: 12rpx;
+	font-size: 22rpx;
+	color: rgba(55, 75, 35, 0.46);
+	font-weight: 500;
+	line-height: 1.5;
+}
+.login-perks {
+	display: flex;
+	margin-top: 34rpx;
+	margin-bottom: 36rpx;
+	position: relative;
+	z-index: 1;
+	background: rgba(255, 255, 255, 0.48);
+	border-radius: 28rpx;
+	border: 1rpx solid rgba(255, 255, 255, 0.7);
+	padding: 22rpx 8rpx;
+	backdrop-filter: blur(8rpx);
+	-webkit-backdrop-filter: blur(8rpx);
+}
+.login-perk {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8rpx;
 	position: relative;
 }
-.lc-btn:active { opacity: 0.92; transform: scale(0.97); }
+.login-perk + .login-perk::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	top: 18%;
+	height: 64%;
+	width: 1rpx;
+	background: linear-gradient(
+		180deg,
+		rgba(80, 110, 40, 0) 0%,
+		rgba(80, 110, 40, 0.12) 50%,
+		rgba(80, 110, 40, 0) 100%
+	);
+}
+.login-perk-t {
+	font-size: 24rpx;
+	font-weight: 800;
+	letter-spacing: 1rpx;
+}
+.login-perk-s {
+	font-size: 18rpx;
+	color: rgba(55, 75, 35, 0.4);
+	font-weight: 500;
+	letter-spacing: 0.5rpx;
+}
+.login-btn {
+	position: relative;
+	z-index: 1;
+	margin: 0 -4rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12rpx;
+	width: calc(100% + 8rpx);
+	color: #fff;
+	text-align: center;
+	padding: 32rpx 0;
+	border-radius: 999rpx;
+}
+.login-btn:active {
+	opacity: 0.92;
+	transform: scale(0.98);
+}
+.login-btn-icon {
+	width: 40rpx;
+	height: 40rpx;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.24);
+	font-size: 20rpx;
+	font-weight: 800;
+	line-height: 40rpx;
+	text-align: center;
+	flex-shrink: 0;
+}
+.login-btn-t {
+	font-size: 28rpx;
+	font-weight: 700;
+	letter-spacing: 3rpx;
+}
+.login-panel-tip {
+	display: block;
+	position: relative;
+	z-index: 1;
+	margin-top: 22rpx;
+	text-align: center;
+	font-size: 18rpx;
+	color: rgba(55, 75, 35, 0.34);
+	font-weight: 500;
+	letter-spacing: 0.5rpx;
+}
+.btn-main {
+	width: 100%;
+	background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
+	color: #fff;
+	text-align: center;
+	padding: 30rpx 0;
+	border-radius: 999rpx;
+	font-size: 28rpx;
+	font-weight: 700;
+	letter-spacing: 3rpx;
+	box-shadow: 0 10rpx 24rpx rgba(0, 0, 0, 0.14);
+	border: none;
+}
+.btn-main:active {
+	opacity: 0.9;
+	transform: scale(0.98);
+}
 
-/* ==================== 授权弹窗（毛玻璃） ==================== */
-.auth-mask {
+.vip-card {
+	border-radius: 36rpx;
+	padding: 30rpx 28rpx;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	box-shadow:
+		0 2rpx 8rpx rgba(160, 120, 20, 0.04),
+		0 12rpx 28rpx rgba(160, 120, 20, 0.09);
+	border: 1rpx solid rgba(255, 255, 255, 0.55);
+	position: relative;
+	overflow: hidden;
+}
+.vip-card::after {
+	content: '';
+	position: absolute;
+	right: -24rpx;
+	top: -32rpx;
+	width: 120rpx;
+	height: 120rpx;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.32);
+	pointer-events: none;
+}
+.vip-card::before {
+	content: '';
+	position: absolute;
+	right: 70rpx;
+	bottom: -40rpx;
+	width: 80rpx;
+	height: 80rpx;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.18);
+	pointer-events: none;
+}
+.vip-l {
+	flex: 1;
+	min-width: 0;
+	position: relative;
+	z-index: 1;
+}
+.vip-t {
+	display: block;
+	font-size: 28rpx;
+	font-weight: 800;
+	color: #5c430c;
+}
+.vip-s {
+	display: block;
+	margin-top: 8rpx;
+	font-size: 21rpx;
+	color: #8a6a12;
+	font-weight: 500;
+}
+.vip-go {
+	position: relative;
+	z-index: 1;
+	flex-shrink: 0;
+	padding: 14rpx 32rpx;
+	border-radius: 999rpx;
+	background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
+	color: #fff;
+	font-size: 22rpx;
+	font-weight: 700;
+}
+
+.menu {
+	background: #fff;
+	border-radius: 36rpx;
+	overflow: hidden;
+	box-shadow:
+		0 2rpx 8rpx rgba(70, 100, 30, 0.04),
+		0 14rpx 40rpx rgba(70, 100, 30, 0.08);
+}
+.mi {
+	display: flex;
+	align-items: center;
+	padding: 32rpx 28rpx;
+}
+.mi:active {
+	background: rgba(124, 179, 66, 0.05);
+}
+.mi + .mi {
+	border-top: 1rpx solid rgba(80, 110, 40, 0.05);
+}
+.mi-ico {
+	width: 64rpx;
+	height: 64rpx;
+	border-radius: 20rpx;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 28rpx;
+	font-weight: 700;
+	line-height: 1;
+	flex-shrink: 0;
+}
+.mi-t {
+	flex: 1;
+	margin-left: 22rpx;
+	font-size: 28rpx;
+	color: #1a1a1a;
+	font-weight: 500;
+}
+.mi-a {
+	font-size: 34rpx;
+	color: #c5cdb5;
+	line-height: 1;
+	font-weight: 300;
+}
+.dot {
+	width: 20rpx;
+	height: 20rpx;
+	border-radius: 50%;
+	margin-right: 10rpx;
+}
+
+.logout {
+	padding: 28rpx;
+	text-align: center;
+	background: #fff;
+	border-radius: 999rpx;
+	font-size: 28rpx;
+	font-weight: 600;
+	color: #c45c5c;
+	box-shadow:
+		0 2rpx 6rpx rgba(70, 100, 30, 0.03),
+		0 12rpx 36rpx rgba(70, 100, 30, 0.07);
+	margin-top: 8rpx;
+}
+.logout:active {
+	background: #fff5f5;
+}
+.foot {
+	padding: 32rpx 0 16rpx;
+	text-align: center;
+	font-size: 20rpx;
+	color: #c0cbb4;
+	letter-spacing: 4rpx;
+	font-weight: 500;
+}
+
+.mask {
 	position: fixed;
-	top: 0;
 	left: 0;
 	right: 0;
+	top: 0;
 	bottom: 0;
-	background: rgba(15,15,35,0.55);
-	backdrop-filter: blur(12rpx);
-	-webkit-backdrop-filter: blur(12rpx);
+	background: rgba(15, 23, 10, 0.45);
 	z-index: 9999;
 	display: flex;
 	align-items: flex-end;
 }
-.auth-popup {
+.popup {
 	width: 100%;
-	background: rgba(255,255,255,0.92);
-	backdrop-filter: blur(40rpx);
-	-webkit-backdrop-filter: blur(40rpx);
-	border-radius: 32rpx 32rpx 0 0;
-	padding: 20rpx 40rpx 60rpx;
+	background: #fff;
+	border-radius: 40rpx 40rpx 0 0;
+	padding: 20rpx 36rpx 60rpx;
 	padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
-	animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
-	border-top: 1rpx solid rgba(255,255,255,0.6);
-	box-shadow: inset 0 0 40rpx rgba(0,0,0,0.05);
+	animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
 }
 @keyframes slideUp {
-	from { transform: translateY(100%); opacity: 0.8; }
-	to { transform: translateY(0); opacity: 1; }
+	from {
+		transform: translateY(100%);
+	}
+	to {
+		transform: translateY(0);
+	}
 }
-.popup-drag {
-	width: 64rpx;
-	height: 8rpx;
-	background: linear-gradient(90deg, #d0d0e0, #e8e8f0, #d0d0e0);
-	border-radius: 4rpx;
+.drag {
+	width: 48rpx;
+	height: 6rpx;
+	background: #d5dcc8;
+	border-radius: 3rpx;
 	margin: 0 auto 28rpx;
 }
-.popup-title {
-	font-size: 34rpx;
-	font-weight: 700;
-	color: #1a1a2e;
+.pop-title {
 	display: block;
 	text-align: center;
-	margin-bottom: 40rpx;
+	font-size: 32rpx;
+	font-weight: 800;
+	color: #1a1a1a;
+	margin-bottom: 24rpx;
 }
-/* 头像行 */
-.popup-avatar-row {
+.field {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
 	padding: 24rpx 0;
-	border-bottom: 1rpx solid rgba(240,240,245,0.8);
+	border-bottom: 1rpx solid rgba(80, 110, 40, 0.06);
 }
-.popup-label {
-	font-size: 30rpx;
-	color: #333;
+.label {
+	font-size: 28rpx;
+	color: #1a1a1a;
 	font-weight: 500;
 }
-.popup-avatar-btn-wrap {
-	display: flex;
-	align-items: center;
-}
-.popup-avatar-btn {
+.av-btn {
 	display: flex;
 	align-items: center;
 	background: transparent;
@@ -1095,456 +1518,71 @@ export default {
 	margin: 0;
 	line-height: normal;
 }
-.popup-avatar-btn::after {
+.av-btn::after {
 	border: none;
 }
-.popup-avatar-img {
+.av-img {
 	width: 96rpx;
 	height: 96rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, #f0f2ff, #f5f6fa);
-	box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.1);
+	background: #f3f5f0;
 }
-.popup-arrow {
-	font-size: 36rpx;
-	color: #ccc;
+.arrow {
+	font-size: 34rpx;
+	color: #c5cdb5;
 	margin-left: 12rpx;
 }
-/* 昵称行 */
-.popup-nickname-row {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 24rpx 0;
-	border-bottom: 1rpx solid rgba(240,240,245,0.8);
-}
-.popup-nickname-input {
+.input {
 	flex: 1;
 	text-align: right;
 	font-size: 30rpx;
-	color: #333;
+	color: #1a1a1a;
 	height: 48rpx;
 }
-.popup-placeholder {
-	color: #ccc;
+.ph {
+	color: #c5cdb5;
 }
-/* 保存按钮（背景由内联样式动态设置） */
-.popup-save-btn {
+.pop-btn {
 	margin-top: 48rpx;
-	width: 100%;
-	background: transparent;
-	text-align: center;
-	padding: 28rpx;
-	border-radius: 44rpx;
-	color: #fff;
-	font-size: 32rpx;
-	font-weight: 700;
-	transition: all 0.2s;
-}
-.popup-save-btn:active {
-	transform: scale(0.98);
-	box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.4);
 }
 
-/* ==================== VIP横幅 ==================== */
-.vip-banner {
-	margin: -188rpx 24rpx 24rpx;
-	border-radius: 32rpx;
-	overflow: hidden;
-	background: linear-gradient(150deg, #f0fdf4 0%, #d1fae5 35%, #a7f3d0 65%, #f0fdf4 100%);
-	box-shadow:
-		0 4rpx 12rpx rgba(0,0,0,0.06),
-		0 12rpx 36rpx rgba(0,0,0,0.1),
-		0 24rpx 60rpx rgba(0,0,0,0.06);
-	position: relative;
-	border: 1rpx solid rgba(255,255,255,0.5);
-}
-.vip-banner::before {
-	content: '';
-	position: absolute;
-	top: -100rpx;
-	right: -80rpx;
-	width: 320rpx;
-	height: 320rpx;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(0,0,0,0.07), transparent 70%);
-	pointer-events: none;
-}
-.vip-banner::after {
-	content: '';
-	position: absolute;
-	bottom: -80rpx;
-	left: -60rpx;
-	width: 260rpx;
-	height: 260rpx;
-	border-radius: 50%;
-	background: radial-gradient(circle, rgba(26,188,156,0.05), transparent 70%);
-	pointer-events: none;
-}
-.vip-content {
+.theme-grid {
 	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	padding: 44rpx 32rpx 16rpx;
-	position: relative;
-	z-index: 1;
-}
-.vip-left { flex: 1; }
-.vip-title-row { display: flex; align-items: center; gap: 16rpx; }
-.vip-crown {
-	font-size: 48rpx;
-	filter: drop-shadow(0 3rpx 8rpx rgba(0,0,0,0.1));
-}
-.vip-title {
-	font-size: 40rpx;
-	font-weight: 900;
-	color: #14532d;
-	letter-spacing: 4rpx;
-}
-.vip-desc {
-	font-size: 26rpx;
-	color: #4ade80;
-	margin-top: 12rpx;
-	display: block;
-	font-weight: 500;
-	letter-spacing: 1rpx;
-}
-.vip-action {
-	background: #2ed573;
-	padding: 20rpx 48rpx;
-	border-radius: 40rpx;
-	flex-shrink: 0;
-	box-shadow: 0 6rpx 18rpx rgba(46,213,115,0.25);
-	position: relative;
-	overflow: hidden;
-}
-.vip-action::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	height: 50%;
-	background: linear-gradient(to bottom, rgba(255,255,255,0.15), transparent);
-	border-radius: 40rpx 40rpx 0 0;
-	pointer-events: none;
-}
-.vip-action-t {
-	font-size: 28rpx;
-	color: #fff;
-	font-weight: 800;
-	letter-spacing: 3rpx;
-	text-shadow: 0 1rpx 4rpx rgba(0,0,0,0.15);
-}
-.vip-action:active { opacity: 0.85; transform: scale(0.96); }
-.vip-features {
-	display: flex;
-	padding: 12rpx 32rpx 40rpx;
+	flex-wrap: wrap;
 	gap: 16rpx;
-	position: relative;
-	z-index: 1;
+	padding: 8rpx 0 16rpx;
 }
-.vip-feat {
-	font-size: 22rpx;
-	color: #4ade80;
-	font-weight: 600;
-	background: rgba(255,255,255,0.45);
-	padding: 10rpx 22rpx;
-	border-radius: 18rpx;
-	border: 1rpx solid rgba(0,0,0,0.06);
-	backdrop-filter: blur(6px);
-	box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.03);
-}
-
-/* ==================== 数据统计 ==================== */
-.stats-card {
-	display: flex;
-	background: #fff;
-	margin: 0 24rpx 24rpx;
-	padding: 36rpx 0;
-	border-radius: 28rpx;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06),
-		0 20rpx 48rpx rgba(0,0,0,0.04);
-	border: 1rpx solid rgba(0,0,0,0.03);
-	position: relative;
-}
-.stat-item {
-	flex: 1;
+.th {
+	width: calc((100% - 32rpx) / 3);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	gap: 14rpx;
+	padding: 28rpx 0;
+	border-radius: 28rpx;
+	border: 2rpx solid transparent;
+	background: #f7f8f4;
 }
-/* 图标圆形渐变背景 */
-.stat-icon-wrap {
+.th.active {
+	box-shadow: 0 6rpx 20rpx rgba(124, 179, 66, 0.12);
+}
+.th:active {
+	transform: scale(0.96);
+}
+.th-ball {
 	width: 72rpx;
 	height: 72rpx;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	margin-bottom: 14rpx;
-	position: relative;
-}
-.stat-icon-wrap::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	border-radius: 50%;
-	opacity: 0.12;
-}
-.download-bg {
-	background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(99,102,241,0.06));
-}
-.fav-bg {
-	background: linear-gradient(135deg, rgba(255,71,87,0.10), rgba(255,107,129,0.06));
-}
-.points-bg {
-	background: linear-gradient(135deg, rgba(255,159,67,0.10), rgba(255,183,77,0.06));
-}
-.orders-bg {
-	background: linear-gradient(135deg, rgba(0,0,0,0.06), rgba(105,230,153,0.06));
-}
-.stat-emoji {
-	font-size: 30rpx;
-}
-/* 渐变紫色数字 */
-.stat-num {
-	font-size: 44rpx;
-	font-weight: 800;
-	color: #2ed573;
-	font-variant-numeric: tabular-nums;
-}
-.stat-label {
-	font-size: 24rpx;
-	color: #aaa;
-	margin-top: 8rpx;
-}
-.stat-divider {
-	width: 1rpx;
-	background: linear-gradient(180deg, transparent, #e8e8f5, transparent);
-	margin: 10rpx 0;
-}
-
-/* ==================== 菜单 ==================== */
-.menu-card {
-	background: #fff;
-	margin: 0 24rpx 24rpx;
-	border-radius: 28rpx;
-	overflow: hidden;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06),
-		0 20rpx 48rpx rgba(0,0,0,0.04);
-	border: 1rpx solid rgba(0,0,0,0.03);
-}
-.menu-item {
-	display: flex;
-	align-items: center;
-	padding: 34rpx 32rpx;
-	border-bottom: 1rpx solid rgba(0,0,0,0.04);
-	transition: all 0.2s ease;
-	position: relative;
-}
-.menu-item:active {
-	background: rgba(0,0,0,0.03);
-	transform: scale(0.99);
-}
-.menu-item:last-child {
-	border-bottom: none;
-}
-/* 分组分隔线装饰 - 前3项后加分隔 */
-.menu-item:nth-child(3) {
-	border-bottom: 2rpx solid transparent;
-	background-image: linear-gradient(#fff, #fff), linear-gradient(90deg, transparent, #e8e8f5, transparent);
-	background-origin: border-box;
-	background-clip: padding-box, border-box;
-	border-bottom: 2rpx solid;
-	border-image: linear-gradient(90deg, transparent, #e0e0f0, transparent) 1;
-	padding-bottom: 32rpx;
-	margin-bottom: 4rpx;
-}
-
-/* 菜单图标圆形容器+渐变背景 */
-.menu-icon-wrap {
-	width: 60rpx;
-	height: 60rpx;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	position: relative;
-}
-.menu-emoji {
-	font-size: 28rpx;
-}
-.download-bg {
-	background: linear-gradient(135deg, rgba(59,130,246,0.10), rgba(99,102,241,0.06));
-}
-.fav-bg {
-	background: linear-gradient(135deg, rgba(255,71,87,0.10), rgba(255,107,129,0.06));
-}
-.order-bg {
-	background: linear-gradient(135deg, rgba(0,184,148,0.10), rgba(72,219,185,0.06));
-}
-.vip-bg {
-	background: linear-gradient(135deg, rgba(249,202,36,0.10), rgba(255,215,0,0.06));
-}
-.fb-bg {
-	background: linear-gradient(135deg, rgba(99,102,241,0.10), rgba(139,92,246,0.06));
-}
-.about-bg {
-	background: linear-gradient(135deg, rgba(148,163,184,0.10), rgba(176,190,210,0.06));
-}
-.theme-bg {
-	background: linear-gradient(135deg, rgba(236,72,153,0.10), rgba(139,92,246,0.06));
-}
-.theme-dot {
-	width: 24rpx;
-	height: 24rpx;
-	border-radius: 50%;
-	margin-right: 12rpx;
-	border: 3rpx solid rgba(255,255,255,0.8);
-	box-shadow: 0 2rpx 8rpx rgba(0,0,0,0.1);
-	flex-shrink: 0;
-}
-.menu-text {
-	flex: 1;
-	margin-left: 22rpx;
-	font-size: 28rpx;
-	color: #1a1a2e;
-	font-weight: 600;
-	letter-spacing: 0.5rpx;
-}
-.menu-arrow {
-	font-size: 28rpx;
-	background: linear-gradient(180deg, #ccc, #999);
-	-webkit-background-clip: text;
-	background-clip: text;
-	color: transparent;
-	-webkit-text-fill-color: transparent;
-	font-weight: 300;
-	transition: transform 0.2s;
-}
-.menu-item:active .menu-arrow {
-	transform: translateX(4rpx);
-}
-
-/* ==================== 退出登录（渐变边框） ==================== */
-.logout-btn {
-	margin: 40rpx 24rpx;
-	text-align: center;
-	padding: 28rpx;
-	background: #fff;
-	border-radius: 44rpx;
-	font-size: 28rpx;
-	color: #ff4757;
-	font-weight: 600;
-	position: relative;
-	overflow: hidden;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
-	border: 2rpx solid transparent;
-	background-clip: padding-box;
-}
-.logout-btn::before {
-	content: '';
-	position: absolute;
-	top: -2rpx;
-	left: -2rpx;
-	right: -2rpx;
-	bottom: -2rpx;
-	border-radius: 46rpx;
-	background: linear-gradient(135deg, #ff4757, #ff6b81, #ff4757);
-	z-index: -1;
-}
-.logout-btn::after {
-	content: '';
-	position: absolute;
-	inset: 2rpx;
-	border-radius: 42rpx;
-	background: #fff;
-	z-index: -1;
-}
-.logout-btn:active {
-	background: #fef2f2;
-	border-color: transparent;
-}
-.logout-btn:active::after {
-	background: #fef2f2;
-}
-
-/* ==================== 主题选择弹窗 ==================== */
-.theme-popup {
-	width: 100%;
-	background: rgba(255,255,255,0.96);
-	backdrop-filter: blur(40rpx);
-	-webkit-backdrop-filter: blur(40rpx);
-	border-radius: 32rpx 32rpx 0 0;
-	padding: 20rpx 40rpx 60rpx;
-	padding-bottom: calc(60rpx + env(safe-area-inset-bottom));
-	animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1);
-	border-top: 1rpx solid rgba(255,255,255,0.6);
-}
-.theme-grid {
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	padding: 20rpx 0 10rpx;
-}
-.theme-item {
-	width: 30%;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	padding: 28rpx 0 20rpx;
-	margin-bottom: 16rpx;
-	border-radius: 24rpx;
-	background: #f7f8fc;
-	border: 2rpx solid transparent;
-	transition: all 0.25s ease;
-}
-.theme-item.active {
-	background: rgba(0,0,0, 0.06);
-	box-shadow: 0 4rpx 20rpx rgba(0,0,0, 0.12);
-}
-.theme-item:active {
-	transform: scale(0.95);
-}
-.theme-circle {
-	width: 80rpx;
-	height: 80rpx;
-	border-radius: 50%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	margin-bottom: 16rpx;
-	box-shadow: 0 6rpx 20rpx rgba(0,0,0,0.12);
-	position: relative;
-}
-.theme-circle::after {
-	content: '';
-	position: absolute;
-	top: 6rpx;
-	left: 15%;
-	right: 15%;
-	height: 30%;
-	background: linear-gradient(to bottom, rgba(255,255,255,0.45), transparent);
-	border-radius: 50%;
-}
-.theme-check {
-	font-size: 32rpx;
 	color: #fff;
+	font-size: 28rpx;
 	font-weight: 800;
-	text-shadow: 0 2rpx 6rpx rgba(0,0,0,0.2);
 }
-.theme-label {
-	font-size: 24rpx;
-	color: #444;
+.th-name {
+	font-size: 22rpx;
 	font-weight: 600;
-	letter-spacing: 0.5rpx;
+	color: #1a1a1a;
 }
 </style>

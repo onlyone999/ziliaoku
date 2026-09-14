@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="main-scroll">
 			<!-- 图片画廊 -->
 			<view class="gallery-wrap">
@@ -40,10 +40,10 @@
 				<view class="hero-deco"></view>
 				<view class="hero-badges" v-if="resource.is_hot || resource.is_new || resource.is_recommended">
 					<view class="hero-badge hot" :style="'background:' + tc.badgeBg + ';color:' + tc.primary + ';border:2rpx solid ' + tc.badgeBorder + ';'" v-if="resource.is_hot">
-						<text class="badge-emoji">🔥</text> 热门
+						<text class="badge-emoji">★</text> 热门
 					</view>
 					<view class="hero-badge new" :style="'background:' + tc.badgeBg + ';color:' + tc.primary + ';border:2rpx solid ' + tc.badgeBorder + ';'" v-if="resource.is_new">
-						<text class="badge-emoji">🆕</text> 新品
+						<text class="badge-emoji">NEW</text> 新品
 					</view>
 					<view class="hero-badge rec" :style="'background:' + tc.badgeBg + ';color:' + tc.primary + ';border:2rpx solid ' + tc.badgeBorder + ';'" v-if="resource.is_recommended">
 						<text class="badge-emoji">⭐</text> 推荐
@@ -54,7 +54,7 @@
 					<view class="hero-stats">
 						<view class="hero-stat">
 							<view class="stat-icon-circle view">
-								<text class="stat-icon">👁</text>
+								<text class="stat-icon">◉</text>
 							</view>
 							<text class="stat-num" :style="'color:' + tc.primary + ';'">{{ formatCount(resource.view_count || 0) }}</text>
 						</view>
@@ -68,7 +68,7 @@
 						<view class="stat-divider"></view>
 						<view class="hero-stat">
 							<view class="stat-icon-circle like">
-								<text class="stat-icon">❤</text>
+								<text class="stat-icon">♡</text>
 							</view>
 							<text class="stat-num" :style="'color:' + tc.primary + ';'">{{ formatCount(resource.like_count || 0) }}</text>
 						</view>
@@ -133,7 +133,7 @@
 			<view class="vote-card">
 				<view class="vote-btn" :class="{ active: userVote === 'up' }" :style="userVote === 'up' ? 'background:rgba(' + tc.rgbPrimary + ',0.08);border:2rpx solid rgba(' + tc.rgbPrimary + ',0.25);' : ''" @tap="toggleVote('up')">
 					<view class="vote-icon-wrap up" :style="'background:rgba(' + tc.rgbPrimary + ',0.06);'">
-						<text class="vote-icon">👍</text>
+						<text class="vote-icon">▲</text>
 					</view>
 					<text class="vote-count" :style="userVote === 'up' ? tPri : ''">{{ upVotes }}</text>
 				</view>
@@ -145,7 +145,7 @@
 				</view>
 				<view class="vote-btn" :class="{ active: userVote === 'down' }" @tap="toggleVote('down')">
 					<view class="vote-icon-wrap down">
-						<text class="vote-icon">👎</text>
+						<text class="vote-icon">▼</text>
 					</view>
 					<text class="vote-count" :style="userVote === 'down' ? tPri : ''">{{ downVotes }}</text>
 				</view>
@@ -447,48 +447,48 @@
 			<view class="bar-left">
 				<view class="bar-btn" @tap="toggleFavorite">
 					<view class="bar-icon-circle" :class="{ active: isFavorited }">
-						<text class="bar-icon" :class="{ active: isFavorited }">{{ isFavorited ? '❤' : '♡' }}</text>
+						<image class="bar-icon-img" :src="isFavorited ? '/static/icons/detail/fav-on.png' : '/static/icons/detail/fav.png'" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">收藏</text>
 				</view>
 				<view class="bar-btn" v-if="canAccess" @tap="handlePreview">
 					<view class="bar-icon-circle">
-						<text class="bar-icon">👁</text>
+						<image class="bar-icon-img" src="/static/icons/detail/preview.png" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">预览</text>
 				</view>
 				<view class="bar-btn" v-if="canAccess" @tap="handlePrint">
 					<view class="bar-icon-circle">
-						<text class="bar-icon">🖨</text>
+						<image class="bar-icon-img" src="/static/icons/detail/print.png" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">打印</text>
 				</view>
 				<view class="bar-btn" v-if="!canAccess" @tap="showAccessTip">
 					<view class="bar-icon-circle locked">
-						<text class="bar-icon">🔒</text>
+						<image class="bar-icon-img" src="/static/icons/detail/preview.png" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">预览</text>
 				</view>
 				<view class="bar-btn" v-if="!canAccess" @tap="showAccessTip">
 					<view class="bar-icon-circle locked">
-						<text class="bar-icon">🔒</text>
+						<image class="bar-icon-img" src="/static/icons/detail/print.png" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">打印</text>
 				</view>
 				<button class="bar-btn share-btn" open-type="share">
 					<view class="bar-icon-circle">
-						<text class="bar-icon">↗</text>
+						<image class="bar-icon-img" src="/static/icons/detail/share.png" mode="aspectFit"></image>
 					</view>
 					<text class="bar-label">分享</text>
 				</button>
 			</view>
 			<view class="bar-right">
 				<view class="action-btn buy-btn" v-if="!isPurchased && !isMemberFree && resource.price > 0" @tap="handleBuy">
-					<text class="action-btn-icon">🛒</text>
-					<text>¥{{ resource.price }} 立即购买</text>
+					<text class="action-btn-icon">¥</text>
+					<text>{{ resource.price }} 立即购买</text>
 				</view>
 				<view class="action-btn free-btn" :style="'background:' + tc.primary + ';color:#fff;border-color:' + tc.primary + ';'" v-else-if="!isPurchased && isMemberFree && !isVip" @tap="showVipOrBuy">
-					<text class="action-btn-icon">👑</text>
+					<text class="action-btn-icon">♛</text>
 					<text>开通VIP免费获取</text>
 				</view>
 				<view class="action-btn free-btn" :style="'background:' + tc.primary + ';color:#fff;border-color:' + tc.primary + ';'" v-else @tap="handleDownload">
@@ -1327,7 +1327,7 @@ export default {
 /* ========== 基础 ========== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 	position: relative;
 }
 .main-scroll {
@@ -1408,10 +1408,10 @@ export default {
 }
 .indicator-bar {
 	height: 100%;
-	background: linear-gradient(90deg, #2ed573, #1abc9c);
+	background: linear-gradient(90deg, #7cb342, #558b2f);
 	border-radius: 3rpx;
 	transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 0 10rpx rgba(46,213,115,0.5);
+	box-shadow: 0 0 10rpx rgba(124,179,66,0.5);
 }
 .gallery-tags {
 	position: absolute;
@@ -1437,15 +1437,15 @@ export default {
 .tag-dot {
 	width: 10rpx;
 	height: 10rpx;
-	background: #2ed573;
+	background: #7cb342;
 	border-radius: 50%;
 	display: inline-block;
 }
 .gallery-tag.free {
-	background: rgba(46,213,115,0.10);
-	color: #27ae60;
-	border-color: rgba(46,213,115,0.18);
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115,0.08);
+	background: rgba(124,179,66,0.10);
+	color: #558b2f;
+	border-color: rgba(124,179,66,0.18);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66,0.08);
 }
 .tag-spark {
 	font-size: 20rpx;
@@ -1461,14 +1461,11 @@ export default {
 	background: #fff;
 	margin: -60rpx 24rpx 0;
 	padding: 36rpx;
-	border-radius: 28rpx;
+	border-radius: 40rpx;
 	position: relative;
 	z-index: 15;
-	box-shadow:
-		0 4rpx 12rpx rgba(0,0,0,0.06),
-		0 12rpx 36rpx rgba(0,0,0,0.1),
-		0 24rpx 60rpx rgba(0,0,0,0.06);
-	border: 1rpx solid rgba(0,0,0,0.03);
+	box-shadow: 0 16rpx 48rpx rgba(80, 110, 40, 0.12);
+	border: none;
 	overflow: hidden;
 }
 .hero-card::before {
@@ -1477,21 +1474,12 @@ export default {
 	top: 0;
 	left: 0;
 	right: 0;
-	height: 3rpx;
-	background: linear-gradient(90deg, #2ed573, #1abc9c, #27ae60, #2ed573);
-	border-radius: 0 0 2rpx 2rpx;
-	box-shadow: 0 0 12rpx rgba(0,0,0,0.15), 0 0 24rpx rgba(0,0,0,0.06);
-	filter: blur(0.5rpx);
+	height: 6rpx;
+	background: linear-gradient(90deg, #a8e063 0%, #7cb342 50%, #a8e063 100%);
+	border-radius: 0 0 3rpx 3rpx;
 }
 .hero-deco {
-	position: absolute;
-	top: -40rpx;
-	right: -40rpx;
-	width: 200rpx;
-	height: 200rpx;
-	background: radial-gradient(circle, rgba(0,0,0,0.04), transparent 70%);
-	border-radius: 50%;
-	pointer-events: none;
+	display: none;
 }
 .hero-badges {
 	display: flex;
@@ -1501,36 +1489,38 @@ export default {
 }
 .hero-badge {
 	font-size: 20rpx;
-	padding: 6rpx 16rpx;
-	border-radius: 20rpx;
-	font-weight: 700;
+	padding: 6rpx 14rpx;
+	border-radius: 8rpx;
+	font-weight: 600;
 	display: flex;
 	align-items: center;
 	gap: 4rpx;
+	border: 1rpx solid transparent;
 }
 .hero-badge.hot {
-	background: rgba(46,213,115,0.10);
-	color: #27ae60;
-	border: 2rpx solid rgba(46,213,115,0.18);
+	background: rgba(124,179,66,0.08);
+	color: #558b2f;
+	border: 1rpx solid rgba(124,179,66,0.14);
 }
 .hero-badge.new {
-	background: rgba(46,213,115,0.10);
-	color: #27ae60;
-	border: 2rpx solid rgba(46,213,115,0.18);
+	background: rgba(22,163,74,0.08);
+	color: #15803d;
+	border: 1rpx solid rgba(22,163,74,0.14);
 }
 .hero-badge.rec {
-	background: rgba(46,213,115,0.10);
-	color: #27ae60;
-	border: 2rpx solid rgba(46,213,115,0.18);
+	background: rgba(201,162,39,0.1);
+	color: #a06e00;
+	border: 1rpx solid rgba(201,162,39,0.18);
 }
 .badge-emoji {
 	font-size: 22rpx;
 }
 .hero-title {
 	font-size: 36rpx;
-	font-weight: 800;
-	color: #1a1a2e;
-	line-height: 1.5;
+	font-weight: 700;
+	color: #1a1a1a;
+	line-height: 1.45;
+	letter-spacing: 0.2rpx;
 	display: block;
 	letter-spacing: 1rpx;
 }
@@ -1568,7 +1558,7 @@ export default {
 	background: rgba(59,130,246,0.08);
 }
 .stat-icon-circle.download {
-	background: rgba(46,213,115,0.08);
+	background: rgba(124,179,66,0.08);
 }
 .stat-icon-circle.like {
 	background: rgba(239,68,68,0.08);
@@ -1586,7 +1576,7 @@ export default {
 	align-items: center;
 	background: linear-gradient(135deg, #fff8e1, #fff3cd);
 	padding: 10rpx 22rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	gap: 6rpx;
 	position: relative;
 	border: 2rpx solid rgba(245,158,11,0.15);
@@ -1614,7 +1604,7 @@ export default {
 }
 .rating-count {
 	font-size: 20rpx;
-	color: #b8860b;
+	color: #e6a817;
 	position: relative;
 }
 
@@ -1623,7 +1613,7 @@ export default {
 	background: #fff;
 	margin: 20rpx 24rpx 0;
 	padding: 32rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
@@ -1639,7 +1629,7 @@ export default {
 	top: 0;
 	bottom: 0;
 	width: 8rpx;
-	background: linear-gradient(180deg, #ff4757, #ff6b81, #ff4757);
+	background: #f0f7e6;
 	border-radius: 4rpx;
 }
 .price-left {
@@ -1761,7 +1751,7 @@ export default {
 
 /* 免费卡片 */
 .free-card {
-	background: #f0fdf4;
+	background: #eff6ff;
 	border: 1rpx solid rgba(0,0,0,0.04);
 	box-shadow:
 		0 2rpx 8rpx rgba(0,0,0,0.03),
@@ -1778,7 +1768,7 @@ export default {
 	border-radius: 50%;
 	background: transparent;
 	box-shadow:
-		12rpx 8rpx 0 2rpx rgba(46,213,115,0.15),
+		12rpx 8rpx 0 2rpx rgba(124,179,66,0.15),
 		32rpx 20rpx 0 1.5rpx rgba(245,158,11,0.12),
 		8rpx 36rpx 0 2rpx rgba(255,215,0,0.1);
 	animation: float-particle 3s ease-in-out infinite;
@@ -1811,8 +1801,8 @@ export default {
 	right: -6rpx;
 	bottom: -6rpx;
 	border-radius: 50%;
-	border: 3rpx dashed rgba(46,213,115,0.2);
-	animation: ring-rotate 8s linear infinite;
+	border: 2rpx dashed rgba(124,179,66,0.2);
+	animation: none;
 }
 @keyframes ring-rotate {
 	to { transform: rotate(360deg); }
@@ -1824,14 +1814,14 @@ export default {
 	flex: 1;
 }
 .free-title {
-	font-size: 34rpx;
-	font-weight: 900;
-	color: #166534;
+	font-size: 32rpx;
+	font-weight: 700;
+	color: #2a4a9e;
 	display: block;
 }
 .free-desc {
 	font-size: 24rpx;
-	color: #4ade80;
+	color: #9ccc65;
 	margin-top: 6rpx;
 	display: block;
 }
@@ -1843,7 +1833,7 @@ export default {
 .sparkle {
 	position: absolute;
 	font-size: 20rpx;
-	color: rgba(46,213,115,0.4);
+	color: rgba(124,179,66,0.4);
 }
 .sparkle.s1 { top: 0; right: 0; animation: sparkle-twinkle 2s ease-in-out infinite; }
 .sparkle.s2 { top: 28rpx; right: 20rpx; animation: sparkle-twinkle 2s ease-in-out 0.5s infinite; }
@@ -1924,7 +1914,7 @@ export default {
 }
 .vote-fill {
 	height: 100%;
-	background: linear-gradient(90deg, #2ed573, #2ed573);
+	background: linear-gradient(90deg, #7cb342, #7cb342);
 	border-radius: 4rpx;
 	transition: width 0.5s ease;
 	position: relative;
@@ -1972,13 +1962,13 @@ export default {
 	right: 0;
 	width: 200rpx;
 	height: 200rpx;
-	background: radial-gradient(circle at top right, rgba(46,213,115,0.04), transparent 70%);
+	background: radial-gradient(circle at top right, rgba(124,179,66,0.04), transparent 70%);
 	pointer-events: none;
 }
 .file-icon-wrap {
 	width: 96rpx;
 	height: 96rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -2029,7 +2019,7 @@ export default {
 }
 .file-name {
 	font-size: 30rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 800;
 	display: block;
 	overflow: hidden;
@@ -2044,27 +2034,27 @@ export default {
 }
 .file-chip {
 	font-size: 22rpx;
-	background: rgba(46,213,115,0.08);
+	background: rgba(124,179,66,0.08);
 	padding: 8rpx 20rpx;
-	border-radius: 16rpx;
-	border: 2rpx solid rgba(46,213,115,0.15);
+	border-radius: 28rpx;
+	border: 2rpx solid rgba(124,179,66,0.15);
 	display: flex;
 	align-items: center;
 	gap: 6rpx;
 }
 .file-chip.type {
-	background: rgba(46,213,115,0.08);
-	border-color: rgba(46,213,115,0.15);
+	background: rgba(124,179,66,0.08);
+	border-color: rgba(124,179,66,0.15);
 }
 .file-chip.size {
-	color: #3b82f6;
+	color: #9ccc65;
 	background: rgba(59,130,246,0.08);
 	border-color: rgba(59,130,246,0.15);
 }
 .file-chip.format {
 	font-weight: 600;
-	background: rgba(46,213,115,0.08);
-	border-color: rgba(46,213,115,0.15);
+	background: rgba(124,179,66,0.08);
+	border-color: rgba(124,179,66,0.15);
 }
 .chip-dot {
 	width: 8rpx;
@@ -2105,7 +2095,7 @@ export default {
 .section-title {
 	font-size: 32rpx;
 	font-weight: 800;
-	color: #1a1a2e;
+	color: #1c2333;
 	letter-spacing: 1rpx;
 }
 .section-hint-badge {
@@ -2113,7 +2103,7 @@ export default {
 	align-items: center;
 	gap: 6rpx;
 	padding: 8rpx 18rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 }
 .hint-eye {
 	font-size: 22rpx;
@@ -2196,7 +2186,7 @@ export default {
 	left: 0;
 	width: 6rpx;
 	height: 100%;
-	background: linear-gradient(180deg, #2ed573, #1abc9c, #27ae60, #2ed573);
+	background: linear-gradient(180deg, #7cb342, #558b2f, #558b2f, #7cb342);
 	border-radius: 18rpx 0 0 18rpx;
 	z-index: 2;
 }
@@ -2229,7 +2219,7 @@ export default {
 	font-size: 20rpx;
 	color: #fff;
 	padding: 6rpx 18rpx;
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 	font-weight: 600;
 }
 .code-copy-btn {
@@ -2239,7 +2229,7 @@ export default {
 	align-items: center;
 	justify-content: center;
 	background: rgba(255,255,255,0.06);
-	border-radius: 12rpx;
+	border-radius: 28rpx;
 }
 .copy-icon {
 	font-size: 24rpx;
@@ -2290,7 +2280,7 @@ export default {
 }
 .tag-item {
 	padding: 10rpx 24rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	display: flex;
 	align-items: center;
 	gap: 6rpx;
@@ -2298,8 +2288,8 @@ export default {
 	border: 1rpx solid rgba(0,0,0,0.04);
 }
 .tag-item.tag-color-0 {
-	background: linear-gradient(135deg, rgba(46,213,115,0.06), rgba(46,213,115,0.08));
-	border: 2rpx solid rgba(46,213,115,0.12);
+	background: linear-gradient(135deg, rgba(124,179,66,0.06), rgba(124,179,66,0.08));
+	border: 2rpx solid rgba(124,179,66,0.12);
 }
 .tag-item.tag-color-0 .tag-hash,
 .tag-item.tag-color-0 .tag-text { }
@@ -2309,7 +2299,7 @@ export default {
 	border: 2rpx solid rgba(59,130,246,0.12);
 }
 .tag-item.tag-color-1 .tag-hash,
-.tag-item.tag-color-1 .tag-text { color: #3b82f6; }
+.tag-item.tag-color-1 .tag-text { color: #9ccc65; }
 
 .tag-item.tag-color-2 {
 	background: linear-gradient(135deg, rgba(236,72,153,0.06), rgba(244,114,182,0.08));
@@ -2343,7 +2333,7 @@ export default {
 	align-items: center;
 	background: linear-gradient(135deg, #fff8e1, #fff3cd);
 	padding: 8rpx 20rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	gap: 6rpx;
 	border: 2rpx solid rgba(245,158,11,0.15);
 }
@@ -2430,7 +2420,7 @@ export default {
 	height: 76rpx;
 	border-radius: 50%;
 	padding: 3rpx;
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	flex-shrink: 0;
 }
 .comment-avatar {
@@ -2450,7 +2440,7 @@ export default {
 }
 .comment-name {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 800;
 }
 .comment-stars {
@@ -2487,7 +2477,7 @@ export default {
 	align-items: center;
 	gap: 6rpx;
 	padding: 8rpx 16rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	background: #f8f8fc;
 	transition: all 0.2s;
 }
@@ -2509,7 +2499,7 @@ export default {
 .empty-bubble {
 	width: 100rpx;
 	height: 100rpx;
-	background: linear-gradient(135deg, rgba(46,213,115,0.06), rgba(46,213,115,0.1));
+	background: linear-gradient(135deg, rgba(124,179,66,0.06), rgba(124,179,66,0.1));
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -2545,7 +2535,7 @@ export default {
 .form-title {
 	font-size: 30rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 }
 .form-title-row {
 	display: flex;
@@ -2558,7 +2548,7 @@ export default {
 	color: #999;
 	padding: 6rpx 16rpx;
 	background: rgba(0,0,0,0.04);
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 }
 .form-rating {
 	display: flex;
@@ -2586,7 +2576,7 @@ export default {
 }
 .form-rating-tag {
 	padding: 6rpx 16rpx;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	font-weight: 700;
 	margin-left: 8rpx;
@@ -2595,7 +2585,7 @@ export default {
 .form-rating-tag.rating-level-2 { color: #f97316; background: rgba(249,115,22,0.08); }
 .form-rating-tag.rating-level-3 { color: #f59e0b; background: rgba(245,158,11,0.08); }
 .form-rating-tag.rating-level-4 { color: #22c55e; background: rgba(34,197,94,0.08); }
-.form-rating-tag.rating-level-5 { background: rgba(46,213,115, 0.08); }
+.form-rating-tag.rating-level-5 { background: rgba(124,179,66, 0.08); }
 .form-textarea-wrap {
 	position: relative;
 	margin-bottom: 24rpx;
@@ -2614,9 +2604,9 @@ export default {
 	transition: all 0.3s;
 }
 .form-textarea:focus {
-	border-color: rgba(46,213,115,0.2);
+	border-color: rgba(124,179,66,0.2);
 	background: #fff;
-	box-shadow: 0 4rpx 20rpx rgba(46,213,115,0.06);
+	box-shadow: 0 4rpx 20rpx rgba(124,179,66,0.06);
 }
 .form-textarea-footer {
 	display: flex;
@@ -2650,7 +2640,7 @@ export default {
 }
 .form-submit-btn:active {
 	transform: scale(0.97) translateY(2rpx);
-	box-shadow: 0 4rpx 12rpx rgba(46,213,115,0.18);
+	box-shadow: 0 4rpx 12rpx rgba(124,179,66,0.18);
 }
 .submit-icon {
 	font-size: 28rpx;
@@ -2719,7 +2709,7 @@ export default {
 	padding: 4rpx 14rpx;
 	border-radius: 14rpx;
 	font-weight: 700;
-	box-shadow: 0 4rpx 12rpx rgba(46,213,115,0.3);
+	box-shadow: 0 4rpx 12rpx rgba(124,179,66,0.3);
 }
 .related-info {
 	padding: 18rpx 20rpx 20rpx;
@@ -2784,7 +2774,7 @@ export default {
 .progress-icon-wrap {
 	width: 88rpx;
 	height: 88rpx;
-	background: linear-gradient(135deg, #2ed573, #27ae60);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
@@ -2800,7 +2790,7 @@ export default {
 	bottom: -6rpx;
 	border-radius: 50%;
 	border: 3rpx solid transparent;
-	border-top-color: rgba(46,213,115,0.3);
+	border-top-color: rgba(124,179,66,0.3);
 	animation: spin 1.2s linear infinite;
 }
 @keyframes spin {
@@ -2814,7 +2804,7 @@ export default {
 .progress-title {
 	font-size: 32rpx;
 	font-weight: 800;
-	color: #1a1a2e;
+	color: #1c2333;
 	margin-bottom: 32rpx;
 	display: block;
 }
@@ -2828,7 +2818,7 @@ export default {
 }
 .progress-bar-fill {
 	height: 100%;
-	background: linear-gradient(90deg, #2ed573, #1abc9c);
+	background: linear-gradient(90deg, #7cb342, #558b2f);
 	border-radius: 8rpx;
 	transition: width 0.3s ease;
 	position: relative;
@@ -2838,7 +2828,7 @@ export default {
 	top: -2rpx;
 	width: 40rpx;
 	height: 20rpx;
-	background: rgba(46,213,115,0.3);
+	background: rgba(124,179,66,0.3);
 	border-radius: 50%;
 	filter: blur(8rpx);
 	transition: left 0.3s ease;
@@ -2890,66 +2880,78 @@ export default {
 	left: 10%;
 	right: 10%;
 	height: 1rpx;
-	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), rgba(46,213,115,0.08), rgba(255,255,255,0.6), transparent);
+	background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), rgba(124,179,66,0.08), rgba(255,255,255,0.6), transparent);
 	pointer-events: none;
 }
 .bar-left {
 	display: flex;
 	align-items: center;
-	gap: 20rpx;
-	margin-right: 20rpx;
+	gap: 8rpx;
+	margin-right: 12rpx;
 }
 .bar-btn {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	background: none;
 	border: none;
-	padding: 0;
+	padding: 8rpx 6rpx;
 	line-height: 1;
 	margin: 0;
+	min-width: 72rpx;
 }
 .bar-btn::after {
 	display: none;
 }
 .share-btn {
 	margin-left: 0;
-	padding: 0;
+	padding: 8rpx 6rpx;
 }
 .bar-icon-circle {
-	width: 64rpx;
-	height: 64rpx;
-	border-radius: 50%;
-	background: #f5f5fa;
+	width: 44rpx;
+	height: 44rpx;
+	border-radius: 0;
+	background: transparent !important;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	transition: all 0.3s;
+	transition: opacity 0.2s;
+	border: none !important;
+	box-shadow: none !important;
 }
 .bar-icon-circle:active {
-	transform: scale(0.9) translateY(2rpx);
-	background: #ebebf0;
+	transform: none;
+	background: transparent !important;
+	opacity: 0.6;
 }
 .bar-icon-circle.active {
-	background: rgba(255,71,87,0.08);
+	background: transparent !important;
 }
 .bar-icon-circle.locked {
-	background: #f0f0f5;
-	opacity: 0.5;
+	background: transparent !important;
+	opacity: 0.35;
+}
+.bar-icon-img {
+	width: 40rpx;
+	height: 40rpx;
+	display: block;
 }
 .bar-icon {
-	font-size: 36rpx;
-	color: #888;
-	transition: all 0.3s;
+	font-size: 32rpx;
+	color: #5a6b4a;
+	transition: all 0.2s;
+	line-height: 1;
 }
 .bar-icon.active {
-	color: #ff4757;
+	color: #e53e3e;
 }
 .bar-label {
 	font-size: 20rpx;
-	color: #aaa;
-	margin-top: 6rpx;
-	font-weight: 600;
+	color: #8a9578;
+	margin-top: 8rpx;
+	font-weight: 500;
+	line-height: 1.2;
 }
 .bar-right {
 	flex: 1;
@@ -3039,7 +3041,7 @@ export default {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: linear-gradient(180deg, #f0f2ff, #f5f6fa);
+	background: #f0f7e6;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -3079,7 +3081,7 @@ export default {
 	width: 12rpx;
 	height: 12rpx;
 	border-radius: 50%;
-	background: #2ed573;
+	background: #7cb342;
 	animation: dot-bounce 1.4s ease-in-out infinite;
 }
 .ldot:nth-child(2) { animation-delay: 0.2s; }
@@ -3101,7 +3103,7 @@ export default {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: linear-gradient(180deg, #f0f2ff, #f5f6fa);
+	background: #f0f7e6;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -3144,7 +3146,7 @@ export default {
 .error-title {
 	font-size: 36rpx;
 	font-weight: 800;
-	color: #1a1a2e;
+	color: #1c2333;
 	display: block;
 	margin-bottom: 14rpx;
 }
@@ -3156,14 +3158,14 @@ export default {
 	line-height: 1.6;
 }
 .error-retry-btn {
-	background: linear-gradient(135deg, #2ed573, #27ae60);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
 	text-align: center;
 	padding: 28rpx;
 	border-radius: 48rpx;
 	font-size: 30rpx;
 	font-weight: 800;
 	color: #fff;
-	box-shadow: 0 10rpx 32rpx rgba(46,213,115,0.3);
+	box-shadow: 0 10rpx 32rpx rgba(124,179,66,0.3);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -3171,7 +3173,7 @@ export default {
 }
 .error-retry-btn:active {
 	transform: scale(0.97) translateY(2rpx);
-	box-shadow: 0 4rpx 12rpx rgba(46,213,115,0.18);
+	box-shadow: 0 4rpx 12rpx rgba(124,179,66,0.18);
 }
 .retry-icon {
 	font-size: 32rpx;

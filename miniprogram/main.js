@@ -44,7 +44,10 @@ Vue.mixin({
     },
     tPri () { return 'color:' + this.tc.primary + ';' },
     tPriDk () { return 'color:' + this.tc.primaryDark + ';' },
-    tBgPri () { return 'background:' + this.tc.primary + ';' }
+    tBgPri () { return 'background:' + this.tc.primary + ';' },
+    pageBgStyle () {
+      return 'background:' + (this.tc.pageBg || '#f0f7e6') + ';'
+    }
   },
   onLoad () {
     var self = this;
@@ -70,7 +73,17 @@ Vue.mixin({
         backgroundColor: t.navBg,
         animation: { duration: 200, timingFunc: 'easeIn' }
       })
-      uni.setTabBarStyle({ selectedColor: t.tabBarSelected })
+      uni.setTabBarStyle({
+        color: t.tabBarColor,
+        selectedColor: t.tabBarSelected,
+        backgroundColor: t.tabBarBg,
+        borderStyle: 'white'
+      })
+      uni.setBackgroundColor({
+        backgroundColor: t.pageBg,
+        backgroundColorTop: t.pageBg,
+        backgroundColorBottom: t.pageBg
+      })
     } catch (e) {}
   }
 })

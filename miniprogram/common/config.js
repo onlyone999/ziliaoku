@@ -3,17 +3,17 @@
  * 统一管理API地址、超时时间等配置项
  */
 
-// API基础地址（请替换为实际域名）
-const BASE_URL = 'https://your-domain.com/api'
+// API基础地址
+const BASE_URL = 'http://127.0.0.1:9901'
 
 // 请求超时时间（毫秒）
-const REQUEST_TIMEOUT = 10000
+const REQUEST_TIMEOUT = 15000
 
 // 文件下载基础地址
-const FILE_DOWNLOAD_URL = 'https://your-domain.com/download'
+const FILE_DOWNLOAD_URL = 'http://127.0.0.1:9901'
 
 // 文件上传地址
-const FILE_UPLOAD_URL = 'https://your-domain.com/api/upload'
+const FILE_UPLOAD_URL = 'http://127.0.0.1:9901/api/upload'
 
 // 分页默认每页条数
 const PAGE_SIZE = 20

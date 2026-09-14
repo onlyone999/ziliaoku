@@ -1,12 +1,12 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view scroll-y class="scroll" :show-scrollbar="false">
 			<!-- Logo区 -->
 			<view class="logo-section">
 				<view class="logo-circle" :style="'background:' + tc.primary + ';'">
 					<text class="logo-text">Z</text>
 				</view>
-				<text class="app-name">{{ info.site_name || '资料下载器' }}</text>
+				<text class="app-name">{{ info.site_name || '资料库' }}</text>
 				<text class="app-ver">{{ info.version || 'v1.0.0' }}</text>
 			</view>
 
@@ -79,7 +79,7 @@ export default {
 </script>
 
 <style scoped>
-.page { height: 100vh; background: #f5f6fa; overflow: hidden; display: flex; flex-direction: column; }
+.page { height: 100vh; background: transparent; overflow: hidden; display: flex; flex-direction: column; }
 page { overflow: hidden; height: 100vh; }
 .scroll { flex: 1; height: 0; padding: 0 28rpx; box-sizing: border-box; }
 
@@ -92,12 +92,12 @@ page { overflow: hidden; height: 100vh; }
 .logo-circle {
 	width: 120rpx;
 	height: 120rpx;
-	border-radius: 32rpx;
+	border-radius: 36rpx;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	margin-bottom: 20rpx;
-	box-shadow: 0 8rpx 24rpx rgba(0,0,0,0.1);
+	box-shadow: 0 12rpx 32rpx rgba(124, 179, 66, 0.2);
 }
 .logo-text {
 	font-size: 52rpx;
@@ -105,19 +105,20 @@ page { overflow: hidden; height: 100vh; }
 	color: #fff;
 }
 .app-name {
-	font-size: 34rpx;
-	font-weight: 700;
-	color: #1a1a2e;
+	font-size: 36rpx;
+	font-weight: 800;
+	color: #1a1a1a;
 	margin-bottom: 6rpx;
+	letter-spacing: 1rpx;
 }
 .app-ver {
 	font-size: 24rpx;
-	color: #aaa;
+	color: #9aa88a;
 }
 
 .card {
 	background: #fff;
-	border-radius: 20rpx;
+	border-radius: 36rpx;
 	padding: 28rpx;
 	margin-bottom: 20rpx;
 	box-shadow: 0 2rpx 12rpx rgba(0,0,0,0.04);
@@ -126,7 +127,7 @@ page { overflow: hidden; height: 100vh; }
 .card-title {
 	font-size: 30rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	display: block;
 	margin-bottom: 16rpx;
 }
@@ -150,7 +151,7 @@ page { overflow: hidden; height: 100vh; }
 .qr-wrap {
 	width: 360rpx;
 	height: 360rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	overflow: hidden;
 	background: #fff;
 	border: 2rpx solid #f0f0f0;

@@ -1,5 +1,5 @@
 <template>
-	<view class="page" :style="'--tc-primary:' + tc.primary + ';'">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle + '--tc-primary:' + tc.primary + ';'">
 		<scroll-view scroll-y class="detail-scroll">
 			<!-- 加载骨架屏 -->
 			<view v-if="loading && !activity" class="skeleton">
@@ -460,7 +460,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 	position: relative;
 }
 .detail-scroll {
@@ -544,11 +544,11 @@ export default {
 .info-card {
 	margin: -20rpx 24rpx 24rpx;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	padding: 32rpx;
 	position: relative;
 	z-index: 2;
-	box-shadow: 0 12rpx 40rpx var(--tc-primary, #2ed573)1a, 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
+	box-shadow: 0 12rpx 40rpx var(--tc-primary, #7cb342)1a, 0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 /* 顶部装饰圆点 */
 .info-card::before {
@@ -559,14 +559,14 @@ export default {
 	width: 10rpx;
 	height: 10rpx;
 	border-radius: 50%;
-	background: var(--tc-primary, #2ed573);
-	box-shadow: 0 0 12rpx var(--tc-primary, #2ed573), 24rpx 0 0 var(--tc-primary, #2ed573), 48rpx 0 0 var(--tc-primary, #2ed573);
+	background: var(--tc-primary, #7cb342);
+	box-shadow: 0 0 12rpx var(--tc-primary, #7cb342), 24rpx 0 0 var(--tc-primary, #7cb342), 48rpx 0 0 var(--tc-primary, #7cb342);
 	opacity: 0.6;
 }
 .activity-title {
 	font-size: 36rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	display: block;
 	margin-bottom: 24rpx;
 	margin-top: 16rpx;
@@ -585,7 +585,7 @@ export default {
 	justify-content: center;
 	margin-right: 16rpx;
 	flex-shrink: 0;
-	background: rgba(46,213,115, 0.06);
+	background: rgba(124,179,66, 0.06);
 	border-radius: 14rpx;
 }
 .row-icon {
@@ -610,7 +610,7 @@ export default {
 .progress-section {
 	margin-top: 24rpx;
 	padding-top: 24rpx;
-	border-top: 1rpx solid rgba(46,213,115, 0.06);
+	border-top: 1rpx solid rgba(124,179,66, 0.06);
 }
 .progress-header {
 	display: flex;
@@ -650,16 +650,16 @@ export default {
 .progress-bar-bg {
 	flex: 1;
 	height: 18rpx;
-	background: rgba(46,213,115, 0.08);
+	background: rgba(124,179,66, 0.08);
 	border-radius: 18rpx;
 	overflow: hidden;
 }
 .progress-bar-fill {
 	height: 100%;
-	background: linear-gradient(90deg, #2ed573, #27ae60);
+	background: linear-gradient(90deg, #7cb342, #558b2f);
 	border-radius: 18rpx;
 	transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-	box-shadow: 0 2rpx 10rpx rgba(46,213,115, 0.3);
+	box-shadow: 0 2rpx 10rpx rgba(124,179,66, 0.3);
 	position: relative;
 }
 .progress-bar-fill::after {
@@ -707,12 +707,12 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.25);
 }
 .section-title {
 	font-size: 30rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 	display: block;
 	margin-bottom: 20rpx;
 	position: relative;
@@ -758,10 +758,10 @@ export default {
 	left: 0;
 	right: 0;
 	height: 2rpx;
-	background: linear-gradient(90deg, #2ed573, #3be88a, #2ed573);
+	background: linear-gradient(90deg, #7cb342, #9ccc65, #7cb342);
 	border-radius: 2rpx 2rpx 0 0;
 	z-index: 2;
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.25);
 }
 .signup-info-header {
 	display: flex;
@@ -771,7 +771,7 @@ export default {
 }
 .signup-status-badge {
 	padding: 6rpx 20rpx;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	font-weight: 600;
 }
@@ -781,8 +781,8 @@ export default {
 	box-shadow: 0 2rpx 8rpx rgba(255, 159, 67, 0.12), 0 0 14rpx rgba(255, 159, 67, 0.06);
 }
 .signup-status-badge.confirmed {
-	background: rgba(46,213,115, 0.1);
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.12), 0 0 14rpx rgba(46,213,115, 0.06);
+	background: rgba(124,179,66, 0.1);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.12), 0 0 14rpx rgba(124,179,66, 0.06);
 }
 .signup-status-badge.cancelled {
 	color: #999;
@@ -792,8 +792,8 @@ export default {
 .signup-detail {
 	padding: 20rpx 24rpx;
 	background: linear-gradient(135deg, #f8f9fe, #f0f2ff);
-	border-radius: 16rpx;
-	border: 1rpx solid rgba(46,213,115, 0.06);
+	border-radius: 28rpx;
+	border: 1rpx solid rgba(124,179,66, 0.06);
 }
 .signup-detail-item {
 	font-size: 26rpx;
@@ -921,12 +921,12 @@ export default {
 	justify-content: space-between;
 	align-items: center;
 	padding: 30rpx;
-	border-bottom: 1rpx solid rgba(46,213,115, 0.06);
+	border-bottom: 1rpx solid rgba(124,179,66, 0.06);
 }
 .modal-title {
 	font-size: 32rpx;
 	font-weight: 700;
-	color: #1a1a2e;
+	color: #1c2333;
 }
 .modal-close {
 	width: 52rpx;
@@ -936,12 +936,12 @@ export default {
 	justify-content: center;
 	font-size: 28rpx;
 	color: #999;
-	background: rgba(46,213,115, 0.06);
+	background: rgba(124,179,66, 0.06);
 	border-radius: 50%;
 	transition: all 0.2s ease;
 }
 .modal-close:active {
-	background: rgba(46,213,115, 0.12);
+	background: rgba(124,179,66, 0.12);
 }
 .modal-body {
 	padding: 30rpx;
@@ -967,15 +967,15 @@ export default {
 	font-size: 28rpx;
 	color: #333;
 	padding: 0 24rpx;
-	background: rgba(46,213,115, 0.03);
+	background: rgba(124,179,66, 0.03);
 	border-radius: 18rpx;
-	border: 2rpx solid rgba(46,213,115, 0.1);
+	border: 2rpx solid rgba(124,179,66, 0.1);
 	transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 .form-input:focus {
-	border-color: rgba(46,213,115, 0.4);
-	background: rgba(46,213,115, 0.05);
-	box-shadow: 0 0 0 6rpx rgba(46,213,115, 0.08), 0 0 12rpx rgba(46,213,115, 0.12);
+	border-color: rgba(124,179,66, 0.4);
+	background: rgba(124,179,66, 0.05);
+	box-shadow: 0 0 0 6rpx rgba(124,179,66, 0.08), 0 0 12rpx rgba(124,179,66, 0.12);
 }
 .modal-footer {
 	display: flex;
@@ -989,11 +989,11 @@ export default {
 	border-radius: 40rpx;
 	font-size: 28rpx;
 	color: #888;
-	background: rgba(46,213,115, 0.06);
+	background: rgba(124,179,66, 0.06);
 	transition: all 0.2s ease;
 }
 .modal-btn-cancel:active {
-	background: rgba(46,213,115, 0.12);
+	background: rgba(124,179,66, 0.12);
 }
 .modal-btn-confirm {
 	flex: 2;
@@ -1003,8 +1003,8 @@ export default {
 	font-size: 28rpx;
 	font-weight: 700;
 	color: #fff;
-	background: linear-gradient(135deg, #2ed573, #27ae60);
-	box-shadow: 0 6rpx 24rpx rgba(46,213,115, 0.3);
+	background: linear-gradient(135deg, #7cb342, #558b2f);
+	box-shadow: 0 6rpx 24rpx rgba(124,179,66, 0.3);
 	transition: all 0.2s ease;
 	position: relative;
 	overflow: hidden;
@@ -1022,7 +1022,7 @@ export default {
 }
 .modal-btn-confirm:active {
 	transform: scale(0.97);
-	box-shadow: 0 3rpx 12rpx rgba(46,213,115, 0.2);
+	box-shadow: 0 3rpx 12rpx rgba(124,179,66, 0.2);
 }
 .modal-btn-confirm.disabled {
 	opacity: 0.45;
@@ -1033,7 +1033,7 @@ export default {
 	padding: 32rpx;
 	margin: 24rpx 24rpx 0;
 	background: #fff;
-	border-radius: 24rpx;
+	border-radius: 28rpx;
 	box-shadow:
 		0 2rpx 8rpx rgba(0,0,0,0.03),
 		0 8rpx 24rpx rgba(0,0,0,0.06);
@@ -1058,7 +1058,7 @@ export default {
 .ann-title {
 	font-size: 36rpx;
 	font-weight: 800;
-	color: #1a1a2e;
+	color: #1c2333;
 	line-height: 1.5;
 	letter-spacing: 1rpx;
 	margin-bottom: 24rpx;
@@ -1084,7 +1084,7 @@ export default {
 }
 .ann-image {
 	width: 100%;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 }
 
 /* 公告附件 */

@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<scroll-view
 			scroll-y
 			class="list-scroll"
@@ -169,7 +169,7 @@ export default {
 /* ===== 页面基础 ===== */
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 }
 .list-scroll {
 	height: 100vh;
@@ -181,7 +181,7 @@ export default {
 }
 .fav-card {
 	background: #fff;
-	border-radius: 28rpx;
+	border-radius: 36rpx;
 	margin-bottom: 20rpx;
 	overflow: hidden;
 	box-shadow:
@@ -206,7 +206,7 @@ export default {
 }
 .fav-card:active {
 	transform: scale(0.985);
-	box-shadow: 0 4rpx 16rpx rgba(46,213,115, 0.12);
+	box-shadow: 0 4rpx 16rpx rgba(124,179,66, 0.12);
 }
 .card-main {
 	display: flex;
@@ -230,7 +230,7 @@ export default {
 }
 .card-title {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -247,12 +247,12 @@ export default {
 .card-badge {
 	display: inline-block;
 	font-size: 20rpx;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.12), rgba(90, 82, 213, 0.06));
+	background: linear-gradient(135deg, rgba(124,179,66, 0.12), rgba(90, 82, 213, 0.06));
 	padding: 6rpx 18rpx;
-	border-radius: 20rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
 	letter-spacing: 1rpx;
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115, 0.08);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66, 0.08);
 }
 .card-bottom {
 	display: flex;
@@ -272,7 +272,7 @@ export default {
 .card-free-tag {
 	padding: 4rpx 16rpx;
 	border-radius: 8rpx;
-	background: #2ed573;
+	background: #7cb342;
 }
 .card-free-tag text {
 	font-size: 20rpx;
@@ -311,33 +311,33 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 120rpx 0;
+	padding: 100rpx 0;
 	position: relative;
 }
 .empty::before {
 	content: '';
 	position: absolute;
-	top: 40rpx;
-	width: 320rpx;
-	height: 320rpx;
+	top: 50rpx;
+	width: 240rpx;
+	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
-	filter: blur(2rpx);
+	background: linear-gradient(160deg, #ffffff 0%, #e8f2dc 100%);
+	filter: none;
 }
 .empty-icon {
-	font-size: 120rpx;
-	margin-bottom: 32rpx;
+	font-size: 96rpx;
+	margin-bottom: 28rpx;
 	position: relative;
 	z-index: 1;
-	animation: breathe 3s ease-in-out infinite;
+	animation: none;
 }
 @keyframes breathe {
 	0%, 100% { transform: scale(1); }
 	50% { transform: scale(1.04); }
 }
 .empty-title {
-	font-size: 34rpx;
-	color: #1a1a2e;
+	font-size: 32rpx;
+	color: #1a1a1a;
 	font-weight: 700;
 	margin-bottom: 12rpx;
 	position: relative;
@@ -345,45 +345,30 @@ export default {
 }
 .empty-desc {
 	font-size: 26rpx;
-	color: #aaa;
+	color: #a3b08a;
 	margin-bottom: 40rpx;
 	position: relative;
 	z-index: 1;
 }
 .empty-btn {
 	padding: 20rpx 56rpx;
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
-	border-radius: 40rpx;
+	background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
+	border-radius: 999rpx;
 	font-size: 28rpx;
 	color: #fff;
-	font-weight: 600;
-	box-shadow:
-		0 4rpx 12rpx rgba(0,0,0,0.1),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
+	font-weight: 700;
+	box-shadow: 0 8rpx 24rpx rgba(26, 26, 26, 0.25);
 	position: relative;
 	z-index: 1;
-	transition: all 0.3s ease;
+	transition: all 0.2s ease;
 	overflow: hidden;
 }
-/* 空状态按钮shimmer */
 .empty-btn::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	left: -100%;
-	width: 25%;
-	height: 100%;
-	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-	animation: btnShimmer 5s ease-in-out infinite;
-}
-@keyframes btnShimmer {
-	0% { left: -100%; }
-	50% { left: 100%; }
-	100% { left: 100%; }
+	display: none;
 }
 .empty-btn:active {
 	transform: scale(0.96);
-	box-shadow: 0 4rpx 12rpx rgba(46,213,115, 0.4);
+	box-shadow: 0 4rpx 12rpx rgba(124,179,66, 0.4);
 }
 
 /* ===== 加载状态 ===== */

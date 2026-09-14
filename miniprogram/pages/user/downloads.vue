@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="page" :class="'theme-' + activeTheme" :style="pageBgStyle">
 		<!-- 搜索筛选 -->
 		<view class="filter-bar">
 			<view class="search-box">
@@ -66,14 +66,14 @@
 
 			<!-- 分页栏 -->
 			<view class="pager-bar" v-if="downloads.length > 0">
-				<view class="pager-btn" :class="{ disabled: page <= 1 }" :style="page > 1 ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page - 1)">
+				<view class="pager-btn" :class="{ disabled: page <= 1 }" @tap="goPage(page - 1)">
 					<text>‹ 上一页</text>
 				</view>
 				<view class="pager-info">
 					<text class="pager-current">{{ page }}/{{ totalPages || 1 }}</text>
 					<text class="pager-total">共{{ total }}条</text>
 				</view>
-				<view class="pager-btn" :class="{ disabled: page >= totalPages }" :style="page < totalPages ? 'background:' + tc.primary + ';color:#fff;' : ''" @tap="goPage(page + 1)">
+				<view class="pager-btn" :class="{ disabled: page >= totalPages }" @tap="goPage(page + 1)">
 					<text>下一页 ›</text>
 				</view>
 			</view>
@@ -246,7 +246,7 @@ export default {
 <style scoped>
 .page {
 	min-height: 100vh;
-	background: linear-gradient(180deg, #eef0f8 0%, #f3f4f8 8%, #f7f8fc 20%, #fafbfe 50%, #f8f9fc 100%);
+	background: transparent;
 	display: flex;
 	flex-direction: column;
 }
@@ -270,8 +270,8 @@ export default {
 	transition: all 0.3s ease;
 }
 .search-box:focus-within {
-	border-color: rgba(46,213,115, 0.2);
-	box-shadow: 0 0 0 4rpx rgba(46,213,115, 0.06);
+	border-color: rgba(124,179,66, 0.2);
+	box-shadow: 0 0 0 4rpx rgba(124,179,66, 0.06);
 }
 .filter-input {
 	flex: 1;
@@ -321,14 +321,14 @@ export default {
 	background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.08) 50%, rgba(0,0,0,0.06) 70%, transparent 100%);
 	border-radius: 1rpx;
 	filter: blur(1rpx);
-	box-shadow: 0 0 6rpx rgba(46,213,115, 0.4), 0 0 6rpx rgba(46,213,115, 0.15);
+	box-shadow: 0 0 6rpx rgba(124,179,66, 0.4), 0 0 6rpx rgba(124,179,66, 0.15);
 	opacity: 0.8;
 	z-index: 1;
 }
 .download-card:active {
 	transform: scale(0.97);
 	box-shadow:
-		0 1rpx 4rpx rgba(46,213,115, 0.04),
+		0 1rpx 4rpx rgba(124,179,66, 0.04),
 		0 4rpx 12rpx rgba(0, 0, 0, 0.04);
 }
 .card-cover-wrap {
@@ -341,7 +341,7 @@ export default {
 	width: 200rpx;
 	height: 170rpx;
 	border-radius: 24rpx 0 0 24rpx;
-	border-right: 2rpx solid rgba(46,213,115, 0.06);
+	border-right: 2rpx solid rgba(124,179,66, 0.06);
 	transition: transform 0.4s ease;
 }
 .download-card:active .card-cover {
@@ -352,15 +352,15 @@ export default {
 	position: absolute;
 	top: 12rpx;
 	left: 12rpx;
-	background: rgba(46,213,115,0.10);
-	color: #27ae60;
+	background: rgba(124,179,66,0.10);
+	color: #558b2f;
 	font-size: 18rpx;
 	font-weight: 700;
 	padding: 4rpx 12rpx;
 	border-radius: 10rpx;
 	backdrop-filter: blur(8px);
-	box-shadow: 0 2rpx 8rpx rgba(46,213,115,0.08);
-	border: 2rpx solid rgba(46,213,115,0.18);
+	box-shadow: 0 2rpx 8rpx rgba(124,179,66,0.08);
+	border: 2rpx solid rgba(124,179,66,0.18);
 	overflow: hidden;
 }
 .file-type-badge::after {
@@ -388,7 +388,7 @@ export default {
 }
 .card-title {
 	font-size: 28rpx;
-	color: #1a1a2e;
+	color: #1c2333;
 	font-weight: 600;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -407,12 +407,12 @@ export default {
 }
 .card-category {
 	font-size: 20rpx;
-	background: linear-gradient(135deg, rgba(46,213,115, 0.1), rgba(139, 127, 255, 0.08));
+	background: linear-gradient(135deg, rgba(124,179,66, 0.1), rgba(139, 127, 255, 0.08));
 	padding: 4rpx 16rpx;
-	border-radius: 16rpx;
+	border-radius: 28rpx;
 	font-weight: 500;
 	background-size: 200% 100%;
-	background-image: linear-gradient(135deg, rgba(46,213,115, 0.1) 0%, rgba(46,213,115, 0.1) 50%, rgba(139, 127, 255, 0.18) 100%);
+	background-image: linear-gradient(135deg, rgba(124,179,66, 0.1) 0%, rgba(124,179,66, 0.1) 50%, rgba(139, 127, 255, 0.18) 100%);
 }
 .card-category:active {
 	animation: badgeGradientShift 0.6s ease;
@@ -442,7 +442,7 @@ export default {
 }
 .card-file-type {
 	font-size: 20rpx;
-	background: rgba(46,213,115, 0.08);
+	background: rgba(124,179,66, 0.08);
 	padding: 2rpx 10rpx;
 	border-radius: 8rpx;
 	font-weight: 600;
@@ -450,11 +450,11 @@ export default {
 /* 重新下载按钮 shimmer 扫光效果 */
 .redownload-btn {
 	padding: 10rpx 28rpx;
-	background: #2ed573;
-	border-radius: 24rpx;
+	background: #7cb342;
+	border-radius: 28rpx;
 	font-size: 22rpx;
 	color: #fff;
-	box-shadow: 0 4rpx 12rpx rgba(46,213,115, 0.25);
+	box-shadow: 0 4rpx 12rpx rgba(124,179,66, 0.25);
 	transition: all 0.2s ease;
 	position: relative;
 	overflow: hidden;
@@ -487,23 +487,16 @@ export default {
 	padding: 20rpx 24rpx;
 	margin: 0 24rpx 20rpx;
 	background: #fff;
-	border-radius: 20rpx;
-	box-shadow:
-		0 2rpx 8rpx rgba(0,0,0,0.03),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
-	border: 1rpx solid rgba(0,0,0,0.03);
+	border-radius: 36rpx;
+	border: none;
+	box-shadow: 0 10rpx 36rpx rgba(90, 120, 50, 0.07);
 }
 .pager-btn {
-	padding: 12rpx 28rpx;
-	border-radius: 24rpx;
-	background: #e8e8e8;
-	font-size: 24rpx;
-	color: #333;
-	font-weight: 600;
-	transition: all 0.2s;
+	padding: 14rpx 28rpx;
+	border-radius: 999rpx;
+	transition: all 0.2s ease;
 }
 .pager-btn.disabled {
-	opacity: 0.4;
 	pointer-events: none;
 }
 .pager-btn:active {
@@ -516,12 +509,12 @@ export default {
 }
 .pager-current {
 	font-size: 26rpx;
-	color: #333;
+	color: #1a1a1a;
 	font-weight: 700;
 }
 .pager-total {
 	font-size: 20rpx;
-	color: #aaa;
+	color: #a3b08a;
 	margin-top: 4rpx;
 }
 
@@ -529,24 +522,24 @@ export default {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	padding: 120rpx 0;
+	padding: 100rpx 0;
 	position: relative;
 }
 .empty::before {
 	content: '';
 	position: absolute;
-	top: 60rpx;
-	width: 280rpx;
-	height: 280rpx;
+	top: 50rpx;
+	width: 240rpx;
+	height: 240rpx;
 	border-radius: 50%;
-	background: linear-gradient(135deg, rgba(0,0,0,0.02), rgba(0,0,0,0.01));
+	background: linear-gradient(160deg, #ffffff 0%, #e8f2dc 100%);
 }
 .empty-icon {
-	font-size: 100rpx;
+	font-size: 96rpx;
 	margin-bottom: 24rpx;
 	position: relative;
 	z-index: 1;
-	animation: breathe 3s ease-in-out infinite;
+	animation: none;
 }
 @keyframes breathe {
 	0%, 100% { transform: scale(1); }
@@ -554,35 +547,34 @@ export default {
 }
 .empty-title {
 	font-size: 32rpx;
-	color: #333;
-	font-weight: 600;
+	color: #1a1a1a;
+	font-weight: 700;
 	margin-bottom: 12rpx;
 	position: relative;
 	z-index: 1;
 }
 .empty-desc {
 	font-size: 26rpx;
-	color: #bbb;
+	color: #a3b08a;
 	margin-bottom: 30rpx;
 	position: relative;
 	z-index: 1;
 }
 .empty-btn {
 	padding: 18rpx 56rpx;
-	background: linear-gradient(135deg, #2ed573, #1abc9c);
-	border-radius: 36rpx;
+	background: linear-gradient(180deg, #2b2b2b 0%, #1a1a1a 100%);
+	border-radius: 999rpx;
 	font-size: 28rpx;
 	color: #fff;
-	box-shadow:
-		0 4rpx 12rpx rgba(0,0,0,0.1),
-		0 8rpx 24rpx rgba(0,0,0,0.06);
+	font-weight: 700;
+	box-shadow: 0 8rpx 24rpx rgba(26, 26, 26, 0.25);
 	position: relative;
 	z-index: 1;
 	transition: all 0.2s ease;
 }
 .empty-btn:active {
-	transform: scale(0.97);
-	box-shadow: 0 3rpx 10rpx rgba(46,213,115, 0.25);
+	transform: scale(0.96);
+	opacity: 0.92;
 }
 
 .load-status {
@@ -593,7 +585,7 @@ export default {
 }
 .load-status text {
 	display: inline-block;
-	background: linear-gradient(90deg, #bbb 0%, #2ed573 40%, #bbb 80%);
+	background: linear-gradient(90deg, #bbb 0%, #7cb342 40%, #bbb 80%);
 	background-size: 200% 100%;
 	animation: loadShimmer 2s linear infinite;
 }

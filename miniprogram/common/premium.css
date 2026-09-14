@@ -1,74 +1,60 @@
 /**
- * 全局高级感样式覆盖
- * 统一提升卡片、按钮、标签、空状态的视觉品质
+ * 专业正规质感层
+ * 统一卡片、按钮、标签、空状态的视觉标准
  */
 
-/* ===== 卡片 - 精致玻璃态 ===== */
-.card-glass {
-  background: linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.88) 100%);
-  border: 1rpx solid rgba(255,255,255,0.6);
-  border-radius: 28rpx;
+/* ===== 卡片 ===== */
+.card-glass,
+.card-premium {
+  background: #ffffff;
+  border: 1rpx solid rgba(28, 35, 51, 0.05);
+  border-radius: 24rpx;
   box-shadow:
-    0 2rpx 8rpx rgba(0,0,0,0.03),
-    0 8rpx 24rpx rgba(0,0,0,0.06),
-    0 20rpx 48rpx rgba(0,0,0,0.04);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-}
-
-/* ===== 按钮 - 精致渐变 ===== */
-.btn-premium {
-  border-radius: 48rpx;
-  box-shadow:
-    0 4rpx 12rpx rgba(0,0,0,0.1),
-    0 1rpx 3rpx rgba(0,0,0,0.06),
-    inset 0 1rpx 0 rgba(255,255,255,0.2);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
+    0 1rpx 2rpx rgba(28, 35, 51, 0.04),
+    0 8rpx 24rpx rgba(28, 35, 51, 0.05);
   overflow: hidden;
 }
-.btn-premium::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 50%;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.18), transparent);
-  border-radius: 48rpx 48rpx 0 0;
-  pointer-events: none;
+
+/* ===== 按钮 ===== */
+.btn-premium {
+  border-radius: 16rpx;
+  box-shadow: 0 4rpx 12rpx rgba(28, 35, 51, 0.1);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: 600;
 }
 .btn-premium:active {
-  transform: scale(0.97);
-  opacity: 0.9;
+  transform: scale(0.98);
+  opacity: 0.92;
 }
 
-/* ===== 标签 - 精致胶囊 ===== */
+/* ===== 标签 ===== */
 .tag-premium {
-  padding: 6rpx 18rpx;
-  border-radius: 20rpx;
+  padding: 6rpx 16rpx;
+  border-radius: 8rpx;
   font-size: 20rpx;
   font-weight: 600;
-  letter-spacing: 0.5rpx;
-  border: 1rpx solid rgba(0,0,0,0.04);
+  letter-spacing: 0.3rpx;
+  border: 1rpx solid rgba(28, 35, 51, 0.06);
 }
 
-/* ===== 页面背景 - 高级渐变 ===== */
+/* ===== 页面背景 ===== */
 .page-bg-premium {
-  background: linear-gradient(180deg, #f0f2f8 0%, #f5f6fa 15%, #f8f9fc 40%, #fafbfe 100%);
+  background: #f4f6f9;
 }
 
-/* ===== 分割线 - 精致渐变 ===== */
+/* ===== 分割线 ===== */
 .divider-premium {
   height: 1rpx;
-  background: linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.06) 20%, rgba(0,0,0,0.06) 80%, transparent 100%);
+  background: rgba(28, 35, 51, 0.06);
   margin: 0 24rpx;
 }
 
-/* ===== 徽章 - 高级质感 ===== */
+/* ===== 徽章 ===== */
 .badge-premium {
-  padding: 4rpx 14rpx;
-  border-radius: 12rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 6rpx;
   font-size: 20rpx;
   font-weight: 600;
   letter-spacing: 0.3rpx;
@@ -77,33 +63,34 @@
   gap: 4rpx;
 }
 
-/* ===== 加载骨架屏 - 高级闪烁 ===== */
+/* ===== 骨架屏 ===== */
 .skeleton-premium {
-  background: linear-gradient(90deg, #eef0f5 25%, #f5f6fa 37%, #eef0f5 63%);
+  background: linear-gradient(90deg, #e9edf2 25%, #f3f5f8 37%, #e9edf2 63%);
   background-size: 400% 100%;
   animation: skeleton-shimmer-premium 1.6s ease-in-out infinite;
-  border-radius: 12rpx;
+  border-radius: 8rpx;
 }
 @keyframes skeleton-shimmer-premium {
   0% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
 
-/* ===== 输入框 - 精致毛玻璃 ===== */
+/* ===== 输入框 ===== */
 .input-premium {
-  background: rgba(245, 247, 250, 0.8);
-  border: 2rpx solid rgba(0,0,0,0.04);
-  border-radius: 36rpx;
-  transition: all 0.3s ease;
+  background: #f7f8fa;
+  border: 1rpx solid rgba(28, 35, 51, 0.08);
+  border-radius: 12rpx;
+  transition: all 0.2s ease;
 }
 .input-premium:focus {
-  border-color: rgba(var(--c-rgb-primary), 0.3);
-  box-shadow: 0 0 0 4rpx rgba(var(--c-rgb-primary), 0.06);
+  border-color: rgba(37, 99, 235, 0.35);
+  box-shadow: 0 0 0 3rpx rgba(37, 99, 235, 0.08);
+  background: #ffffff;
 }
 
 /* ===== 渐变文字 ===== */
 .text-gradient-premium {
-  background: linear-gradient(135deg, #1a1a2e 0%, #4a4a6a 50%, #2d2d4a 100%);
+  background: linear-gradient(135deg, #1c2333 0%, #3a4558 50%, #1c2333 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
